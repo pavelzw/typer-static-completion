@@ -1,0 +1,17 @@
+Input: typer-static-completions check --no-d<TAB>
+
+Shell: bash
+
+> typer-static-completions check --no-diff ▏
+
+---
+
+Shell: fish
+
+> typer-static-completions check --no-diff ▏
+
+---
+
+Shell: zsh
+
+> typer-static-completions check --no-diff ▏

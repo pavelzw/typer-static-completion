@@ -119,3 +119,51 @@ def test_multiple_scripts_and_repeated_sourcing(program, line, completed):
         / f"multiple-scripts-{program}.snap",
         actual,
     )
+
+
+@pytest.mark.parametrize(
+    "name,line,completed",
+    [
+        (
+            "command",
+            "typer-static-completions gen",
+            "typer-static-completions generate ",
+        ),
+        (
+            "shell",
+            "typer-static-completions generate --shell f",
+            "typer-static-completions generate --shell fish ",
+        ),
+        (
+            "repeated-shell",
+            "typer-static-completions sync --shell bash --shell z",
+            "typer-static-completions sync --shell bash --shell zsh ",
+        ),
+        (
+            "no-diff",
+            "typer-static-completions check --no-d",
+            "typer-static-completions check --no-diff ",
+        ),
+    ],
+)
+def test_cli_screen(name, line, completed):
+    from typer_static_completions.cli import build_cli
+
+    sections = []
+    for shell in ("bash", "fish", "zsh"):
+        sentinel = (
+            "function typer-static-completions; printf invoked > invoked; end\n"
+            if shell == "fish"
+            else "typer-static-completions() { printf invoked > invoked; }\n"
+        )
+        screen = capture(
+            generate(build_cli(), "typer-static-completions", shell) + sentinel,
+            line + "<TAB>",
+            shell=shell,
+        )
+        assert screen == f"> {completed}▏\n"
+        sections.append(f"Shell: {shell}\n\n{screen}")
+    actual = f"Input: {line}<TAB>\n\n" + "\n---\n\n".join(sections)
+    assert_snapshot(
+        Path(__file__).with_name("snapshots") / "cli" / f"{name}.snap", actual
+    )

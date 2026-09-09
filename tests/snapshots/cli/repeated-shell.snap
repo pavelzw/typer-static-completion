@@ -1,0 +1,17 @@
+Input: typer-static-completions sync --shell bash --shell z<TAB>
+
+Shell: bash
+
+> typer-static-completions sync --shell bash --shell zsh ▏
+
+---
+
+Shell: fish
+
+> typer-static-completions sync --shell bash --shell zsh ▏
+
+---
+
+Shell: zsh
+
+> typer-static-completions sync --shell bash --shell zsh ▏

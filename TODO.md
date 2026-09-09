@@ -5,8 +5,8 @@ syntax checks, and shared interactive screen snapshots. Full generated completio
 files are snapshot-tested alongside those screens. `write()` supports build-time
 generation with validated layouts, dry runs, and unchanged-file detection.
 `CompletionSet` now syncs/checks explicit app mappings with ownership tracking.
-Pyproject discovery and app overrides are implemented. The CLI, PowerShell
-generation, and the public candidate-verification helper remain scaffolds.
+Pyproject discovery and app overrides are implemented. The CLI implements generate/sync/check. PowerShell generation, CLI install/verify,
+and the public candidate-verification helper remain scaffolds.
 
 Use `../commander-static-completion` as the local reference, especially
 `test/snapshots.test.js`, `test/snapshot-harness.js`,
@@ -99,8 +99,8 @@ harness and scenario checklist is in section 3.
 
 ### Interactive screen snapshots like Commander (first-milestone requirement)
 
-All three shells share 50 reviewed screen cases (21 original cases, 27 parsing
-cases, and 2 multi-CLI cases), a pexpect/pyte harness, explicit
+All three shells share 54 reviewed screen cases (21 original cases, 27 parsing
+cases, 2 multi-CLI cases, and 4 CLI cases), a pexpect/pyte harness, explicit
 update/check tasks, failure/cleanup and terminal negotiation tests, and a dedicated
 Linux/macOS CI job. Full generated scripts for both fixtures live in
 `tests/snapshots/generated/`. Parsing cases assert the expected completed line
@@ -160,15 +160,19 @@ before snapshot comparison, with separate tests against Typer's actual parser.
       wrapper-target handling and standard-library TOML parsing. Direct mappings and
       `load_app()` now support Typer instances without calling wrappers/factories.
       Filtered `only` sets preserve ownership outside the selection.
-- [ ] Implement CLI generate/sync/check/verify with stdout/stderr and exit-code
-      tests. Treat installation as a later feature with explicit destinations;
-      avoid automatic shell-profile changes.
+- [x] Implement CLI generate/sync/check with stdout/stderr and exit-code tests,
+      project discovery, overrides, and shell/app selection. Add interactive and
+      full generated snapshots for the CLI itself.
+- [ ] Implement CLI verify. Treat installation as a later feature with explicit
+      destinations; avoid automatic shell-profile changes.
 - [x] Add a runnable example and generate its completions in CI. Document build-
       time generation, installation per shell, regeneration, and static limits.
 - [ ] Validate built wheels/sdists in clean environments, including subpackages,
       runtime dependencies, the console entrypoint, and typed API distribution.
       Pixi runtime requirements are now explicit for Python and Typer;
-      clean wheel/entrypoint validation remains outstanding.
+      a wheel built from the sdist was tested in an isolated venv for imports,
+      all three shell generators, sync/check, and exit codes 0/1/2. Automate this
+      validation in CI and verify typed API distribution.
 - [ ] Test the declared Typer range on supported Python versions (3.11+).
       Keep compatibility tests for private Typer access; the current upstream
       Click comparison skips when Click is absent, so decide whether to provide

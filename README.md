@@ -10,8 +10,8 @@ Generate static shell completions for typer applications. Requires Python 3.11 o
 Status: initial Bash, Fish, and Zsh implementation. Typer introspection and generation work
 for nested commands, flags, choices, scalar/variadic arguments, and paths.
 The `write()` and `CompletionSet` APIs support build-time file generation and
-staleness checks, including pyproject discovery. PowerShell and CLI commands are
-still scaffolds. See
+staleness checks, including pyproject discovery. The CLI implements `generate`,
+`sync`, and `check`; PowerShell, installation automation, and `verify` remain unimplemented. See
 [TODO.md](TODO.md) for the remaining work.
 
 ```python
@@ -172,6 +172,45 @@ no apps. Missing tables and malformed metadata fail rather than becoming empty
 sets. An explicitly empty `[project.scripts]` table is allowed for projects that
 have removed all their commands. TOML parsing uses the standard-library `tomllib`.
 
+## Command line interface
+
+Generate one shell's script from an importable Typer app:
+
+```bash
+pixi run typer-static-completions generate myapp.cli:app --prog-name myapp --shell fish -o myapp.fish
+```
+
+Omit `-o` (or use `-o -`) to emit only the script on stdout. Python import output
+is redirected to stderr so it cannot corrupt the generated script.
+
+For a project with `[project.scripts]`, generate or check all its completions:
+
+```bash
+pixi run typer-static-completions sync --app myapp=myapp.cli:app
+pixi run typer-static-completions check --app myapp=myapp.cli:app --no-diff
+```
+
+`--app NAME=MODULE:APP` overrides a declared wrapper entrypoint. Repeat `--app`,
+`--only NAME`, or `--shell bash --shell fish` to select several apps or shells.
+`--pyproject PATH` selects metadata explicitly; otherwise the nearest pyproject
+is used. The default output is `completions/` beside that file. An explicit
+`--output-dir` is relative to cwd. `--no-prune` retains old outputs, and
+`check --max-files 5` bounds diagnostics. Commit the scripts and ownership manifest,
+then run `check` without `sync` in CI.
+
+Exit codes are **0** for success, **1** for a failed check or a sync with skipped
+apps, and **2** for usage, configuration, or operation errors. Sync reports go to
+stdout; check reports and errors go to stderr. Import targets must already be
+installed or importable in your environment.
+
+To generate this CLI's own completions from the checkout:
+
+```bash
+pixi run typer-static-completions sync --app typer-static-completions=typer_static_completions.cli:app
+```
+
+The CLI is also available as `pixi run python -m typer_static_completions.cli`.
+
 ## Interactive screen snapshots
 
 Bash, Fish, and Zsh have real interactive PTY screen snapshots like those in
@@ -200,6 +239,9 @@ Its screen tests assert the expected completed line before comparing snapshots.
 `tests/snapshots/parsing/` also checks two CLIs loaded together and sourced twice;
 `tests/snapshots/generated/parsing.{bash,fish,zsh}` records the corresponding full
 completion files. Separate tests verify the tricky cases against Typer's parser.
+
+The CLI itself has four shared interactive cases in `tests/snapshots/cli/` and
+full scripts in `tests/snapshots/generated/cli.{bash,fish,zsh}`.
 
 Current snapshot baselines target the locked Bash 5.x, Fish 4.x, and Zsh 5.9 environment. Unicode,
 custom word-break settings, unusual shell parsing modes, and filenames containing
