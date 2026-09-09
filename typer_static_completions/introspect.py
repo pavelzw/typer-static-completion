@@ -64,10 +64,26 @@ def from_app(
     Raises:
         IntrospectionError: if the command tree cannot be read.
     """
-    from typer.main import get_command
+    from typer.main import get_command, solve_typer_info_defaults
+    from typer.models import TyperInfo
+
+    def reject_chain(info: Any) -> None:
+        # Typer 0.26 accepts the setting but drops it during conversion. Check
+        # the resolved settings first, including callback/add_typer overrides.
+        resolved = solve_typer_info_defaults(info)
+        if resolved.chain:
+            raise IntrospectionError(
+                "chain=True is unsupported by the Typer 0.26 parser; "
+                "cannot generate chained-command completions"
+            )
+        for child in info.typer_instance.registered_groups:
+            reject_chain(child)
 
     try:
+        reject_chain(TyperInfo(app))
         command = get_command(app)
+    except IntrospectionError:
+        raise
     except Exception as exc:
         raise IntrospectionError(f"Cannot read Typer app: {exc}") from exc
     return from_command(

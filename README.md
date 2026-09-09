@@ -23,8 +23,11 @@ script = generate(app, "myapp", "bash")
 Pass `"fish"` or `"zsh"` to target those shells. Write the returned script to a
 file and source it in the corresponding shell (after `compinit` for Zsh). Completion stays
 static: dynamic callback values are omitted by default. Explicit file fallback
-is supported; hybrid delegation currently raises an error. Chain groups
-are not yet supported and raise errors instead of generating approximate completions.
+is supported; hybrid delegation currently raises an error. The supported
+Typer 0.26 parser accepts `chain=True` but does not execute chained commands.
+Generation rejects this setting explicitly, including callback and `add_typer`
+settings, before Typer discards it during command conversion. Chain completion
+remains deferred until the supported parser can execute chains.
 
 Tuple options such as `pair: tuple[Color, Path]` complete each value using its
 own type. All three shells support `--pair blue path`, `--pair=blue path`,

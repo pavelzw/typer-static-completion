@@ -49,7 +49,11 @@ interactive screen harness and behavioral tests.
       and following scalar/variadic arguments, with interactive/full-file snapshots.
 - [x] Support group arguments with native option boundaries and child-scope
       transitions; snapshot scalar, tuple, path, optional, and variadic arguments.
-- [ ] Implement and snapshot chain groups before claiming support.
+- [x] Detect `chain=True` in Typer constructor, callback, and `add_typer` settings
+      before conversion drops it; test precedence and generation errors.
+- [ ] Revisit chain groups when the supported Typer parser implements chaining.
+      The locked 0.26.8 parser rejects a second command even with `chain=True`;
+      keep the parser compatibility regression before adding completion snapshots.
 - [ ] Support custom groups with interspersed options; their parser scans child
       tokens in the parent scope, so they require different dispatch rules.
 - [ ] Add opt-in dynamic delegation and test it separately from static guarantees.
