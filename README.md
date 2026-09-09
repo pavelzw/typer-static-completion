@@ -9,7 +9,8 @@ Generate static shell completions for typer applications
 
 Status: initial Bash, Fish, and Zsh implementation. Typer introspection and generation work
 for nested commands, flags, choices, scalar/variadic arguments, and paths.
-PowerShell, file management, and CLI commands are still scaffolds. See
+The `write()` API supports build-time file generation. `CompletionSet`, PowerShell,
+and CLI commands are still scaffolds. See
 [TODO.md](TODO.md) for the remaining work.
 
 ```python
@@ -25,6 +26,82 @@ static: dynamic callback values are omitted by default. Explicit file fallback
 is supported; hybrid delegation currently raises an error. Chain groups, group
 arguments, tuple arity, and case-insensitive choices are not yet supported and
 raise errors instead of generating approximate completions.
+
+## Build-time generation and example
+
+Run the example from this checkout:
+
+```bash
+pixi run example deploy --environment staging
+pixi run example-completions
+```
+
+The second task calls [`write()`](typer_static_completions/core.py) from
+[`examples/completions.py`](examples/completions.py), producing
+`build/completions/bash/shipyard`, `build/completions/zsh/_shipyard`, and
+`build/completions/fish/shipyard.fish`. The example is exercised by the CI test
+suite. In your project, call the same API during your build or release process:
+
+```python
+from typer_static_completions import GenerationOptions, write
+from myapp.cli import app
+
+outputs = write(
+    app,
+    "myapp",
+    output_dir="build/completions",
+    options=GenerationOptions(regenerate_command="pixi run completions"),
+)
+```
+
+Use `shells=["fish"]` to select shells, `dry_run=True` to preview the returned
+path-to-content mapping without writes, or
+`layout={"bash": "share/bash-completion/completions/{prog}"}` to override a
+shell's destination beneath the output directory. Unchanged files keep their
+modification times. Generation and destination checks finish before writing;
+changed files are replaced individually, so an I/O failure can leave a partially
+updated set. Custom paths cannot escape the output directory or collide.
+
+To try completion in an interactive shell, run these commands from the checkout
+in the corresponding shell. The `shipyard` function supplies the example command;
+a packaged application would supply its own console entrypoint.
+
+Bash:
+
+```bash
+shipyard() { pixi run example "$@"; }
+source build/completions/bash/shipyard
+```
+
+Zsh:
+
+```zsh
+shipyard() { pixi run example "$@"; }
+autoload -Uz compinit
+compinit
+source build/completions/zsh/_shipyard
+```
+
+Fish:
+
+```fish
+function shipyard
+    pixi run example $argv
+end
+source build/completions/fish/shipyard.fish
+```
+
+Try typing `shipyard deploy --environment st` followed by TAB. Completion itself
+runs entirely in the shell. For persistent installation, copy the Bash file to
+`~/.local/share/bash-completion/completions/shipyard` when using bash-completion,
+or source it from your Bash startup file. Copy the Fish file to
+`~/.config/fish/completions/shipyard.fish` (or your `$XDG_CONFIG_HOME` equivalent).
+For Zsh, copy `_shipyard` to a directory on `fpath` before calling `compinit`.
+These installation steps are manual; generation does not edit shell profiles.
+
+After changing the CLI, rerun `pixi run example-completions` and source or install
+the updated files. For your own application, replace that task with your build's
+generation command. The banner records the regeneration command for reference.
 
 ## Interactive screen snapshots
 

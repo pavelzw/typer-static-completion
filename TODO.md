@@ -2,7 +2,9 @@
 
 Bash, Fish, and Zsh now implement model traversal, Typer extraction, generation,
 syntax checks, and shared interactive screen snapshots. Full generated completion
-files are snapshot-tested alongside those screens. File management, the CLI,
+files are snapshot-tested alongside those screens. `write()` supports build-time
+generation with validated layouts, dry runs, and unchanged-file detection.
+Set management, the CLI,
 PowerShell generation, and the public candidate-verification helper remain scaffolds.
 
 Use `../commander-static-completion` as the local reference, especially
@@ -146,13 +148,15 @@ before snapshot comparison, with separate tests against Typer's actual parser.
 
 ## 4. Management, CLI, and packaging
 
-- [ ] Implement `write()` and `CompletionSet` after the generation path works:
-      dry runs, deterministic diffs, missing/stale/orphan reports, bounded report
-      output, unchanged mtimes, safe writes, and the failure/pruning rules above.
+- [x] Implement `write()`: dry runs, default/custom layouts, unchanged mtimes,
+      render-before-write validation, and atomic replacement per file. Reject
+      escaping paths, symlinks, and layout collisions.
+- [ ] Implement `CompletionSet`: deterministic diffs, missing/stale/orphan reports,
+      bounded report output, and the failure/pruning rules above.
 - [ ] Implement CLI generate/sync/check/verify with stdout/stderr and exit-code
       tests. Treat installation as a later feature with explicit destinations;
       avoid automatic shell-profile changes.
-- [ ] Add a runnable example and generate its completions in CI. Document build-
+- [x] Add a runnable example and generate its completions in CI. Document build-
       time generation, installation per shell, regeneration, and static limits.
 - [ ] Validate built wheels/sdists in clean environments, including subpackages,
       runtime dependencies, the console entrypoint, and typed API distribution.

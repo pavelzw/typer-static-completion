@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING
 
 from .config import GenerationOptions
 from .model import CommandTree
-from .shells import ShellName
+from .shells import DEFAULT_SHELLS, ShellName
 
 if TYPE_CHECKING:
     import typer
@@ -56,24 +56,31 @@ def generate(
         >>> script = generate(app, "myapp", "fish")
     """
     from .generators import get_generator
-    from .introspect import from_app
 
     settings = options or GenerationOptions()
     generator = get_generator(shell, settings)
+    return generator.render(_tree(app, prog_name, settings))
+
+
+def _tree(
+    app: typer.Typer | CommandTree,
+    prog_name: str | None,
+    settings: GenerationOptions,
+) -> CommandTree:
+    from .introspect import from_app
+
     if isinstance(app, CommandTree):
         if prog_name is not None:
             raise ValueError("prog_name must be omitted for a CommandTree")
-        tree = app
-    else:
-        if not prog_name:
-            raise ValueError("prog_name is required for a Typer app")
-        tree = from_app(
-            app,
-            prog_name,
-            include_hidden=settings.include_hidden,
-            include_deprecated=settings.include_deprecated,
-        )
-    return generator.render(tree)
+        return app
+    if not prog_name:
+        raise ValueError("prog_name is required for a Typer app")
+    return from_app(
+        app,
+        prog_name,
+        include_hidden=settings.include_hidden,
+        include_deprecated=settings.include_deprecated,
+    )
 
 
 def write(
@@ -97,9 +104,85 @@ def write(
         dry_run: Compute the mapping without writing. Useful for previewing.
 
     Returns:
-        ``{path: content}`` for every file written (or that would be).
+        ``{path: content}`` for all selected outputs, including unchanged files.
+        Paths retain the relative/absolute form of ``output_dir``.
+
+    Unchanged files retain their modification times. All scripts and destinations
+    are validated before writing. Each changed file is replaced atomically as
+    UTF-8 with LF newlines; an I/O failure can still leave a partially updated set.
+    Existing file permissions are retained; new files use mode 0644.
+    Layouts must stay beneath ``output_dir``, contain no symlinks beneath that
+    root, and must not collide. Invalid destinations raise ``ValueError`` or an
+    ``OSError``. A dry run performs the same validation without creating files.
     """
-    raise NotImplementedError
+    from .generators import get_generator
+
+    settings = options or GenerationOptions()
+    tree = _tree(app, prog_name, settings)
+    root = Path(output_dir)
+    resolved_root = root.resolve()
+    rendered: dict[Path, str] = {}
+    destinations: set[Path] = set()
+    for shell in dict.fromkeys(DEFAULT_SHELLS if shells is None else shells):
+        generator = get_generator(shell, settings)
+        template = (layout or {}).get(shell, generator.shell + "/" + generator.filename)
+        relative = Path(template.format(prog=tree.prog_name))
+        if relative.is_absolute() or ".." in relative.parts or relative == Path("."):
+            raise ValueError(
+                f"Completion layout must be a relative file path: {relative}"
+            )
+        path = root / relative
+        destination = path.resolve()
+        if (
+            not destination.is_relative_to(resolved_root)
+            or destination == resolved_root
+        ):
+            raise ValueError(f"Completion path escapes output_dir: {path}")
+        if any((root / part).is_symlink() for part in (relative, *relative.parents)):
+            raise ValueError(f"Completion path must not contain symlinks: {path}")
+        if any(
+            destination == other
+            or destination in other.parents
+            or other in destination.parents
+            for other in destinations
+        ):
+            raise ValueError(f"Completion layout collision: {path}")
+        destinations.add(destination)
+        rendered[path] = generator.render(tree)
+
+    # Render and inspect every destination before making any filesystem changes.
+    changed: dict[Path, bytes] = {}
+    for path, content in rendered.items():
+        for parent in path.parents:
+            if parent.exists() and not parent.is_dir():
+                raise NotADirectoryError(parent)
+        data = content.encode("utf-8")
+        if not path.exists() or path.read_bytes() != data:
+            changed[path] = data
+    if not dry_run:
+        for path, data in changed.items():
+            _replace_file(path, data)
+    return rendered
+
+
+def _replace_file(path: Path, data: bytes) -> None:
+    """Replace one file atomically; a set of files is not a transaction."""
+    import os
+    import stat
+    import tempfile
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    mode = stat.S_IMODE(path.stat().st_mode) if path.exists() else 0o644
+    temporary: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as stream:
+            temporary = Path(stream.name)
+            stream.write(data)
+        temporary.chmod(mode)
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 @dataclass(frozen=True)

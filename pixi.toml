@@ -19,6 +19,10 @@ uv = "*"
 typer-static-completions = { path = "." }
 typer = ">=0.26,<0.27"
 
+[tasks]
+example = "python -m examples.cli"
+example-completions = "python -m examples.completions"
+
 [feature.test.dependencies]
 pytest = "*"
 pytest-cov = "*"
