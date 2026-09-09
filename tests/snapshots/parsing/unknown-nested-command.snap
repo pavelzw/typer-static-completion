@@ -1,0 +1,17 @@
+Input: demo remote unknown paint bl<TAB>
+
+Shell: bash
+
+> demo remote unknown paint bl▏
+
+---
+
+Shell: fish
+
+> demo remote unknown paint bl▏
+
+---
+
+Shell: zsh
+
+> demo remote unknown paint bl▏

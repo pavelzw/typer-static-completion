@@ -48,6 +48,13 @@ snapshots fail checks; updating is forbidden in CI. The harness uses an isolated
 fail if static completion invokes the CLI or Python. CI checks the snapshots on
 Linux and macOS. Fish terminal capability negotiation is exercised by the harness.
 
+The parsing matrix in `tests/parsing_cases.py` covers scalar/variadic arguments,
+repeated options, count flags, short clusters, shadowed parent options, and `--`.
+Its screen tests assert the expected completed line before comparing snapshots.
+`tests/snapshots/parsing/` also checks two CLIs loaded together and sourced twice;
+`tests/snapshots/generated/parsing.{bash,fish,zsh}` records the corresponding full
+completion files. Separate tests verify the tricky cases against Typer's parser.
+
 Current snapshot baselines target the locked Bash 5.x, Fish 4.x, and Zsh 5.9 environment. Unicode,
 custom word-break settings, unusual shell parsing modes, and filenames containing
 control characters still need broader coverage.

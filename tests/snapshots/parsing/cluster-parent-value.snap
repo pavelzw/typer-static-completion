@@ -1,0 +1,17 @@
+Input: demo -vkremote pa<TAB>
+
+Shell: bash
+
+> demo -vkremote paint ▏
+
+---
+
+Shell: fish
+
+> demo -vkremote paint ▏
+
+---
+
+Shell: zsh
+
+> demo -vkremote paint ▏

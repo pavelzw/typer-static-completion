@@ -1,0 +1,17 @@
+Input: demo --target remote pa<TAB>
+
+Shell: bash
+
+> demo --target remote paint ▏
+
+---
+
+Shell: fish
+
+> demo --target remote paint ▏
+
+---
+
+Shell: zsh
+
+> demo --target remote paint ▏

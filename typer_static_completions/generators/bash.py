@@ -43,11 +43,14 @@ class BashGenerator(Generator):
         ids = {c.path: i for i, c in enumerate(nodes)}
         params: list[Param] = []
         option_cases, command_cases, argument_cases, suggestion_cases = [], [], [], []
+        group_cases = []
         for node_id, command in enumerate(nodes):
             if command.chain:
                 raise IntrospectionError("Chain groups are not supported yet")
             if (command.is_group or command.subcommands) and command.arguments:
                 raise IntrospectionError("Group arguments are not supported yet")
+            if command.is_group or command.subcommands:
+                group_cases.append(f"{node_id}) return 0 ;;")
             flags: list[str] = []
             argument_index = 0
             for param in command.params:
@@ -127,6 +130,7 @@ class BashGenerator(Generator):
         for marker, cases in (
             ("OPTIONS", option_cases),
             ("COMMANDS", command_cases),
+            ("GROUPS", group_cases),
             ("ARGUMENTS", argument_cases),
             ("SUGGESTIONS", suggestion_cases),
             ("ACTIONS", actions),
@@ -191,6 +195,10 @@ _PARSER = r"""@NAME@() {
         fi
         case "$node:$word" in
 @COMMANDS@
+        esac
+        # Groups without arguments require the next operand to be a command.
+        case $node in
+@GROUPS@
         esac
         ((position+=1))
     done

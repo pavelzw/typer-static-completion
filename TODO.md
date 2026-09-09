@@ -68,7 +68,7 @@ harness and scenario checklist is in section 3.
       nested groups, aliases, boolean negations, enum choices, paths/files,
       custom help flags, hidden/deprecated entries, and callback detection.
       Test actual extracted trees, not only the existence of private attributes.
-- [ ] Add fixtures for groups/options whose values look like command names.
+- [x] Add fixtures for groups/options whose values look like command names.
       Walk tokens using parameter arity and scope rather than matching every
       non-flag word against a list of paths.
 - [x] Implement registry and `generate()` for Bash, Zsh, and Fish. Start with
@@ -78,14 +78,14 @@ harness and scenario checklist is in section 3.
       apostrophes, quotes, colons, brackets, dollars, backticks, backslashes,
       whitespace, Unicode, and shell substitution syntax. Syntax checks alone
       cannot detect dropped characters or unintended evaluation.
-- [ ] Exercise two generated CLIs loaded together, repeated sourcing, and Zsh
+- [x] Exercise two generated CLIs loaded together, repeated sourcing, and Zsh
       autoload installation through `fpath` / `#compdef`.
 
 ## 3. Snapshot tests (priority)
 
 ### Shared fixtures and fast checks
 
-- [ ] Create `tests/fixtures.py` and a shared case matrix consumed by every shell.
+- [x] Create `tests/fixtures.py` and a shared case matrix consumed by every shell.
       Include both hand-built trees and real Typer apps to cover the adapter.
 - [ ] Implement syntax checks and native candidate tests. Bash `COMPREPLY` and
       Fish `complete -C` are useful fast checks; mocked Zsh `_arguments` only
@@ -96,9 +96,12 @@ harness and scenario checklist is in section 3.
 
 ### Interactive screen snapshots like Commander (first-milestone requirement)
 
-All three shells share 21 reviewed screen cases, a pexpect/pyte harness, explicit
+All three shells share 50 reviewed screen cases (21 original cases, 27 parsing
+cases, and 2 multi-CLI cases), a pexpect/pyte harness, explicit
 update/check tasks, failure/cleanup and terminal negotiation tests, and a dedicated
-Linux/macOS CI job. Full generated scripts live in `tests/snapshots/generated/`.
+Linux/macOS CI job. Full generated scripts for both fixtures live in
+`tests/snapshots/generated/`. Parsing cases assert the expected completed line
+before snapshot comparison, with separate tests against Typer's actual parser.
 
 - [x] Build `tests/snapshot_harness.py`: launch actual interactive Bash, Zsh,
       and Fish in a PTY, source generated scripts, and drive their line editors.
@@ -116,8 +119,9 @@ Linux/macOS CI job. Full generated scripts live in `tests/snapshots/generated/`.
 - [ ] Start with unique/ambiguous/no matches, root/nested commands, choices,
       `--option=value`, boolean negations, filenames containing spaces or quotes,
       directories, unfinished quotes, escaped spaces, and cursor-in-the-middle.
-      Extend to `--`, attached short values/clusters, repeatable/variadic/tuple
-      values, parent option scope, help flags, and chain groups as implemented.
+      Scalar/variadic values, repeated options, count flags, short clusters, `--`,
+      and parent option scope are now covered. Extend to tuple values, custom help
+      configuration, and chain groups as implemented.
       Translate Commander cases to Typer semantics rather than copying defaults
       and help-command behavior that Typer does not share.
 - [x] Isolate shell configuration, history, working-directory fixtures, prompt,

@@ -95,6 +95,11 @@ _tsc_2a97516c354b6884() {
 4:add) node=5; position=0; ended=0; continue ;;
 4:remove) node=6; position=0; ended=0; continue ;;
         esac
+        # Groups without arguments require the next operand to be a command.
+        case $node in
+0) return 0 ;;
+4) return 0 ;;
+        esac
         ((position+=1))
     done
     target=$pending

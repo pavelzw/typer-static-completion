@@ -1,0 +1,17 @@
+Input: demo -- remote --target gre<TAB>
+
+Shell: bash
+
+> demo -- remote --target green ▏
+
+---
+
+Shell: fish
+
+> demo -- remote --target green ▏
+
+---
+
+Shell: zsh
+
+> demo -- remote --target green ▏

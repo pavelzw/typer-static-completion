@@ -1,0 +1,19 @@
+Input: other az<TAB>
+
+Setup: demo and other loaded twice
+
+Shell: bash
+
+> other azure ▏
+
+---
+
+Shell: fish
+
+> other azure ▏
+
+---
+
+Shell: zsh
+
+> other azure ▏

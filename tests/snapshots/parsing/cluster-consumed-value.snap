@@ -1,0 +1,17 @@
+Input: demo paint -qvcred bl<TAB>
+
+Shell: bash
+
+> demo paint -qvcred blue ▏
+
+---
+
+Shell: fish
+
+> demo paint -qvcred blue ▏
+
+---
+
+Shell: zsh
+
+> demo paint -qvcred blue ▏

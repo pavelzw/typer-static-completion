@@ -1,4 +1,4 @@
-"""Native Fish completion rules guarded by a token-aware command scanner."""
+"""Fish completion with command-scoped parsing and native candidate matching."""
 
 from __future__ import annotations
 
@@ -40,31 +40,34 @@ class FishGenerator(Generator):
             and param.name in self.options.file_params
         ):
             kind = ValueKind.FILE
-        if kind is ValueKind.FILE:
-            return "-F"
-        if kind is ValueKind.DIRECTORY:
-            return "-f -a '(__fish_complete_directories)'"
+        if kind in (ValueKind.FILE, ValueKind.DIRECTORY):
+            return f"set file_mode {kind.value}"
         if kind is ValueKind.CHOICE:
-            # Fish evaluates the argument expression once; quote each literal
-            # inside it, then quote the whole expression in the registration.
-            choices = " ".join(self.quote(c) for c in param.choices)
-            return "-f -a " + self.quote(choices)
-        return "-f"
+            values = " ".join(self.quote(c) for c in param.choices)
+            action = f"set candidates {values}"
+            if self.options.include_help and param.help:
+                descriptions = " ".join(self.quote(param.help) for _ in param.choices)
+                action += f"; set descriptions {descriptions}"
+            return action
+        return "set candidates"
 
     def render(self, tree: CommandTree) -> str:
         name = "__tsc_" + hashlib.sha256(tree.prog_name.encode()).hexdigest()[:16]
         nodes = list(tree.walk())
         ids = {c.path: i for i, c in enumerate(nodes)}
-        options, children, rules = [], [], []
+        params: list[Param] = []
+        options, children, groups, arguments, suggestions = [], [], [], [], []
         prog = self.quote(tree.prog_name)
-        # Explicit -F on file rules overrides the default suppression.
-        rules.append(f"complete -c {prog} -f")
         for node, command in enumerate(nodes):
             if command.chain:
                 raise IntrospectionError("Chain groups are not supported yet")
             if (command.is_group or command.subcommands) and command.arguments:
                 raise IntrospectionError("Group arguments are not supported yet")
+            if command.is_group or command.subcommands:
+                groups.append(f"case {node}; return")
             position = 0
+            flags: list[str] = []
+            descriptions: list[str] = []
             for param in command.params:
                 if param.is_help and not self.options.include_help_option:
                     continue
@@ -72,51 +75,55 @@ class FishGenerator(Generator):
                     raise IntrospectionError(
                         "Only scalar options and scalar/variadic arguments are supported yet"
                     )
-                description = ""
-                if self.options.include_help and param.help:
-                    description = " -d " + self.quote(param.help)
-                action = self.value_action(param, tree)
+                param_id = len(params)
+                params.append(param)
                 if param.flags:
                     for flag in param.flags:
                         options.append(
-                            f'if test "$node:$flag" = {self.quote(f"{node}:{flag}")}; set takes {int(param.takes_value)}; end'
+                            f'if test "$argv[1]:$argv[2]" = {self.quote(f"{node}:{flag}")}; printf "%s\\n" {param_id} {int(param.takes_value)}; return; end'
                         )
-                        if flag.startswith("--"):
-                            selector = "-l " + self.quote(flag[2:])
-                        elif len(flag) == 2 and flag.startswith("-"):
-                            selector = "-s " + self.quote(flag[1:])
-                        else:
-                            raise IntrospectionError(
-                                f"Unsupported Fish option spelling: {flag!r}"
-                            )
-                        condition = self.quote(f"{name} {node} option")
-                        required = " -r" if param.takes_value else ""
-                        rules.append(
-                            f"complete -c {prog} -n {condition} {selector}{required} {action}{description}"
+                        flags.append(flag)
+                        descriptions.append(
+                            param.help if self.options.include_help else ""
                         )
                 else:
-                    slot = "variadic" if param.nargs == -1 else str(position)
-                    condition = self.quote(f"{name} {node} {slot} {position}")
-                    rules.append(
-                        f"complete -c {prog} -n {condition} {action}{description}"
+                    comparison = "-ge" if param.nargs == -1 else "-eq"
+                    arguments.append(
+                        f"if test $node -eq {node}; and test $position {comparison} {position}; set target {param_id}; end"
                     )
                     position += 1
+            command_names = []
+            command_helps = []
             for child_name, child in command.subcommands.items():
                 children.append(
                     f'if test "$node:$word" = {self.quote(f"{node}:{child_name}")}; set node {ids[child.path]}; set position 0; set ended 0; continue; end'
                 )
-                description = ""
-                if self.options.include_help and child.help:
-                    description = " -d " + self.quote(child.help)
-                condition = self.quote(f"{name} {node} command")
-                rules.append(
-                    f"complete -c {prog} -n {condition} -f -a {self.quote(self.quote(child_name))}{description}"
-                )
-        runtime = (
-            _RUNTIME.replace("@NAME@", name)
-            .replace("@OPTIONS@", "\n".join(options))
-            .replace("@CHILDREN@", "\n".join(children))
-        )
+                command_names.append(child_name)
+                command_helps.append(child.help if self.options.include_help else "")
+
+            def values(words: list[str]) -> str:
+                return " ".join(self.quote(word) for word in words)
+
+            suggestions.append(
+                f"case {node}\nset candidates {values(command_names)}\nset descriptions {values(command_helps)}\n"
+                f"if test $ended -eq 0; and string match -q -- '-*' \"$current\"\n"
+                f"set candidates {values(flags)}\nset descriptions {values(descriptions)}\nend"
+            )
+        actions = [
+            f"case {i}; {self.value_action(param, tree)}"
+            for i, param in enumerate(params)
+        ]
+        runtime = _RUNTIME.replace("@NAME@", name)
+        for marker, cases in (
+            ("OPTIONS", options),
+            ("CHILDREN", children),
+            ("GROUPS", groups),
+            ("ARGUMENTS", arguments),
+            ("SUGGESTIONS", suggestions),
+            ("ACTIONS", actions),
+        ):
+            runtime = runtime.replace(f"@{marker}@", "\n".join(cases))
+        runtime = "\n".join(line.rstrip() for line in runtime.splitlines()) + "\n"
         banner = ""
         if self.options.banner:
             banner = "# Generated - do not edit.\n"
@@ -127,18 +134,28 @@ class FishGenerator(Generator):
                 from importlib.metadata import version
 
                 banner += f"# typer-static-completions {version('typer-static-completions')}; typer {version('typer')}\n"
-        return banner + runtime + "\n".join(rules) + "\n"
+        return banner + runtime + f"complete -c {prog} -f -a '({name})'\n"
 
 
-_RUNTIME = r"""function @NAME@
+_RUNTIME = r"""function @NAME@_option
+@OPTIONS@
+    printf '%s\n' -1 0
+end
+
+function @NAME@
     set -l tokens (commandline -xpc)
+    set -l current (commandline -ct)
+    set -l unescaped (string unescape -- "$current")
+    if test (count $unescaped) -eq 1
+        set current "$unescaped"
+    end
     set -l node 0
     set -l position 0
-    set -l pending 0
+    set -l pending -1
     set -l ended 0
     for word in $tokens[2..-1]
-        if test $pending -eq 1
-            set pending 0
+        if test $pending -ge 0
+            set pending -1
             continue
         end
         if test "$word" = --; and test $ended -eq 0
@@ -147,11 +164,10 @@ _RUNTIME = r"""function @NAME@
         end
         if string match -qr '^-.+' -- "$word"; and test $ended -eq 0
             set -l flag (string split -m 1 = -- "$word")[1]
-            set -l takes -1
-@OPTIONS@
-            if test $takes -ge 0
-                if test $takes -eq 1; and not string match -q '*=*' -- "$word"
-                    set pending 1
+            set -l info (@NAME@_option $node "$flag")
+            if test $info[1] -ge 0
+                if test $info[2] -eq 1; and not string match -q '*=*' -- "$word"
+                    set pending $info[1]
                 end
                 continue
             end
@@ -160,36 +176,91 @@ _RUNTIME = r"""function @NAME@
                 while test -n "$rest"
                     set flag -(string sub -l 1 -- "$rest")
                     set rest (string sub -s 2 -- "$rest")
-                    set takes -1
-@OPTIONS@
-                    if test $takes -lt 0
-                        return 1
+                    set info (@NAME@_option $node "$flag")
+                    if test $info[1] -lt 0
+                        return
                     end
-                    if test $takes -eq 1
+                    if test $info[2] -eq 1
                         if test -z "$rest"
-                            set pending 1
+                            set pending $info[1]
                         end
                         break
                     end
                 end
                 continue
             end
-            return 1
+            return
         end
 @CHILDREN@
+        switch $node
+@GROUPS@
+        end
         set position (math $position + 1)
     end
-    test $node -eq $argv[1]; or return 1
-    if test "$argv[2]" = option
-        test $ended -eq 0
-    else if test $pending -eq 1
-        return 1
-    else if test "$argv[2]" = command
-        test $position -eq 0
-    else if test "$argv[2]" = variadic
-        test $position -ge $argv[3]
-    else
-        test $position -eq $argv[2]
+    set -l target $pending
+    set -l prefix ''
+    set -l candidates
+    set -l descriptions
+    set -l file_mode ''
+    if test $target -lt 0; and test $ended -eq 0
+        if string match -q -- '--*=*' "$current"
+            set -l parts (string split -m 1 = -- "$current")
+            set -l info (@NAME@_option $node "$parts[1]")
+            test $info[2] -eq 1; or return
+            set target $info[1]
+            set prefix "$parts[1]="
+            set current "$parts[2]"
+        else if string match -qr '^-[^-].*' -- "$current"
+            set -l rest (string sub -s 2 -- "$current")
+            set -l attached -
+            while test -n "$rest"
+                set -l flag -(string sub -l 1 -- "$rest")
+                set attached "$attached"(string sub -l 1 -- "$rest")
+                set rest (string sub -s 2 -- "$rest")
+                set -l info (@NAME@_option $node "$flag")
+                if test $info[1] -lt 0
+                    break
+                end
+                if test $info[2] -eq 1
+                    set target $info[1]
+                    set prefix "$attached"
+                    set current "$rest"
+                    break
+                end
+            end
+        end
+    end
+    if test $target -lt 0
+        switch $node
+@SUGGESTIONS@
+        end
+        if test $ended -eq 1; or not string match -q -- '-*' "$current"
+@ARGUMENTS@
+        end
+    end
+    if test $target -ge 0
+        set candidates
+        set descriptions
+        switch $target
+@ACTIONS@
+        end
+    end
+    set -l index 1
+    for candidate in $candidates
+        printf '%s\t%s\n' "$prefix$candidate" "$descriptions[$index]"
+        set index (math $index + 1)
+    end
+    if test -n "$file_mode"
+        set -l escaped (string escape -- "$current")
+        set -l paths
+        if test "$file_mode" = directory
+            set paths (__fish_complete_directories "$escaped")
+        else
+            set paths (__fish_complete_path "$escaped")
+        end
+        for candidate in $paths
+            printf '%s\n' "$prefix$candidate"
+        end
     end
 end
 """

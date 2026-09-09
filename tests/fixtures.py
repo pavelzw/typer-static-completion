@@ -49,3 +49,49 @@ def fixture() -> typer.Typer:
 
     app.add_typer(remote, name="remote")
     return app
+
+
+class RootTarget(str, Enum):
+    root = "root"
+    remote = "remote"
+
+
+class GroupTarget(str, Enum):
+    group = "group"
+    green = "green"
+
+
+def parsing_fixture() -> typer.Typer:
+    """Options shadow each other across scopes; values can look like commands."""
+    app = typer.Typer(add_completion=False)
+    remote = typer.Typer()
+
+    @app.callback()
+    def root(
+        target: RootTarget = typer.Option(RootTarget.root, "--target", "-t"),
+        token: str = typer.Option("", "--token", "-k"),
+        verbose: int = typer.Option(0, "--verbose", "-v", count=True),
+        root_only: bool = False,
+    ):
+        pass
+
+    @remote.callback()
+    def group(target: GroupTarget = typer.Option(GroupTarget.group, "--target", "-t")):
+        pass
+
+    def paint(
+        first: Color,
+        rest: list[Color] = typer.Argument(None),
+        target: Color = typer.Option(Color.red, "--target", "-t"),
+        color: Color = typer.Option(Color.red, "--color", "-c"),
+        tag: list[Color] = typer.Option(None, "--tag", "-g"),
+        token: str = typer.Option("", "--token", "-k"),
+        verbose: int = typer.Option(0, "--verbose", "-v", count=True),
+        quiet: bool = typer.Option(False, "--quiet", "-q"),
+    ):
+        """Paint one or more colors."""
+
+    app.command()(paint)
+    remote.command()(paint)
+    app.add_typer(remote, name="remote")
+    return app

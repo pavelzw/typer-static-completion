@@ -1,0 +1,17 @@
+Input: demo remote paint red --root-o<TAB>
+
+Shell: bash
+
+> demo remote paint red --root-o▏
+
+---
+
+Shell: fish
+
+> demo remote paint red --root-o▏
+
+---
+
+Shell: zsh
+
+> demo remote paint red --root-o▏

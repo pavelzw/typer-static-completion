@@ -1,0 +1,17 @@
+Input: demo paint --token --tag bl<TAB>
+
+Shell: bash
+
+> demo paint --token --tag blue ▏
+
+---
+
+Shell: fish
+
+> demo paint --token --tag blue ▏
+
+---
+
+Shell: zsh
+
+> demo paint --token --tag blue ▏

@@ -1,0 +1,17 @@
+Input: demo paint red --col<TAB>
+
+Shell: bash
+
+> demo paint red --color ▏
+
+---
+
+Shell: fish
+
+> demo paint red --color ▏
+
+---
+
+Shell: zsh
+
+> demo paint red --color ▏

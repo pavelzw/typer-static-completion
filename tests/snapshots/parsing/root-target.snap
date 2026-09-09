@@ -1,0 +1,17 @@
+Input: demo --target roo<TAB>
+
+Shell: bash
+
+> demo --target root ▏
+
+---
+
+Shell: fish
+
+> demo --target root ▏
+
+---
+
+Shell: zsh
+
+> demo --target root ▏

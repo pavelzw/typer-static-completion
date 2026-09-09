@@ -1,0 +1,17 @@
+Input: demo remote paint --target bl<TAB>
+
+Shell: bash
+
+> demo remote paint --target blue ▏
+
+---
+
+Shell: fish
+
+> demo remote paint --target blue ▏
+
+---
+
+Shell: zsh
+
+> demo remote paint --target blue ▏

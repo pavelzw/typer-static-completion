@@ -1,0 +1,17 @@
+Input: demo unknown remote pa<TAB>
+
+Shell: bash
+
+> demo unknown remote pa▏
+
+---
+
+Shell: fish
+
+> demo unknown remote pa▏
+
+---
+
+Shell: zsh
+
+> demo unknown remote pa▏

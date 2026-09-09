@@ -1,0 +1,17 @@
+Input: demo --token remote pa<TAB>
+
+Shell: bash
+
+> demo --token remote paint ▏
+
+---
+
+Shell: fish
+
+> demo --token remote paint ▏
+
+---
+
+Shell: zsh
+
+> demo --token remote paint ▏
