@@ -7,6 +7,7 @@ import re
 import shutil
 import signal
 import time
+from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -103,6 +104,18 @@ class TerminalProtocol(Transcript):
         self.pending = self.pending[end:]
 
 
+@dataclass(frozen=True)
+class CapturedScreen:
+    """Screen plus unnormalized editor text and character offset in UTF-8 locales.
+
+    Synthetic test terminals can omit the editor-state message.
+    """
+
+    screen: str
+    line: str | None
+    cursor: int | None
+
+
 def capture(
     script: str,
     input: str,
@@ -112,6 +125,25 @@ def capture(
     timeout: float = 10,
     locale: str = "C",
 ) -> str:
+    return capture_state(
+        script,
+        input,
+        shell=shell,
+        executable=executable,
+        timeout=timeout,
+        locale=locale,
+    ).screen
+
+
+def capture_state(
+    script: str,
+    input: str,
+    *,
+    shell: str = "bash",
+    executable: str | None = None,
+    timeout: float = 10,
+    locale: str = "C",
+) -> CapturedScreen:
     keys = keystrokes(input)
     if shell not in ("bash", "fish", "zsh"):
         raise ValueError(f"Unsupported shell: {shell}")
@@ -142,7 +174,7 @@ def capture(
     bind 'set page-completions off'
     bind 'set completion-query-items 0'
     bind 'set bell-style none'
-    _mark() { printf '\033]777;TSC_DONE\007'; }
+    _mark() { printf '\033]778;%s;%s\007\033]777;TSC_DONE\007' "$READLINE_POINT" "$READLINE_LINE"; }
     bind -x '"\C-x\C-g":_mark'
     demo() { printf invoked > invoked; }
     python() { printf invoked > invoked; }
@@ -162,7 +194,7 @@ setopt NO_BEEP
 unsetopt AUTO_MENU MENU_COMPLETE
 bindkey -e
 zstyle ':completion:*' list-colors ''
-_mark() { printf '\033]777;TSC_DONE\007'; }
+_mark() { printf '\033]778;%s;%s\007\033]777;TSC_DONE\007' "$CURSOR" "$BUFFER"; }
 zle -N _mark
 bindkey '^X^G' _mark
 demo() { printf invoked > invoked; }
@@ -185,7 +217,10 @@ set -g fish_key_bindings fish_default_key_bindings
 function fish_prompt; printf '> '; end
 function fish_right_prompt; end
 function fish_title; end
-bind ctrl-x,ctrl-g "printf '\033]777;TSC_DONE\007'"
+function _mark
+    printf '\033]778;%s;%s\007\033]777;TSC_DONE\007' (commandline -C) (commandline -b)
+end
+bind ctrl-x,ctrl-g _mark
 function demo; printf invoked > invoked; end
 function python; printf invoked > invoked; end
 function python3; printf invoked > invoked; end
@@ -231,6 +266,13 @@ printf '\033]777;TSC_READY\007'
             child.expect_exact(DONE, timeout=max(0, deadline - time.monotonic()))
             screen_output = child.before
             transcript += screen_output
+            state = re.search(r"\x1b\]778;(\d+);([^\x07]*)\x07", screen_output)
+            input_line = state[2] if state else None
+            input_cursor = int(state[1]) if state else None
+            if state:
+                screen_output = (
+                    screen_output[: state.start()] + screen_output[state.end() :]
+                )
             if (cwd / "invoked").exists():
                 raise AssertionError("Static completion invoked the CLI or Python")
             # Bash clears the editing line before bind -x runs. Exclude that
@@ -256,11 +298,15 @@ printf '\033]777;TSC_READY\007'
             pyte.Stream(screen).feed(screen_output)
             lines = list(screen.display)
             row, column = screen.cursor.y, screen.cursor.x
-            lines[row] = lines[row][:column] + "▏" + lines[row][column:]
+            # Cursor coordinates count terminal cells, not Unicode code points.
+            cells = screen.buffer[row]
+            before = "".join(cells[x].data for x in range(column))
+            after = "".join(cells[x].data for x in range(column, screen.columns))
+            lines[row] = before + "▏" + after
             lines = [line.rstrip() for line in lines]
             while lines and not lines[-1]:
                 lines.pop()
-            return "\n".join(lines) + "\n"
+            return CapturedScreen("\n".join(lines) + "\n", input_line, input_cursor)
         except (pexpect.TIMEOUT, pexpect.EOF) as exc:
             transcript += child.before
             raise AssertionError(

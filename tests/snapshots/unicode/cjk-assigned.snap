@@ -1,0 +1,26 @@
+Input: demo --value=東<TAB>
+
+Shell: bash
+
+> demo --value=東京 ▏
+
+Buffer: "demo --value=\u6771\u4eac "
+Cursor: 16
+
+---
+
+Shell: fish
+
+> demo --value=東京 ▏
+
+Buffer: "demo --value=\u6771\u4eac "
+Cursor: 16
+
+---
+
+Shell: zsh
+
+> demo --value=東京 ▏
+
+Buffer: "demo --value=\u6771\u4eac "
+Cursor: 16

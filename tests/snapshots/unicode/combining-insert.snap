@@ -1,0 +1,26 @@
+Input: demo --value caf<TAB>
+
+Shell: bash
+
+> demo --value café ▏
+
+Buffer: "demo --value cafe\u0301 "
+Cursor: 19
+
+---
+
+Shell: fish
+
+> demo --value café ▏
+
+Buffer: "demo --value cafe\u0301 "
+Cursor: 19
+
+---
+
+Shell: zsh
+
+> demo --value cafe<0301> ▏
+
+Buffer: "demo --value cafe\u0301 "
+Cursor: 19

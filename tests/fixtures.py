@@ -278,3 +278,24 @@ def group_argument_fixture() -> typer.Typer:
     app.add_typer(optional, name="optional")
     app.add_typer(many, name="many")
     return app
+
+
+class UnicodeValue(str, Enum):
+    tokyo = "東京"
+    osaka = "大阪"
+    rocket = "🚀launch"
+    decomposed = "cafe\u0301"
+    combining = "a\u0308\u0301value"
+
+
+def unicode_fixture() -> typer.Typer:
+    app = typer.Typer(add_completion=False)
+
+    @app.command()
+    def show(
+        value: UnicodeValue = typer.Option(UnicodeValue.tokyo, "--value", "-v"),
+        quiet: bool = False,
+    ):
+        typer.echo(value.value)
+
+    return app

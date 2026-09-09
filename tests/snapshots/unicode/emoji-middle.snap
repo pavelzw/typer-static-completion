@@ -1,0 +1,26 @@
+Input: demo --value 🚀l --quiet<LEFT:8><TAB>
+
+Shell: bash
+
+> demo --value 🚀launch▏ --quiet
+
+Buffer: "demo --value \ud83d\ude80launch --quiet"
+Cursor: 20
+
+---
+
+Shell: fish
+
+> demo --value 🚀launch ▏--quiet
+
+Buffer: "demo --value \ud83d\ude80launch --quiet"
+Cursor: 21
+
+---
+
+Shell: zsh
+
+> demo --value 🚀launch ▏ --quiet
+
+Buffer: "demo --value \ud83d\ude80launch  --quiet"
+Cursor: 21

@@ -1,0 +1,26 @@
+Input: demo --value ä́v<TAB>
+
+Shell: bash
+
+> demo --value ä́value ▏
+
+Buffer: "demo --value a\u0308\u0301value "
+Cursor: 22
+
+---
+
+Shell: fish
+
+> demo --value ä́value ▏
+
+Buffer: "demo --value a\u0308\u0301value "
+Cursor: 22
+
+---
+
+Shell: zsh
+
+> demo --value a<0308><0301>value ▏
+
+Buffer: "demo --value a\u0308\u0301value "
+Cursor: 22

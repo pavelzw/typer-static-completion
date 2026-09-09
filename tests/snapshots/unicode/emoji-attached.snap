@@ -1,0 +1,26 @@
+Input: demo -v🚀l<TAB>
+
+Shell: bash
+
+> demo -v🚀launch ▏
+
+Buffer: "demo -v\ud83d\ude80launch "
+Cursor: 15
+
+---
+
+Shell: fish
+
+> demo -v🚀launch ▏
+
+Buffer: "demo -v\ud83d\ude80launch "
+Cursor: 15
+
+---
+
+Shell: zsh
+
+> demo -v🚀launch ▏
+
+Buffer: "demo -v\ud83d\ude80launch "
+Cursor: 15

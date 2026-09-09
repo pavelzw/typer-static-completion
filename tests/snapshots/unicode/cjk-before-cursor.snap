@@ -1,0 +1,26 @@
+Input: demo --value 東京 --qu<TAB>
+
+Shell: bash
+
+> demo --value 東京 --quiet ▏
+
+Buffer: "demo --value \u6771\u4eac --quiet "
+Cursor: 24
+
+---
+
+Shell: fish
+
+> demo --value 東京 --quiet ▏
+
+Buffer: "demo --value \u6771\u4eac --quiet "
+Cursor: 24
+
+---
+
+Shell: zsh
+
+> demo --value 東京 --quiet ▏
+
+Buffer: "demo --value \u6771\u4eac --quiet "
+Cursor: 24

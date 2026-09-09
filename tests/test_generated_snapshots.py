@@ -11,6 +11,7 @@ from fixtures import (
     parsing_fixture,
     tuple_argument_fixture,
     tuple_fixture,
+    unicode_fixture,
 )
 from snapshot_assertions import assert_snapshot
 
@@ -31,6 +32,7 @@ from typer_static_completions.verify import check_syntax, is_available
         ("case", case_fixture),
         ("tuple-arguments", tuple_argument_fixture),
         ("group-arguments", group_argument_fixture),
+        ("unicode", unicode_fixture),
     ],
 )
 def test_generated_file(shell, name, make_app):

@@ -226,9 +226,19 @@ options, arguments, tuple positions, ambiguous matches, and accented values,
 plus sensitive-choice regressions. Full scripts live in
 `tests/snapshots/generated/case.{bash,fish,zsh}`.
 
-Current snapshot baselines target the locked Bash 5.x, Fish 4.x, and Zsh 5.9 environment. Broader Unicode coverage (including wide and combining characters),
-custom word-break settings, unusual shell parsing modes, and filenames containing
-control characters still need broader coverage.
+The Unicode fixture adds 14 shared screens for CJK characters, single-code-point
+emoji, and decomposed/stacked accents, including completion in the middle of a
+line. Cursor markers use terminal cells rather than string indices. Snapshots
+also record the exact editor buffer and cursor offset, and tests pass the
+completed arguments through Typer so screen normalization cannot hide changes
+to decomposed values. Zsh's default display shows combining marks as codes;
+the original code points remain in its edit buffer. Full scripts live in
+`tests/snapshots/generated/unicode.{bash,fish,zsh}`.
+
+Current snapshot baselines target the locked Bash 5.x, Fish 4.x, and Zsh 5.9
+environment. Multi-code-point emoji sequences, line wrapping, custom word-break
+settings, unusual shell parsing modes, and filenames containing control
+characters still need broader coverage.
 
 ## Installation
 

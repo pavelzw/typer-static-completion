@@ -19,8 +19,8 @@ interactive screen harness and behavioral tests.
 - [x] Load explicit module/app targets without calling wrappers or factories.
 - [x] Implement CLI `generate` with required shell selection, stdout/file output,
       error handling, and stream/exit-code tests.
-- [x] Record full generated scripts for demo, parsing, CLI, coverage, tuple, tuple-argument, group-argument, and case-matching fixtures in all
-      three shells, alongside 190 shared interactive screen cases.
+- [x] Record full generated scripts for demo, parsing, CLI, coverage, tuple, tuple-argument, group-argument, case-matching, and Unicode fixtures in all
+      three shells, alongside 204 shared interactive screen cases.
 - [x] Test interactive completion for choices, quoted files, nested commands,
       assignments, short clusters, repeated flags, positional values, `--`, parent
       scope, two CLIs loaded together, and repeated sourcing.
@@ -39,8 +39,11 @@ interactive screen harness and behavioral tests.
 - [x] Cover literal metacharacters already in escaped/quoted prefixes, including
       assignments, embedded quotes, and closed quotes. Check the actual argument
       values and reject substitution execution in every shell.
-- [ ] Extend to wide/combining Unicode, unusual word-break settings, and
-      control-character filenames.
+- [x] Cover CJK, single-code-point emoji, and decomposed/stacked accents at the
+      end and middle of the line. Record exact editor state independently of
+      display normalization, and place cursor markers by terminal cell.
+- [ ] Extend to multi-code-point emoji sequences, line wrapping, unusual
+      word-break settings, and control-character filenames.
 - [x] Add cases for custom/disabled help flags, hidden commands/options,
       deprecated commands, and literal descriptions with descriptions disabled.
 - [x] Support tuple options with per-position types, repeated occurrences, assigned
