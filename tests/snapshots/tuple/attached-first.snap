@@ -1,0 +1,17 @@
+Input: demo paint -pbl<TAB>
+
+Shell: bash
+
+> demo paint -pblue ▏
+
+---
+
+Shell: fish
+
+> demo paint -pblue ▏
+
+---
+
+Shell: zsh
+
+> demo paint -pblue ▏

@@ -1,0 +1,17 @@
+Input: demo paint --resource=blue two<TAB>
+
+Shell: bash
+
+> demo paint --resource=blue two\ words.json ▏
+
+---
+
+Shell: fish
+
+> demo paint --resource=blue two\ words.json ▏
+
+---
+
+Shell: zsh
+
+> demo paint --resource=blue two\ words.json ▏

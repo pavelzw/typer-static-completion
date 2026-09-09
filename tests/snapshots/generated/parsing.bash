@@ -18,12 +18,16 @@ _tsc_2a97516c354b6884() {
         fi
     done
     words+=("$token")
-    local cur=$token node=0 position=0 ended=0 pending=-1 target=-1 takes=0
+    local cur=$token node=0 position=0 ended=0 pending=-1 remaining=0 target=-1 takes=0
     local word flag value j prefix= file_mode= candidate
     COMPREPLY=()
     for ((i=1; i<${#words[@]}-1; i++)); do
         word=${words[i]}
-        if ((pending >= 0)); then pending=-1; continue; fi
+        if ((pending >= 0)); then
+            ((remaining-=1))
+            if ((remaining)); then ((pending+=1)); else pending=-1; fi
+            continue
+        fi
         if [[ $word == -- && $ended == 0 ]]; then ended=1; continue; fi
         if [[ $word == -* && $word != - && $ended == 0 ]]; then
             flag=${word%%=*}; value=0
@@ -70,7 +74,8 @@ _tsc_2a97516c354b6884() {
 3:--help) target=24; takes=0 ;;
             esac
             if ((target >= 0)); then
-                if ((takes && !value)); then pending=$target; fi
+                remaining=$((takes-value))
+                if ((remaining > 0)); then pending=$((target+value)); fi
                 continue
             fi
             # Short flag clusters and attached short values.
@@ -119,7 +124,10 @@ _tsc_2a97516c354b6884() {
                     esac
                     ((target < 0)) && return 0
                     if ((takes)); then
-                        ((j == ${#word}-1)) && pending=$target
+                        value=0
+                        ((j < ${#word}-1)) && value=1
+                        remaining=$((takes-value))
+                        if ((remaining > 0)); then pending=$((target+value)); fi
                         break
                     fi
                 done

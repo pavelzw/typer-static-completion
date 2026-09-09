@@ -8,7 +8,7 @@
 Generate static shell completions for typer applications. Requires Python 3.11 or newer.
 
 Status: initial Bash, Fish, and Zsh implementation. Typer introspection and generation work
-for nested commands, flags, choices, scalar/variadic arguments, and paths.
+for nested commands, flags, choices, tuple options, scalar/variadic arguments, and paths.
 The CLI provides `generate`; the Python API provides `generate()` and `write()`.
 PowerShell and dynamic delegation remain unimplemented. See
 [TODO.md](TODO.md) for the remaining work.
@@ -24,8 +24,13 @@ Pass `"fish"` or `"zsh"` to target those shells. Write the returned script to a
 file and source it in the corresponding shell (after `compinit` for Zsh). Completion stays
 static: dynamic callback values are omitted by default. Explicit file fallback
 is supported; hybrid delegation currently raises an error. Chain groups, group
-arguments, tuple arity, and case-insensitive choices are not yet supported and
+arguments, tuple positional arguments, and case-insensitive choices are not yet supported and
 raise errors instead of generating approximate completions.
+
+Tuple options such as `pair: tuple[Color, Path]` complete each value using its
+own type. All three shells support `--pair blue path`, `--pair=blue path`,
+attached short values, and repeated occurrences. `Param.values` holds the
+per-position `ValueSpec` metadata for callers constructing command trees by hand.
 
 The public `Shell` enum lists the three implemented shells. Generator subclasses
 implement `render()` and `quote()`; custom generators can be registered under
@@ -184,6 +189,9 @@ argument values and reject executable substitutions before snapshots can update.
 Bash explicitly quotes literal candidates containing expansion syntax because
 Readline's filename quoting alone can leave backticks executable. Custom help
 aliases retain their configured order for deterministic output across processes.
+
+The tuple cases in `tests/tuple_cases.py` have interactive screen snapshots and a
+full generated-script fixture alongside the existing parsing matrix.
 
 Current snapshot baselines target the locked Bash 5.x, Fish 4.x, and Zsh 5.9 environment. Broader Unicode coverage (including wide and combining characters),
 custom word-break settings, unusual shell parsing modes, and filenames containing

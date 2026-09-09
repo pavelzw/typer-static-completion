@@ -13,6 +13,7 @@ from fixtures import fixture, parsing_fixture
 from parsing_cases import CASES as PARSING_CASES
 from snapshot_assertions import assert_snapshot
 from snapshot_harness import capture
+from tuple_cases import CASES as TUPLE_CASES
 
 from typer_static_completions import (
     Command,
@@ -259,4 +260,21 @@ def test_coverage_descriptions(include_help):
     name = "descriptions" if include_help else "no-descriptions"
     assert_snapshot(
         Path(__file__).with_name("snapshots") / "coverage" / f"{name}.snap", actual
+    )
+
+
+@pytest.mark.parametrize("case", TUPLE_CASES, ids=lambda case: case.name)
+def test_tuple_screen(case):
+    from fixtures import tuple_fixture
+
+    sections = []
+    for shell in ("bash", "fish", "zsh"):
+        screen = capture(
+            generate(tuple_fixture(), "demo", shell), case.input, shell=shell
+        )
+        assert screen == f"> {case.completed}▏\n", f"{shell}: {case.name}\n{screen}"
+        sections.append(f"Shell: {shell}\n\n{screen}")
+    actual = f"Input: {case.input}\n\n" + "\n---\n\n".join(sections)
+    assert_snapshot(
+        Path(__file__).with_name("snapshots") / "tuple" / f"{case.name}.snap", actual
     )

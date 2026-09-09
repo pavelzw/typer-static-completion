@@ -49,7 +49,7 @@ from .errors import (
     UnsupportedShellError,
 )
 from .introspect import from_app, from_command
-from .model import Command, CommandTree, Param, ParamKind, ValueKind
+from .model import Command, CommandTree, Param, ParamKind, ValueKind, ValueSpec
 from .shells import DEFAULT_SHELLS, Shell
 
 try:
@@ -78,6 +78,7 @@ __all__ = [
     "StaticCompletionError",
     "UnsupportedShellError",
     "ValueKind",
+    "ValueSpec",
     "__version__",
     "from_app",
     "from_command",

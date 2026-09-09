@@ -9,7 +9,7 @@ from ..config import DynamicPolicy
 from ..errors import IntrospectionError
 from ..model import Command, CommandTree, Param, ValueKind
 from ..shells import Shell
-from .base import Generator
+from .base import Generator, value_slots
 
 
 class BashGenerator(Generator):
@@ -56,17 +56,13 @@ class BashGenerator(Generator):
             for param in command.params:
                 if param.is_help and not self.options.include_help_option:
                     continue
-                if param.nargs not in (1, -1) or (param.flags and param.nargs != 1):
-                    raise IntrospectionError(
-                        "Only scalar options and scalar/variadic arguments are supported yet"
-                    )
                 param_id = len(params)
-                params.append(param)
+                params.extend(value_slots(param))
                 if param.flags:
                     flags.extend(param.flags)
                     for flag in param.flags:
                         option_cases.append(
-                            f"{self.quote(f'{node_id}:{flag}')}) target={param_id}; takes={int(param.takes_value)} ;;"
+                            f"{self.quote(f'{node_id}:{flag}')}) target={param_id}; takes={param.nargs if param.takes_value else 0} ;;"
                         )
                 else:
                     pattern = (
@@ -158,12 +154,16 @@ _PARSER = r"""@NAME@() {
         fi
     done
     words+=("$token")
-    local cur=$token node=0 position=0 ended=0 pending=-1 target=-1 takes=0
+    local cur=$token node=0 position=0 ended=0 pending=-1 remaining=0 target=-1 takes=0
     local word flag value j prefix= file_mode= candidate
     COMPREPLY=()
     for ((i=1; i<${#words[@]}-1; i++)); do
         word=${words[i]}
-        if ((pending >= 0)); then pending=-1; continue; fi
+        if ((pending >= 0)); then
+            ((remaining-=1))
+            if ((remaining)); then ((pending+=1)); else pending=-1; fi
+            continue
+        fi
         if [[ $word == -- && $ended == 0 ]]; then ended=1; continue; fi
         if [[ $word == -* && $word != - && $ended == 0 ]]; then
             flag=${word%%=*}; value=0
@@ -173,7 +173,8 @@ _PARSER = r"""@NAME@() {
 @OPTIONS@
             esac
             if ((target >= 0)); then
-                if ((takes && !value)); then pending=$target; fi
+                remaining=$((takes-value))
+                if ((remaining > 0)); then pending=$((target+value)); fi
                 continue
             fi
             # Short flag clusters and attached short values.
@@ -185,7 +186,10 @@ _PARSER = r"""@NAME@() {
                     esac
                     ((target < 0)) && return 0
                     if ((takes)); then
-                        ((j == ${#word}-1)) && pending=$target
+                        value=0
+                        ((j < ${#word}-1)) && value=1
+                        remaining=$((takes-value))
+                        if ((remaining > 0)); then pending=$((target+value)); fi
                         break
                     fi
                 done

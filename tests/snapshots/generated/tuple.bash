@@ -34,13 +34,15 @@ _tsc_2a97516c354b6884() {
             [[ $word == *=* ]] && value=1
             target=-1; takes=0
             case "$node:$flag" in
-0:-h) target=0; takes=0 ;;
-0:--assist) target=0; takes=0 ;;
-1:--value) target=1; takes=1 ;;
-1:-h) target=2; takes=0 ;;
-1:--assist) target=2; takes=0 ;;
-2:-h) target=3; takes=0 ;;
-2:--assist) target=3; takes=0 ;;
+0:--pair) target=0; takes=2 ;;
+0:--help) target=2; takes=0 ;;
+1:--pair) target=3; takes=2 ;;
+1:-p) target=3; takes=2 ;;
+1:--resource) target=5; takes=2 ;;
+1:--triple) target=7; takes=3 ;;
+1:--verbose) target=10; takes=0 ;;
+1:-v) target=10; takes=0 ;;
+1:--help) target=11; takes=0 ;;
             esac
             if ((target >= 0)); then
                 remaining=$((takes-value))
@@ -52,13 +54,15 @@ _tsc_2a97516c354b6884() {
                 for ((j=1; j<${#word}; j++)); do
                     flag=-${word:$j:1}; target=-1; takes=0
                     case "$node:$flag" in
-0:-h) target=0; takes=0 ;;
-0:--assist) target=0; takes=0 ;;
-1:--value) target=1; takes=1 ;;
-1:-h) target=2; takes=0 ;;
-1:--assist) target=2; takes=0 ;;
-2:-h) target=3; takes=0 ;;
-2:--assist) target=3; takes=0 ;;
+0:--pair) target=0; takes=2 ;;
+0:--help) target=2; takes=0 ;;
+1:--pair) target=3; takes=2 ;;
+1:-p) target=3; takes=2 ;;
+1:--resource) target=5; takes=2 ;;
+1:--triple) target=7; takes=3 ;;
+1:--verbose) target=10; takes=0 ;;
+1:-v) target=10; takes=0 ;;
+1:--help) target=11; takes=0 ;;
                     esac
                     ((target < 0)) && return 0
                     if ((takes)); then
@@ -74,9 +78,7 @@ _tsc_2a97516c354b6884() {
             return 0
         fi
         case "$node:$word" in
-0:show) node=1; position=0; ended=0; continue ;;
-0:legacy-deprecated) node=2; position=0; ended=0; continue ;;
-0:bare) node=3; position=0; ended=0; continue ;;
+0:paint) node=1; position=0; ended=0; continue ;;
         esac
         # Groups without arguments require the next operand to be a command.
         case $node in
@@ -88,13 +90,15 @@ _tsc_2a97516c354b6884() {
     if ((target < 0 && ended == 0)) && [[ $cur == --*=* ]]; then
         flag=${cur%%=*}; takes=0
         case "$node:$flag" in
-0:-h) target=0; takes=0 ;;
-0:--assist) target=0; takes=0 ;;
-1:--value) target=1; takes=1 ;;
-1:-h) target=2; takes=0 ;;
-1:--assist) target=2; takes=0 ;;
-2:-h) target=3; takes=0 ;;
-2:--assist) target=3; takes=0 ;;
+0:--pair) target=0; takes=2 ;;
+0:--help) target=2; takes=0 ;;
+1:--pair) target=3; takes=2 ;;
+1:-p) target=3; takes=2 ;;
+1:--resource) target=5; takes=2 ;;
+1:--triple) target=7; takes=3 ;;
+1:--verbose) target=10; takes=0 ;;
+1:-v) target=10; takes=0 ;;
+1:--help) target=11; takes=0 ;;
         esac
         ((takes)) || return 0
         prefix=$flag=; cur=${cur#*=}
@@ -102,13 +106,15 @@ _tsc_2a97516c354b6884() {
         for ((j=1; j<${#cur}; j++)); do
             flag=-${cur:$j:1}; target=-1; takes=0
             case "$node:$flag" in
-0:-h) target=0; takes=0 ;;
-0:--assist) target=0; takes=0 ;;
-1:--value) target=1; takes=1 ;;
-1:-h) target=2; takes=0 ;;
-1:--assist) target=2; takes=0 ;;
-2:-h) target=3; takes=0 ;;
-2:--assist) target=3; takes=0 ;;
+0:--pair) target=0; takes=2 ;;
+0:--help) target=2; takes=0 ;;
+1:--pair) target=3; takes=2 ;;
+1:-p) target=3; takes=2 ;;
+1:--resource) target=5; takes=2 ;;
+1:--triple) target=7; takes=3 ;;
+1:--verbose) target=10; takes=0 ;;
+1:-v) target=10; takes=0 ;;
+1:--help) target=11; takes=0 ;;
             esac
             if ((takes)); then prefix=${cur:0:$((j+1))}; cur=${cur:$((j+1))}; break; fi
             target=-1
@@ -116,10 +122,8 @@ _tsc_2a97516c354b6884() {
     fi
     if ((target < 0)); then
         case $node in
-0) candidates=(show legacy-deprecated bare); if [[ $cur == -* && $ended == 0 ]]; then candidates=(-h --assist); fi ;;
-1) candidates=(); if [[ $cur == -* && $ended == 0 ]]; then candidates=(--value -h --assist); fi ;;
-2) candidates=(); if [[ $cur == -* && $ended == 0 ]]; then candidates=(-h --assist); fi ;;
-3) candidates=(); if [[ $cur == -* && $ended == 0 ]]; then candidates=(); fi ;;
+0) candidates=(paint); if [[ $cur == -* && $ended == 0 ]]; then candidates=(--pair --help); fi ;;
+1) candidates=(); if [[ $cur == -* && $ended == 0 ]]; then candidates=(--pair -p --resource --triple --verbose -v --help); fi ;;
         esac
         if [[ $cur != -* || $ended == 1 ]]; then
             case "$node:$position" in
@@ -131,9 +135,17 @@ _tsc_2a97516c354b6884() {
         candidates=(); descriptions=()
         case $target in
 0) candidates=() ;;
-1) candidates=('apos'"'"'trophe' 'café' 'bracket[one]:two' 'dollar$(demo)' 'tick`demo`' 'quote"double' 'slash\path'); compopt -o filenames 2>/dev/null || : ;;
+1) candidates=() ;;
 2) candidates=() ;;
-3) candidates=() ;;
+3) candidates=(red rose blue 'two words' 'quote'"'"'s'); compopt -o filenames 2>/dev/null || : ;;
+4) candidates=(group green); compopt -o filenames 2>/dev/null || : ;;
+5) candidates=(red rose blue 'two words' 'quote'"'"'s'); compopt -o filenames 2>/dev/null || : ;;
+6) file_mode=file ;;
+7) candidates=() ;;
+8) candidates=() ;;
+9) candidates=(red rose blue 'two words' 'quote'"'"'s'); compopt -o filenames 2>/dev/null || : ;;
+10) candidates=() ;;
+11) candidates=() ;;
         esac
     fi
     if [[ -n $file_mode ]]; then

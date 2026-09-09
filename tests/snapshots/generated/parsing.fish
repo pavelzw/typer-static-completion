@@ -51,10 +51,16 @@ function __tsc_2a97516c354b6884
     set -l node 0
     set -l position 0
     set -l pending -1
+    set -l remaining 0
     set -l ended 0
     for word in $tokens[2..-1]
         if test $pending -ge 0
-            set pending -1
+            set remaining (math $remaining - 1)
+            if test $remaining -gt 0
+                set pending (math $pending + 1)
+            else
+                set pending -1
+            end
             continue
         end
         if test "$word" = --; and test $ended -eq 0
@@ -65,8 +71,11 @@ function __tsc_2a97516c354b6884
             set -l flag (string split -m 1 = -- "$word")[1]
             set -l info (__tsc_2a97516c354b6884_option $node "$flag")
             if test $info[1] -ge 0
-                if test $info[2] -eq 1; and not string match -q '*=*' -- "$word"
-                    set pending $info[1]
+                set -l consumed 0
+                string match -q '*=*' -- "$word"; and set consumed 1
+                set remaining (math $info[2] - $consumed)
+                if test $remaining -gt 0
+                    set pending (math $info[1] + $consumed)
                 end
                 continue
             end
@@ -79,9 +88,12 @@ function __tsc_2a97516c354b6884
                     if test $info[1] -lt 0
                         return
                     end
-                    if test $info[2] -eq 1
-                        if test -z "$rest"
-                            set pending $info[1]
+                    if test $info[2] -gt 0
+                        set -l consumed 0
+                        test -n "$rest"; and set consumed 1
+                        set remaining (math $info[2] - $consumed)
+                        if test $remaining -gt 0
+                            set pending (math $info[1] + $consumed)
                         end
                         break
                     end
@@ -108,7 +120,7 @@ case 2; return
         if string match -q -- '--*=*' "$current"
             set -l parts (string split -m 1 = -- "$current")
             set -l info (__tsc_2a97516c354b6884_option $node "$parts[1]")
-            test $info[2] -eq 1; or return
+            test $info[2] -gt 0; or return
             set target $info[1]
             set prefix "$parts[1]="
             set current "$parts[2]"
@@ -123,7 +135,7 @@ case 2; return
                 if test $info[1] -lt 0
                     break
                 end
-                if test $info[2] -eq 1
+                if test $info[2] -gt 0
                     set target $info[1]
                     set prefix "$attached"
                     set current "$rest"

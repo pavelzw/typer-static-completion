@@ -1,0 +1,17 @@
+Input: demo paint --pair=blue green --ver<TAB>
+
+Shell: bash
+
+> demo paint --pair=blue green --verbose ▏
+
+---
+
+Shell: fish
+
+> demo paint --pair=blue green --verbose ▏
+
+---
+
+Shell: zsh
+
+> demo paint --pair=blue green --verbose ▏

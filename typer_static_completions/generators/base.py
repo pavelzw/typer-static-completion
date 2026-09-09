@@ -9,9 +9,11 @@ app -- so they can be unit-tested against hand-built trees.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from dataclasses import replace
 
 from ..config import GenerationOptions
-from ..model import CommandTree
+from ..errors import IntrospectionError
+from ..model import CommandTree, Param
 
 
 class Generator(ABC):
@@ -44,3 +46,25 @@ class Generator(ABC):
         ``_arguments`` treats ``[``, ``]`` and ``:`` as syntax, so a help string
         like ``List items ("all" by default)`` corrupts an unescaped script.
         """
+
+
+def value_slots(param: Param) -> tuple[Param, ...]:
+    """Flatten option values into consecutive parser targets."""
+    if param.flags and param.nargs > 1:
+        if len(param.values) != param.nargs:
+            raise IntrospectionError("Tuple options require metadata for every value")
+        return tuple(
+            replace(
+                param,
+                value_kind=value.value_kind,
+                choices=value.choices,
+                values=(),
+                nargs=1,
+            )
+            for value in param.values
+        )
+    if param.nargs not in (1, -1) or (param.flags and param.nargs != 1):
+        raise IntrospectionError(
+            "Only scalar/tuple options and scalar/variadic arguments are supported yet"
+        )
+    return (param,)

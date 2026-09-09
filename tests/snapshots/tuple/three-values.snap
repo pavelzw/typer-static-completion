@@ -1,0 +1,17 @@
+Input: demo paint --triple a b bl<TAB>
+
+Shell: bash
+
+> demo paint --triple a b blue ▏
+
+---
+
+Shell: fish
+
+> demo paint --triple a b blue ▏
+
+---
+
+Shell: zsh
+
+> demo paint --triple a b blue ▏

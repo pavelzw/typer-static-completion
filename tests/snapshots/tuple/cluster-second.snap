@@ -1,0 +1,17 @@
+Input: demo paint -vpblue gre<TAB>
+
+Shell: bash
+
+> demo paint -vpblue green ▏
+
+---
+
+Shell: fish
+
+> demo paint -vpblue green ▏
+
+---
+
+Shell: zsh
+
+> demo paint -vpblue green ▏

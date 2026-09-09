@@ -8,7 +8,7 @@ from ..config import DynamicPolicy
 from ..errors import IntrospectionError
 from ..model import CommandTree, Param, ValueKind
 from ..shells import Shell
-from .base import Generator
+from .base import Generator, value_slots
 
 
 class FishGenerator(Generator):
@@ -71,16 +71,12 @@ class FishGenerator(Generator):
             for param in command.params:
                 if param.is_help and not self.options.include_help_option:
                     continue
-                if param.nargs not in (1, -1) or (param.flags and param.nargs != 1):
-                    raise IntrospectionError(
-                        "Only scalar options and scalar/variadic arguments are supported yet"
-                    )
                 param_id = len(params)
-                params.append(param)
+                params.extend(value_slots(param))
                 if param.flags:
                     for flag in param.flags:
                         options.append(
-                            f'if test "$argv[1]:$argv[2]" = {self.quote(f"{node}:{flag}")}; printf "%s\\n" {param_id} {int(param.takes_value)}; return; end'
+                            f'if test "$argv[1]:$argv[2]" = {self.quote(f"{node}:{flag}")}; printf "%s\\n" {param_id} {param.nargs if param.takes_value else 0}; return; end'
                         )
                         flags.append(flag)
                         descriptions.append(
@@ -152,10 +148,16 @@ function @NAME@
     set -l node 0
     set -l position 0
     set -l pending -1
+    set -l remaining 0
     set -l ended 0
     for word in $tokens[2..-1]
         if test $pending -ge 0
-            set pending -1
+            set remaining (math $remaining - 1)
+            if test $remaining -gt 0
+                set pending (math $pending + 1)
+            else
+                set pending -1
+            end
             continue
         end
         if test "$word" = --; and test $ended -eq 0
@@ -166,8 +168,11 @@ function @NAME@
             set -l flag (string split -m 1 = -- "$word")[1]
             set -l info (@NAME@_option $node "$flag")
             if test $info[1] -ge 0
-                if test $info[2] -eq 1; and not string match -q '*=*' -- "$word"
-                    set pending $info[1]
+                set -l consumed 0
+                string match -q '*=*' -- "$word"; and set consumed 1
+                set remaining (math $info[2] - $consumed)
+                if test $remaining -gt 0
+                    set pending (math $info[1] + $consumed)
                 end
                 continue
             end
@@ -180,9 +185,12 @@ function @NAME@
                     if test $info[1] -lt 0
                         return
                     end
-                    if test $info[2] -eq 1
-                        if test -z "$rest"
-                            set pending $info[1]
+                    if test $info[2] -gt 0
+                        set -l consumed 0
+                        test -n "$rest"; and set consumed 1
+                        set remaining (math $info[2] - $consumed)
+                        if test $remaining -gt 0
+                            set pending (math $info[1] + $consumed)
                         end
                         break
                     end
@@ -206,7 +214,7 @@ function @NAME@
         if string match -q -- '--*=*' "$current"
             set -l parts (string split -m 1 = -- "$current")
             set -l info (@NAME@_option $node "$parts[1]")
-            test $info[2] -eq 1; or return
+            test $info[2] -gt 0; or return
             set target $info[1]
             set prefix "$parts[1]="
             set current "$parts[2]"
@@ -221,7 +229,7 @@ function @NAME@
                 if test $info[1] -lt 0
                     break
                 end
-                if test $info[2] -eq 1
+                if test $info[2] -gt 0
                     set target $info[1]
                     set prefix "$attached"
                     set current "$rest"

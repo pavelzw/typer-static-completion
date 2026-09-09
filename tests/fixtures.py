@@ -135,3 +135,23 @@ def coverage_fixture() -> typer.Typer:
         """A command without a help flag."""
 
     return app
+
+
+def tuple_fixture() -> typer.Typer:
+    """Heterogeneous tuple options at parent and leaf scope."""
+    app = typer.Typer(add_completion=False)
+
+    @app.callback()
+    def root(pair: tuple[str, str] = typer.Option(None, "--pair")):
+        pass
+
+    @app.command()
+    def paint(
+        pair: tuple[Color, GroupTarget] = typer.Option(None, "--pair", "-p"),
+        resource: tuple[Color, Path] = typer.Option(None, "--resource"),
+        triple: tuple[str, str, Color] = typer.Option(None, "--triple"),
+        verbose: bool = typer.Option(False, "--verbose", "-v"),
+    ):
+        typer.echo(repr(pair))
+
+    return app

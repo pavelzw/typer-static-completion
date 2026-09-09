@@ -27,7 +27,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from .errors import IntrospectionError
-from .model import Command, CommandTree, Param, ParamKind, ValueKind
+from .model import Command, CommandTree, Param, ParamKind, ValueKind, ValueSpec
 
 if TYPE_CHECKING:
     import typer
@@ -134,26 +134,35 @@ def from_command(
             if not retained(p):
                 continue
             kind = ParamKind(p.param_type_name)
-            value_kind = ValueKind.OPAQUE
-            if getattr(p, "is_flag", False) or getattr(p, "count", False):
-                value_kind = ValueKind.FLAG
-            elif getattr(p, "_custom_shell_complete", None):
-                value_kind = ValueKind.DYNAMIC
-            elif hasattr(p.type, "choices"):
-                if not getattr(p.type, "case_sensitive", True):
-                    raise IntrospectionError(
-                        "Case-insensitive choices are not supported yet"
-                    )
-                value_kind = ValueKind.CHOICE
-            elif p.type.name in DIRECTORY_TYPE_NAMES or (
-                p.type.name == "path" and not p.type.file_okay
-            ):
-                value_kind = ValueKind.DIRECTORY
-            elif p.type.name in FILE_TYPE_NAMES:
-                value_kind = ValueKind.FILE
-            choices = tuple(
-                str(getattr(c, "value", c)) for c in getattr(p.type, "choices", ())
-            )
+
+            def describe(type_: Any) -> ValueSpec:
+                value_kind = ValueKind.OPAQUE
+                if getattr(p, "is_flag", False) or getattr(p, "count", False):
+                    value_kind = ValueKind.FLAG
+                elif getattr(p, "_custom_shell_complete", None):
+                    value_kind = ValueKind.DYNAMIC
+                elif hasattr(type_, "choices"):
+                    if not getattr(type_, "case_sensitive", True):
+                        raise IntrospectionError(
+                            "Case-insensitive choices are not supported yet"
+                        )
+                    value_kind = ValueKind.CHOICE
+                elif type_.name in DIRECTORY_TYPE_NAMES or (
+                    type_.name == "path" and not type_.file_okay
+                ):
+                    value_kind = ValueKind.DIRECTORY
+                elif type_.name in FILE_TYPE_NAMES:
+                    value_kind = ValueKind.FILE
+                return ValueSpec(
+                    value_kind,
+                    tuple(
+                        str(getattr(c, "value", c))
+                        for c in getattr(type_, "choices", ())
+                    ),
+                )
+
+            value = describe(p.type)
+            values = tuple(describe(t) for t in getattr(p.type, "types", ()))
             flags = tuple(p.opts + p.secondary_opts)
             if p is help_option:
                 # Typer deduplicates help aliases with a set. Restore the user's
@@ -166,12 +175,13 @@ def from_command(
                 Param(
                     kind=kind,
                     name=p.name or "",
-                    value_kind=value_kind,
+                    value_kind=value.value_kind,
                     flags=flags if kind is ParamKind.OPTION else (),
                     negation_flags=tuple(p.secondary_opts)
                     if kind is ParamKind.OPTION
                     else (),
-                    choices=choices,
+                    choices=value.choices,
+                    values=values,
                     help=(getattr(p, "help", None) or "").split("\n")[0].strip(),
                     metavar=p.metavar,
                     required=p.required,

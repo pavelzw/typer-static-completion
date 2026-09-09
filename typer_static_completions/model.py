@@ -49,6 +49,14 @@ VARIADIC = -1
 
 
 @dataclass(frozen=True)
+class ValueSpec:
+    """Static completion metadata for one position in a tuple option."""
+
+    value_kind: ValueKind
+    choices: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
 class Param:
     """A single option or positional argument."""
 
@@ -69,7 +77,7 @@ class Param:
     help: str = ""
     metavar: str | None = None
     required: bool = False
-    #: ``1`` for a scalar, :data:`VARIADIC` for ``list[...]``.
+    #: ``1`` for a scalar, tuple arity, or :data:`VARIADIC` for ``list[...]``.
     nargs: int = 1
     #: True if the option may be repeated (``multiple=True``); shells that
     #: normally suppress an already-seen flag must not do so for these.
@@ -77,6 +85,8 @@ class Param:
     hidden: bool = False
     deprecated: bool = False
     is_help: bool = False
+    #: Per-position metadata for a tuple option; empty for scalar parameters.
+    values: tuple[ValueSpec, ...] = ()
 
     @property
     def takes_value(self) -> bool:
@@ -85,7 +95,9 @@ class Param:
 
     @property
     def is_dynamic(self) -> bool:
-        return self.value_kind is ValueKind.DYNAMIC
+        return self.value_kind is ValueKind.DYNAMIC or any(
+            value.value_kind is ValueKind.DYNAMIC for value in self.values
+        )
 
 
 @dataclass(frozen=True)
