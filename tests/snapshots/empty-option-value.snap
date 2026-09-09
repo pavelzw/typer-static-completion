@@ -3,3 +3,15 @@ Input: demo --profile "" dep<TAB>
 Shell: bash
 
 > demo --profile "" deploy ▏
+
+---
+
+Shell: fish
+
+> demo --profile "" deploy ▏
+
+---
+
+Shell: zsh
+
+> demo --profile "" deploy ▏

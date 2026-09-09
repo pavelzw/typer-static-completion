@@ -5,3 +5,17 @@ Shell: bash
 > demo deploy --color r
 red   rose
 > demo deploy --color r▏
+
+---
+
+Shell: fish
+
+> demo deploy --color red ▏
+red  rose
+
+---
+
+Shell: zsh
+
+> demo deploy --color r▏
+red   rose

@@ -3,3 +3,15 @@ Input: demo deploy -cbl<TAB>
 Shell: bash
 
 > demo deploy -cblue ▏
+
+---
+
+Shell: fish
+
+> demo deploy -cblue ▏
+
+---
+
+Shell: zsh
+
+> demo deploy -cblue ▏

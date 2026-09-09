@@ -7,7 +7,7 @@ is seconds on a CLI with heavy transitive imports.
 
 This library bakes the command names, option flags and enum choices into plain
 shell code. Static candidates do not start Python; delegated dynamic parameters
-would invoke the app. Bash generation is implemented; other shells and delegated
+would invoke the app. Bash, Fish, and Zsh generation are implemented; PowerShell and delegated
 callbacks are not yet implemented. Dynamic values are omitted by default.
 
     >>> from typer_static_completions import generate

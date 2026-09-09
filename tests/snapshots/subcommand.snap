@@ -3,3 +3,15 @@ Input: demo dep<TAB>
 Shell: bash
 
 > demo deploy ▏
+
+---
+
+Shell: fish
+
+> demo deploy ▏
+
+---
+
+Shell: zsh
+
+> demo deploy ▏

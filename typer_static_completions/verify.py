@@ -17,10 +17,9 @@ Per-shell mechanics:
 - **fish** has ``complete -C "<line>"``, which runs the real engine. Exact.
 - **bash** requires faking ``COMP_WORDS``/``COMP_CWORD`` and calling the function,
   then reading ``COMPREPLY``.
-- **zsh** in this proposed helper uses a dispatch approximation: ``_arguments`` and ``_describe`` are
-  would be stubbed out and the *dispatch branch* is captured instead of real candidates.
-  A zsh result is therefore closer to "which specs were selected" than to a
-  literal candidate list.
+- **zsh** is exercised through a real interactive PTY in the test suite. The
+  public :func:`complete` helper is still unimplemented; it must not substitute
+  mocked dispatch results for real candidates.
 
 Note that fish only offers option flags once the current token starts with
 ``-``; an empty token after a command shows subcommands and files. That is fish
@@ -46,15 +45,15 @@ def check_syntax(script: str, shell: ShellName) -> None:
             the shell's stderr.
         ShellUnavailableError: if the shell binary is not installed.
     """
-    if shell != "bash":
+    if shell not in ("bash", "fish", "zsh"):
         raise UnsupportedShellError(
             f"Syntax verification is not implemented for {shell!r}"
         )
-    executable = shutil.which("bash")
+    executable = shutil.which(shell)
     if not executable:
-        raise ShellUnavailableError("Bash is not installed")
+        raise ShellUnavailableError(f"{shell} is not installed")
     result = subprocess.run(
-        [executable, "--noprofile", "--norc", "-n"],
+        [executable, "-n"],
         input=script,
         text=True,
         capture_output=True,

@@ -5,6 +5,8 @@ import shutil
 
 import pytest
 
+pytest.register_assert_rewrite("snapshot_assertions")
+
 
 def pytest_addoption(parser):
     parser.addoption("--require-snapshots", action="store_true", default=False)
@@ -19,5 +21,6 @@ def pytest_configure(config):
                 raise pytest.UsageError(
                     f"Snapshot dependency missing: {module}"
                 ) from exc
-        if not shutil.which("bash"):
-            raise pytest.UsageError("Bash is required for screen snapshots")
+        for shell in ("bash", "fish", "zsh"):
+            if not shutil.which(shell):
+                raise pytest.UsageError(f"{shell} is required for screen snapshots")

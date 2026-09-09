@@ -3,3 +3,15 @@ Input: demo deploy --directory nest<TAB>
 Shell: bash
 
 > demo deploy --directory nested\ directory/▏
+
+---
+
+Shell: fish
+
+> demo deploy --directory nested\ directory/▏
+
+---
+
+Shell: zsh
+
+> demo deploy --directory nested\ directory/▏

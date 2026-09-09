@@ -1,16 +1,16 @@
 # Implementation and testing TODO
 
-The first Bash path is implemented: model traversal, Typer extraction, generation,
-syntax checks, and real interactive screen snapshots. File management, the CLI,
-Zsh/Fish/PowerShell generation, and the public candidate-verification helper are
-still scaffolds. The first milestone remains open until Zsh and Fish have the
-same interactive coverage.
+Bash, Fish, and Zsh now implement model traversal, Typer extraction, generation,
+syntax checks, and shared interactive screen snapshots. Full generated completion
+files are snapshot-tested alongside those screens. File management, the CLI,
+PowerShell generation, and the public candidate-verification helper remain scaffolds.
 
 Use `../commander-static-completion` as the local reference, especially
 `test/snapshots.test.js`, `test/snapshot-harness.js`,
 `test/snapshot-harness.test.js`, `test/behavior.test.js`, and
 `test/bash-readline.test.js`. Its interactive snapshots already exist; its
-representative generated-script snapshots are still a TODO.
+representative generated-script snapshots are still a TODO there; this project
+now checks them in `tests/snapshots/generated/`.
 
 ## First milestone: working completion with interactive screen snapshots
 
@@ -21,10 +21,10 @@ Fish before starting file management or CLI convenience features.
 - [x] Deliver a minimal end-to-end path from a Typer fixture to a generated script
       to a real interactive Bash screen snapshot. Capture visible suggestions,
       inserted text, and cursor position from the start.
-- [ ] Require reviewed interactive snapshots for each shell's initial support:
+- [x] Require reviewed interactive snapshots for each shell's initial support:
       unique and ambiguous completion, nested commands, choices, quoted paths,
       and cursor-in-the-middle editing.
-- [ ] Include explicit local snapshot updates and a required shell-integration
+- [x] Include explicit local snapshot updates and a required shell-integration
       CI check in this milestone. Expand the shared case matrix with each new
       completion feature.
 
@@ -54,7 +54,7 @@ harness and scenario checklist is in section 3.
       entrypoints to discover an app. Align `load_app`'s return type and docs.
 - [x] Make third-party shell registration consistent: `Generator.shell` and
       `available_shells()` now accept arbitrary string names; only implemented
-      generators are registered by default (currently Bash).
+      generators are registered by default (Bash, Fish, and Zsh).
 - [ ] Define failure semantics for `CompletionSet`: failed imports must make
       checks fail visibly and must never turn existing files into prune targets.
       Track file ownership; retain handwritten files, and validate custom layouts
@@ -71,7 +71,7 @@ harness and scenario checklist is in section 3.
 - [ ] Add fixtures for groups/options whose values look like command names.
       Walk tokens using parameter arity and scope rather than matching every
       non-flag word against a list of paths.
-- [ ] Implement registry and `generate()` for Bash, Zsh, and Fish. Start with
+- [x] Implement registry and `generate()` for Bash, Zsh, and Fish. Start with
       commands, flags, choices, positional values, and native file completion.
       Ensure stable output, final newlines, and collision-resistant helper names.
 - [ ] Test literal escaping separately for shell strings and Zsh completion specs:
@@ -90,26 +90,26 @@ harness and scenario checklist is in section 3.
 - [ ] Implement syntax checks and native candidate tests. Bash `COMPREPLY` and
       Fish `complete -C` are useful fast checks; mocked Zsh `_arguments` only
       tests dispatch and cannot prove actual insertion or candidate behavior.
-- [ ] Add deterministic generated-script snapshots for representative fixtures
+- [x] Add deterministic generated-script snapshots for representative fixtures
       in each shell. Keep versions/timestamps out by default; assert identical
       output across repeated generation. Review these alongside behavioral tests.
 
 ### Interactive screen snapshots like Commander (first-milestone requirement)
 
-Bash now has 18 reviewed screens, an isolated pexpect/pyte harness, explicit update
-and check tasks, failure/cleanup tests, and a dedicated Linux/macOS CI job. The
-cross-shell items below stay open until Zsh and Fish are covered as well.
+All three shells share 21 reviewed screen cases, a pexpect/pyte harness, explicit
+update/check tasks, failure/cleanup and terminal negotiation tests, and a dedicated
+Linux/macOS CI job. Full generated scripts live in `tests/snapshots/generated/`.
 
-- [ ] Build `tests/snapshot_harness.py`: launch actual interactive Bash, Zsh,
+- [x] Build `tests/snapshot_harness.py`: launch actual interactive Bash, Zsh,
       and Fish in a PTY, source generated scripts, and drive their line editors.
       Use a terminal emulator to interpret redraws and capture the final screen
       with an explicit cursor marker (`▏`); stripping ANSI escapes is insufficient.
-      The initial Bash harness uses pexpect and pyte; extend it to Zsh and Fish,
-      including terminal capability negotiation where required.
-- [ ] Use readable inputs such as `demo deploy --color r<TAB>` and
+      The harness uses pexpect and pyte for all three shells, with Fish terminal
+      capability negotiation and native Zsh completion widgets.
+- [x] Use readable inputs such as `demo deploy --color r<TAB>` and
       `demo deploy --color r --verbose<LEFT:10><TAB>`. Support named editing keys,
       reject raw control characters/Enter, and bound repetition counts.
-- [ ] Store one reviewed `tests/snapshots/<case>.snap` per scenario, containing
+- [x] Store one reviewed `tests/snapshots/<case>.snap` per scenario, containing
       the input and separate Bash/Fish/Zsh screen sections. Preserve insertion,
       cursor position, suggestion descriptions, quoting, and trailing spaces
       where they affect editing behavior.
@@ -120,13 +120,13 @@ cross-shell items below stay open until Zsh and Fish are covered as well.
       values, parent option scope, help flags, and chain groups as implemented.
       Translate Commander cases to Typer semantics rather than copying defaults
       and help-command behavior that Typer does not share.
-- [ ] Isolate shell configuration, history, working-directory fixtures, prompt,
+- [x] Isolate shell configuration, history, working-directory fixtures, prompt,
       locale, terminal size (80x24), and autosuggestions. Use controlled child
       environments, with shell executable overrides and recorded shell versions.
-- [ ] Synchronize on readiness and completion acknowledgements; answer terminal
+- [x] Synchronize on readiness and completion acknowledgements; answer terminal
       capability queries (especially Fish). Bound time and output; clean up the
       PTY and all child processes on success, startup failure, and timeout.
-- [ ] Test the harness itself: malformed keys, startup failure, terminal query
+- [x] Test the harness itself: malformed keys, startup failure, terminal query
       replies, timeouts with useful transcripts, and no surviving child process.
 - [ ] For static cases, make the CLI executable a sentinel that records invocation
       and remove runtime executables from the child PATH after setup. Assert TAB
@@ -134,7 +134,7 @@ cross-shell items below stay open until Zsh and Fish are covered as well.
 - [x] Add Pixi tasks `test-snapshots` and `update-snapshots`. Missing or
       changed snapshots must fail normal tests; updates must be explicit, local,
       and rejected in CI. Print a focused diff and regeneration instructions.
-- [ ] Add a dedicated Linux/macOS shell-integration CI job with locked shell and
+- [x] Add a dedicated Linux/macOS shell-integration CI job with locked shell and
       harness dependencies. Required shells must fail if missing in that job;
       keep portable Python unit tests on the existing OS/Python matrix. Document
       local optional skips and any deliberate platform-specific snapshots.
@@ -166,4 +166,5 @@ cross-shell items below stay open until Zsh and Fish are covered as well.
 Suggested order: resolve the contracts needed for the first fixture, build the
 interactive harness alongside one working shell path, add reviewed screen
 snapshots and CI, then extend generators and interactive snapshots to the other
-two shells. File management and CLI convenience follow that milestone. Keep the documented support limited to implemented and tested shell features.
+two shells (now done for the shared initial cases). File management and CLI
+convenience follow that milestone. Keep the documented support limited to implemented and tested shell features.

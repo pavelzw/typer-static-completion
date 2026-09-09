@@ -3,3 +3,15 @@ Input: demo deploy --color bl --no-cache<LEFT:11><TAB>
 Shell: bash
 
 > demo deploy --color blue▏ --no-cache
+
+---
+
+Shell: fish
+
+> demo deploy --color blue ▏--no-cache
+
+---
+
+Shell: zsh
+
+> demo deploy --color blue ▏ --no-cache

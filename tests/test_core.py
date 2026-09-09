@@ -155,8 +155,8 @@ def test_invalid_api_and_unsupported_shapes():
     with pytest.raises(ValueError, match="prog_name"):
         generate(CommandTree("demo", Command(())), "another")
     with pytest.raises(UnsupportedShellError):
-        generate(fixture(), "demo", "zsh")
-    with pytest.raises(IntrospectionError, match="chain"):
+        generate(fixture(), "demo", "powershell")
+    with pytest.raises(IntrospectionError, match="[Cc]hain"):
         generate(CommandTree("demo", Command((), chain=True)))
     with pytest.raises(IntrospectionError, match="scalar"):
         generate(

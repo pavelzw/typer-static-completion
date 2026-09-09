@@ -3,3 +3,15 @@ Input: demo deploy --color two<TAB>
 Shell: bash
 
 > demo deploy --color two\ words ▏
+
+---
+
+Shell: fish
+
+> demo deploy --color two\ words ▏
+
+---
+
+Shell: zsh
+
+> demo deploy --color two\ words ▏

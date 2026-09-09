@@ -57,7 +57,7 @@ jobs:
         run: pixi run -e ${{ matrix.environment }} test-coverage --color=yes
 
   snapshots:
-    name: Interactive Bash snapshots (${{ matrix.os }})
+    name: Interactive shell snapshots (${{ matrix.os }})
     timeout-minutes: 10
     runs-on: ${{ matrix.os }}
     strategy:

@@ -5,3 +5,17 @@ Shell: bash
 > demo ta
 tags   tasks
 > demo ta▏
+
+---
+
+Shell: fish
+
+> demo tags ▏
+tags  (List tags.)  tasks  (List tasks.)
+
+---
+
+Shell: zsh
+
+> demo ta▏
+tags -- List tags.    tasks -- List tasks.

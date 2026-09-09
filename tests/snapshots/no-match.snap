@@ -3,3 +3,15 @@ Input: demo zzz<TAB>
 Shell: bash
 
 > demo zzz▏
+
+---
+
+Shell: fish
+
+> demo zzz▏
+
+---
+
+Shell: zsh
+
+> demo zzz▏

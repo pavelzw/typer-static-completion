@@ -1,57 +1,72 @@
-"""zsh generator.
-
-The richest output of the four: zsh's ``_arguments`` handles per-option values,
-positional slots and descriptions natively, so most of the work is emitting
-correct specs.
-
-Three things here are load-bearing, and each one fails *silently* -- completing
-nothing at all, with no error:
-
-- **Shift ``words`` past the resolved subcommand path.** ``_arguments`` reads
-  ``words``/``CURRENT`` directly and counts positionals from ``words[2]``. Both
-  are the caller's locals, so shifting them is what makes the specs line up;
-  without it every subcommand word is an unexpected positional and ``_arguments``
-  bails out.
-- **Emit positional specs.** With no ``N:name:action`` spec, ``_arguments``
-  treats a bare word as an error and gives up -- taking the option completions
-  down with it. A variadic argument is ``*:``, not a numbered slot.
-- **One spec per flag, not zsh's ``{-a,--long}`` shorthand.** That form relies on
-  brace expansion, so it only works unquoted -- but specs must be quoted to
-  survive spaces and colons in help text. A ``(-a --long)`` exclusion prefix
-  restores the mutual exclusivity the shorthand provided.
-
-Subcommands are dispatched through ``_arguments -C`` and a ``->subcommand``
-state, then described with ``_describe``. Treating the subcommand as a *named
-positional slot* keeps it from fighting the command's own positionals.
-"""
+"""Zsh completion using the shared Bourne scanner and native completion actions."""
 
 from __future__ import annotations
 
 from ..model import Command, CommandTree
 from ..shells import Shell
-from .base import Generator
+from .bash import _PARSER, BashGenerator
 
 
-class ZshGenerator(Generator):
-    shell = Shell.zsh
+class ZshGenerator(BashGenerator):
+    shell: str = Shell.zsh
     install_layout = "share/zsh/site-functions/_{prog}"
     filename = "_{prog}"
 
     def render(self, tree: CommandTree) -> str:
-        raise NotImplementedError
+        return f"#compdef {self.quote(tree.prog_name)}\n" + super().render(tree)
 
-    def quote(self, text: str) -> str:
-        """Escape for a single-quoted ``_arguments`` spec.
+    def suggestion_action(self, command: Command, flags: list[str]) -> str:
+        action = super().suggestion_action(command, flags)
+        if not self.options.include_help:
+            return action
+        commands = " ".join(
+            self.quote(name + (" -- " + child.help if child.help else ""))
+            for name, child in command.subcommands.items()
+        )
+        helps = {flag: p.help for p in command.options for flag in p.flags}
+        options = " ".join(
+            self.quote(flag + (" -- " + helps[flag] if helps[flag] else ""))
+            for flag in flags
+        )
+        return (
+            action
+            + f"; descriptions=({commands}); if [[ $cur == -* && $ended == 0 ]]; then descriptions=({options}); fi"
+        )
 
-        Doubles ``'`` and backslash-escapes ``[``, ``]`` and ``:``, which are
-        spec syntax rather than text.
-        """
-        raise NotImplementedError
+    def runtime(self) -> str:
+        # The scanner uses zero-based arrays. Keep that emulation local and
+        # restore native Zsh options before invoking its completion helpers.
+        parser = _PARSER.replace(
+            "@SETUP@",
+            "    setopt localoptions ksharrays\n"
+            "    local COMP_LINE=$BUFFER COMP_POINT=$CURSOR\n"
+            "    local -a COMPREPLY\n",
+        )
+        return (
+            parser
+            + r"""
+    unsetopt ksharrays
+    if [[ -n $prefix ]]; then
+        # Tell Zsh that the attached flag is already present in the input.
+        compset -P "${(b)prefix}"
+    fi
+    if [[ $file_mode == directory ]]; then
+        _files -/
+    elif [[ $file_mode == file ]]; then
+        _files
+    else
+        compadd -d descriptions -- "${candidates[@]}"
+    fi
+}
+"""
+        )
 
-    def _option_specs(self, command: Command, tree: CommandTree) -> list[str]:
-        """``_arguments`` specs for the command's options."""
-        raise NotImplementedError
+    def choice_options(self) -> str:
+        return ":"
 
-    def _positional_specs(self, command: Command, tree: CommandTree) -> list[str]:
-        """``N:name:action`` specs, plus the ``->subcommand`` slot if it's a group."""
-        raise NotImplementedError
+    def registration(self, name: str, prog_name: str) -> str:
+        prog = self.quote(prog_name)
+        return (
+            f'if (( $+compstate )); then {name} "$@"; '
+            f"elif (( $+functions[compdef] )); then compdef {name} {prog}; fi\n"
+        )

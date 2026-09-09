@@ -9,8 +9,14 @@ from ..errors import UnsupportedShellError
 from ..shells import ShellName
 from .base import Generator
 from .bash import BashGenerator
+from .fish import FishGenerator
+from .zsh import ZshGenerator
 
-_REGISTRY: dict[str, type[Generator]] = {"bash": BashGenerator}
+_REGISTRY: dict[str, type[Generator]] = {
+    "bash": BashGenerator,
+    "fish": FishGenerator,
+    "zsh": ZshGenerator,
+}
 
 
 def get_generator(

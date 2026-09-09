@@ -1,0 +1,17 @@
+Input: demo deploy --color quote<TAB>
+
+Shell: bash
+
+> demo deploy --color quote\'s ▏
+
+---
+
+Shell: fish
+
+> demo deploy --color quote\'s ▏
+
+---
+
+Shell: zsh
+
+> demo deploy --color quote\'s ▏

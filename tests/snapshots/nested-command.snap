@@ -3,3 +3,15 @@ Input: demo remote a<TAB>
 Shell: bash
 
 > demo remote add ▏
+
+---
+
+Shell: fish
+
+> demo remote add ▏
+
+---
+
+Shell: zsh
+
+> demo remote add ▏

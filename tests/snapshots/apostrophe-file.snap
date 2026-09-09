@@ -1,0 +1,17 @@
+Input: demo deploy --config quote<TAB>
+
+Shell: bash
+
+> demo deploy --config quote\'s.json ▏
+
+---
+
+Shell: fish
+
+> demo deploy --config quote\'s.json ▏
+
+---
+
+Shell: zsh
+
+> demo deploy --config quote\'s.json ▏

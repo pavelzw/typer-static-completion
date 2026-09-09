@@ -40,10 +40,15 @@ def test_timeout_reaps_worker(tmp_path: Path):
         os.kill(int(pid_file.read_text()), 0)
 
 
-def test_static_invocation_is_detected():
-    script = "_bad() { demo; }; complete -F _bad demo\n"
+@pytest.mark.parametrize("shell", ["bash", "fish", "zsh"])
+def test_static_invocation_is_detected(shell):
+    script = {
+        "bash": "_bad() { demo; }; complete -F _bad demo\n",
+        "fish": "function _bad; demo; end; complete -c demo -f -a '(_bad)'\n",
+        "zsh": "_bad() { demo; }; compdef _bad demo\n",
+    }[shell]
     with pytest.raises(AssertionError, match="invoked"):
-        capture(script, "demo a<TAB>")
+        capture(script, "demo a<TAB>", shell=shell)
 
 
 def test_output_is_bounded():
@@ -60,3 +65,63 @@ def test_startup_failure_retains_diagnostics(tmp_path):
     shell.chmod(0o755)
     with pytest.raises(AssertionError, match="startup failed"):
         capture("", "demo", executable=str(shell))
+
+
+def test_terminal_queries_can_be_split_across_reads():
+    from snapshot_harness import TerminalProtocol
+
+    replies: list[str] = []
+    protocol = TerminalProtocol(replies.append)
+    for part in (
+        "\x1b[?",
+        "u",
+        "\x1b[>0q",
+        "\x1b]11;?\x1b",
+        "\\",
+        "\x1bP+q6162\x1b\\",
+        "\x1b[0c",
+    ):
+        protocol.write(part)
+    assert replies == [
+        "\x1b[?0u",
+        "\x1bP>|XTerm(370)\x1b\\",
+        "\x1b]11;rgb:0000/0000/0000\x1b\\",
+        "\x1bP0+r6162\x1b\\",
+        "\x1b[?1;2c",
+    ]
+
+
+def test_live_terminal_negotiation(tmp_path):
+    shell = tmp_path / "querying shell"
+    shell.write_text(
+        "#!/bin/bash\n/bin/stty -echo -icanon min 1\n"
+        "printf '\\033]777;TSC_READY\\007\\033[0c'\n"
+        "seen=\nwhile IFS= read -r -n 1 char; do\n"
+        "seen+=$char\n[[ $seen == *$'\\033[?1;2c' ]] && break\ndone\n"
+        "printf '> negotiation complete\\033]777;TSC_DONE\\007'\nexec /bin/sleep 30\n"
+    )
+    shell.chmod(0o755)
+    assert capture("", "probe", executable=str(shell)) == "> negotiation complete▏\n"
+
+
+def test_zsh_autoload_matches_sourced_script(tmp_path):
+    from fixtures import fixture
+
+    from typer_static_completions import generate
+
+    script = generate(fixture(), "demo", "zsh")
+    (tmp_path / "_demo").write_text(script)
+    loader = f"fpath=({shlex.quote(str(tmp_path))} $fpath)\nautoload -Uz _demo\ncompdef _demo demo\n"
+    expected = capture(script, "demo dep<TAB>", shell="zsh")
+    assert capture(loader, "demo dep<TAB>", shell="zsh") == expected
+
+
+def test_fish_redraw_after_acknowledgement_is_retained(tmp_path):
+    shell = tmp_path / "redrawing shell"
+    shell.write_text(
+        "#!/bin/sh\n/bin/stty -echo -icanon\n"
+        "printf '\\033]777;TSC_READY\\007stale\\033]777;TSC_DONE\\007\\r\\033[K> redraw'\n"
+        "exec /bin/sleep 30\n"
+    )
+    shell.chmod(0o755)
+    assert capture("", "", shell="fish", executable=str(shell)) == "> redraw▏\n"

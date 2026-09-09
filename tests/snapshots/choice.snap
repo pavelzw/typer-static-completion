@@ -3,3 +3,15 @@ Input: demo deploy --color bl<TAB>
 Shell: bash
 
 > demo deploy --color blue ▏
+
+---
+
+Shell: fish
+
+> demo deploy --color blue ▏
+
+---
+
+Shell: zsh
+
+> demo deploy --color blue ▏

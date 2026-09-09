@@ -1,0 +1,17 @@
+Input: demo deploy --config=two<TAB>
+
+Shell: bash
+
+> demo deploy --config=two\ words.json ▏
+
+---
+
+Shell: fish
+
+> demo deploy --config=two\ words.json ▏
+
+---
+
+Shell: zsh
+
+> demo deploy --config=two\ words.json ▏

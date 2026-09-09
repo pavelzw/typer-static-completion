@@ -7,7 +7,7 @@ import shlex
 
 from ..config import DynamicPolicy
 from ..errors import IntrospectionError
-from ..model import CommandTree, Param, ValueKind
+from ..model import Command, CommandTree, Param, ValueKind
 from ..shells import Shell
 from .base import Generator
 
@@ -24,6 +24,20 @@ class BashGenerator(Generator):
             )
         return shlex.quote(text)
 
+    def runtime(self) -> str:
+        return _PARSER.replace("@SETUP@", "") + _OUTPUT
+
+    def registration(self, name: str, prog_name: str) -> str:
+        return f"complete -F {name} -- {self.quote(prog_name)}\n"
+
+    def choice_options(self) -> str:
+        return "compopt -o filenames 2>/dev/null || :"
+
+    def suggestion_action(self, command: Command, flags: list[str]) -> str:
+        words = " ".join(self.quote(x) for x in command.subcommands)
+        options = " ".join(self.quote(x) for x in flags)
+        return f"candidates=({words}); if [[ $cur == -* && $ended == 0 ]]; then candidates=({options}); fi"
+
     def render(self, tree: CommandTree) -> str:
         nodes = list(tree.walk())
         ids = {c.path: i for i, c in enumerate(nodes)}
@@ -31,9 +45,9 @@ class BashGenerator(Generator):
         option_cases, command_cases, argument_cases, suggestion_cases = [], [], [], []
         for node_id, command in enumerate(nodes):
             if command.chain:
-                raise IntrospectionError("Bash chain groups are not supported yet")
+                raise IntrospectionError("Chain groups are not supported yet")
             if (command.is_group or command.subcommands) and command.arguments:
-                raise IntrospectionError("Bash group arguments are not supported yet")
+                raise IntrospectionError("Group arguments are not supported yet")
             flags: list[str] = []
             argument_index = 0
             for param in command.params:
@@ -63,10 +77,8 @@ class BashGenerator(Generator):
                 command_cases.append(
                     f"{self.quote(f'{node_id}:{name}')}) node={ids[child.path]}; position=0; ended=0; continue ;;"
                 )
-            words = " ".join(self.quote(x) for x in command.subcommands)
-            options = " ".join(self.quote(x) for x in flags)
             suggestion_cases.append(
-                f"{node_id}) candidates=({words}); if [[ $cur == -* && $ended == 0 ]]; then candidates=({options}); fi ;;"
+                f"{node_id}) {self.suggestion_action(command, flags)} ;;"
             )
         actions = []
         for index, param in enumerate(params):
@@ -94,7 +106,8 @@ class BashGenerator(Generator):
                 action = (
                     "candidates=("
                     + " ".join(self.quote(c) for c in param.choices)
-                    + "); compopt -o filenames 2>/dev/null || :"
+                    + "); "
+                    + self.choice_options()
                 )
             elif kind in (ValueKind.FILE, ValueKind.DIRECTORY):
                 action = f"file_mode={'directory' if kind is ValueKind.DIRECTORY else 'file'}"
@@ -110,7 +123,7 @@ class BashGenerator(Generator):
                 from importlib.metadata import version
 
                 banner += f"# typer-static-completions {version('typer-static-completions')}; typer {version('typer')}\n"
-        script = _RUNTIME.replace("@NAME@", name)
+        script = self.runtime().replace("@NAME@", name)
         for marker, cases in (
             ("OPTIONS", option_cases),
             ("COMMANDS", command_cases),
@@ -119,15 +132,15 @@ class BashGenerator(Generator):
             ("ACTIONS", actions),
         ):
             script = script.replace(f"@{marker}@", "\n".join(cases))
-        return banner + script + f"complete -F {name} -- {self.quote(tree.prog_name)}\n"
+        return banner + script + self.registration(name, tree.prog_name)
 
 
-_RUNTIME = r"""@NAME@() {
-    local line=${COMP_LINE:0:COMP_POINT} char quote= token= escaped=0 started=0 i
-    local -a words=() candidates=()
+_PARSER = r"""@NAME@() {
+@SETUP@    local line=${COMP_LINE:0:$COMP_POINT} char quote= token= escaped=0 started=0 i
+    local -a words=() candidates=() descriptions=()
     # Tokenize only the text before the cursor, without eval or external tools.
     for ((i=0; i<${#line}; i++)); do
-        char=${line:i:1}
+        char=${line:$i:1}
         if ((escaped)); then
             if [[ $quote == '"' && $char != '$' && $char != '"' && $char != '\' && $char != '`' ]]; then token+='\'; fi
             token+=$char; escaped=0; started=1
@@ -162,7 +175,7 @@ _RUNTIME = r"""@NAME@() {
             # Short flag clusters and attached short values.
             if [[ $word != --* ]]; then
                 for ((j=1; j<${#word}; j++)); do
-                    flag=-${word:j:1}; target=-1; takes=0
+                    flag=-${word:$j:1}; target=-1; takes=0
                     case "$node:$flag" in
 @OPTIONS@
                     esac
@@ -191,11 +204,11 @@ _RUNTIME = r"""@NAME@() {
         prefix=$flag=; cur=${cur#*=}
     elif ((target < 0 && ended == 0)) && [[ $cur == -?* && $cur != --* ]]; then
         for ((j=1; j<${#cur}; j++)); do
-            flag=-${cur:j:1}; target=-1; takes=0
+            flag=-${cur:$j:1}; target=-1; takes=0
             case "$node:$flag" in
 @OPTIONS@
             esac
-            if ((takes)); then prefix=${cur:0:j+1}; cur=${cur:j+1}; break; fi
+            if ((takes)); then prefix=${cur:0:$((j+1))}; cur=${cur:$((j+1))}; break; fi
             target=-1
         done
     fi
@@ -210,19 +223,21 @@ _RUNTIME = r"""@NAME@() {
         fi
     fi
     if ((target >= 0)); then
-        candidates=()
+        candidates=(); descriptions=()
         case $target in
 @ACTIONS@
         esac
     fi
-    if [[ -n $file_mode ]]; then
+"""
+
+_OUTPUT = r"""    if [[ -n $file_mode ]]; then
         while IFS= read -r candidate; do candidates+=("$candidate"); done < <(compgen -A "$file_mode" -- "$cur")
         compopt -o filenames 2>/dev/null || :
     fi
     # Readline replaces only the part after its last word-break character.
     local trim= full=$prefix$cur k
     for ((k=0; k<${#full}; k++)); do
-        char=${full:k:1}
+        char=${full:$k:1}
         if [[ $char != ' ' && $char != "'" && $char != '"' && $char != '\' && $COMP_WORDBREAKS == *"$char"* ]]; then trim=${full:0:k+1}; fi
     done
     for candidate in "${candidates[@]}"; do
