@@ -11,7 +11,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from ..config import GenerationOptions
-from ..model import CommandTree, Param
+from ..model import CommandTree
 
 
 class Generator(ABC):
@@ -44,16 +44,3 @@ class Generator(ABC):
         ``_arguments`` treats ``[``, ``]`` and ``:`` as syntax, so a help string
         like ``List items ("all" by default)`` corrupts an unescaped script.
         """
-
-    def value_action(self, param: Param, tree: CommandTree) -> str:
-        """Render what to offer for ``param``'s value.
-
-        Dispatches on :attr:`~typer_static_completions.model.Param.value_kind`
-        and on :class:`~typer_static_completions.config.DynamicPolicy`; the
-        per-shell spelling is the subclass's job.
-        """
-        raise NotImplementedError
-
-    def install_path(self, prog_name: str, root: str | None = None) -> str:
-        """Where this script belongs on a real system."""
-        raise NotImplementedError

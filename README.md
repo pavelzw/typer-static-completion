@@ -27,6 +27,16 @@ is supported; hybrid delegation currently raises an error. Chain groups, group
 arguments, tuple arity, and case-insensitive choices are not yet supported and
 raise errors instead of generating approximate completions.
 
+The public `Shell` enum lists the three implemented shells. Generator subclasses
+implement `render()` and `quote()`; custom generators can be registered under
+additional string names. `verify.check_syntax()` checks scripts with a locally
+installed shell's parser.
+
+Command models are frozen, and each `Command` copies its subcommand mapping into
+a read-only view. Changing the original dictionary does not change the tree.
+Declaration order is preserved. Trees remain unhashable; use `dataclasses.replace()`
+to construct modified versions. Subcommand views are not mutable dictionaries.
+
 ## Build-time generation and example
 
 Run the example from this checkout:

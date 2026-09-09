@@ -23,7 +23,7 @@ class FishGenerator(Generator):
             )
         return "'" + text.replace("\\", "\\\\").replace("'", "\\'") + "'"
 
-    def value_action(self, param: Param, tree: CommandTree) -> str:
+    def _value_action(self, param: Param, tree: CommandTree) -> str:
         kind = param.value_kind
         if kind is ValueKind.DYNAMIC:
             if self.options.dynamic in (DynamicPolicy.ERROR, DynamicPolicy.DELEGATE):
@@ -110,7 +110,7 @@ class FishGenerator(Generator):
                 f"set candidates {values(flags)}\nset descriptions {values(descriptions)}\nend"
             )
         actions = [
-            f"case {i}; {self.value_action(param, tree)}"
+            f"case {i}; {self._value_action(param, tree)}"
             for i, param in enumerate(params)
         ]
         runtime = _RUNTIME.replace("@NAME@", name)

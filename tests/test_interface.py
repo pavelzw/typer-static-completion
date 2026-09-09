@@ -35,9 +35,7 @@ def test_errors_share_a_base():
 def test_shell_members_are_strings():
     assert tsc.Shell.fish == "fish"
     assert set(tsc.DEFAULT_SHELLS) == {tsc.Shell.bash, tsc.Shell.zsh, tsc.Shell.fish}
-    # PowerShell has a generator but is opt-in: it needs a $PROFILE edit rather
-    # than a directory the shell scans.
-    assert tsc.Shell.powershell not in tsc.DEFAULT_SHELLS
+    assert set(tsc.Shell) == set(tsc.DEFAULT_SHELLS)
 
 
 def test_model_is_constructible_without_typer():

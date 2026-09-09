@@ -16,37 +16,11 @@ class Shell(str, Enum):
     """Shells with a built-in generator."""
 
     bash = "bash"
-    zsh = "zsh"
     fish = "fish"
-    powershell = "powershell"
-
-    @classmethod
-    def parse(cls, value: str | Shell) -> Shell:
-        """Coerce a shell name to a member, accepting ``pwsh`` for PowerShell.
-
-        Raises:
-            UnsupportedShellError: if ``value`` is not a known member.
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def current(cls) -> Shell:
-        """Best-effort guess of the shell that invoked this process.
-
-        Reads ``$SHELL`` and the parent process name, mirroring what typer's
-        ``--install-completion`` does.
-
-        Raises:
-            UnsupportedShellError: if the shell cannot be determined.
-        """
-        raise NotImplementedError
+    zsh = "zsh"
 
 
 #: Shells generated when a caller does not narrow the selection.
-#:
-#: PowerShell is excluded: its completion model is a single ``Register-Argument\
-#: Completer`` block rather than a file the shell picks up on its own, so it is
-#: opt-in.
 DEFAULT_SHELLS: tuple[Shell, ...] = (Shell.bash, Shell.zsh, Shell.fish)
 
 #: Anything accepted where a shell is expected.

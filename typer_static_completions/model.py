@@ -6,8 +6,9 @@ builds these objects out of typer's (private) command classes; generators read
 attribute access in one module, and makes generators testable without
 constructing a real ``Typer`` app.
 
-Dataclass fields are frozen, but nested mappings are currently mutable and make
-command trees unhashable. Deep immutability is still an open design task.
+Model fields are frozen. Commands copy their subcommand mappings and expose them
+read-only, preserving insertion order. Command trees remain unhashable; use
+dataclasses.replace() to build a modified tree.
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ from __future__ import annotations
 from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import Enum
+from types import MappingProxyType
 
 
 class ValueKind(str, Enum):
@@ -107,6 +109,11 @@ class Command:
     chain: bool = False
     is_group: bool = False
 
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self, "subcommands", MappingProxyType(dict(self.subcommands))
+        )
+
     @property
     def name(self) -> str:
         """Last path segment, or ``""`` for the root."""
@@ -136,9 +143,6 @@ class CommandTree:
     #: The name users type, e.g. ``"my-cli"``. Also the completion file's name.
     prog_name: str
     root: Command
-    #: Set when the app has ``autocompletion=`` callbacks anywhere; a generator
-    #: honouring :attr:`DynamicPolicy.DELEGATE` needs it to build the env var.
-    complete_var: str | None = None
 
     def walk(self) -> Iterator[Command]:
         return self.root.walk()

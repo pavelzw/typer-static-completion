@@ -41,18 +41,14 @@ interactive screen harness and behavioral tests.
       case-insensitive choices before claiming support.
 - [ ] Add opt-in dynamic delegation and test it separately from static guarantees.
       Cover all DynamicPolicy variants in each shell.
-- [ ] Expand native candidate verification and implement the public `complete()`
-      helper while retaining interactive screens as the behavioral authority.
+- [ ] Expand native candidate verification while retaining interactive screens as the behavioral authority.
 
-## API and packaging
+## API and compatibility
 
-- [ ] Choose deep immutability or explicitly mutable nested mappings for Command
-      and CommandTree; frozen dataclasses do not freeze their subcommands.
-- [ ] Complete the remaining public shell/generator helpers or remove unused
-      scaffolding from the API.
-- [ ] Automate isolated wheel/sdist validation in CI, including runtime
-      dependencies, console entrypoint behavior, and typed API distribution.
-      The generate-only CLI has been smoke-tested in an isolated wheel installation.
+- [x] Make subcommand mappings read-only defensive copies, preserving declaration
+      order. Keep trees unhashable and support edits via dataclasses.replace().
+- [x] Remove unused shell detection, installation, candidate-verification, and
+      PowerShell generator stubs. Reuse the public Shell enum in the CLI.
 - [ ] Test the declared Typer range and retain useful compatibility checks for
       its vendored internals. Decide whether the optional upstream Click
       comparison should have a provided dependency or be replaced.

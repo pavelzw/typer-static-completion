@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import contextlib
 import sys
-from enum import StrEnum
 from pathlib import Path
 from typing import Annotated
 
@@ -13,14 +12,7 @@ import typer
 from .core import _replace_file, generate
 from .errors import StaticCompletionError
 from .introspect import load_app
-
-
-class CompletionShell(StrEnum):
-    """Shells implemented by the CLI."""
-
-    bash = "bash"
-    fish = "fish"
-    zsh = "zsh"
+from .shells import Shell
 
 
 def build_cli() -> typer.Typer:
@@ -41,7 +33,7 @@ def build_cli() -> typer.Typer:
         prog_name: Annotated[
             str, typer.Option("--prog-name", help="Command name users type.")
         ],
-        shell: Annotated[CompletionShell, typer.Option(help="Target shell.")],
+        shell: Annotated[Shell, typer.Option(help="Target shell.")],
         output: Annotated[
             Path | None,
             typer.Option(
