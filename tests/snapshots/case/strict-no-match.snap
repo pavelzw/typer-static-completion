@@ -1,0 +1,17 @@
+Input: demo --strict bl<TAB>
+
+Shell: bash
+
+> demo --strict bl▏
+
+---
+
+Shell: fish
+
+> demo --strict bl▏
+
+---
+
+Shell: zsh
+
+> demo --strict bl▏

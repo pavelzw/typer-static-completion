@@ -1,0 +1,17 @@
+Input: demo --mode CAFÉ<TAB>
+
+Shell: bash
+
+> demo --mode Café ▏
+
+---
+
+Shell: fish
+
+> demo --mode Café ▏
+
+---
+
+Shell: zsh
+
+> demo --mode Café ▏

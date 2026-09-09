@@ -54,6 +54,13 @@ class ZshGenerator(BashGenerator):
         _files -/
     elif [[ $file_mode == file ]]; then
         _files
+    elif ((ignore_case)); then
+        # Filter explicitly: native matcher character classes miss accented pairs.
+        local -a matches=()
+        for candidate in "${candidates[@]}"; do
+            if [[ ${(L)candidate} == "${(L)cur}"* ]]; then matches+=("$candidate"); fi
+        done
+        compadd -U -i "$IPREFIX" -- "${matches[@]}"
     else
         compadd -d descriptions -- "${candidates[@]}"
     fi

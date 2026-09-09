@@ -23,7 +23,7 @@ _tsc_2a97516c354b6884() {
     done
     words+=("$token")
     local cur=$token node=0 position=0 ended=0 pending=-1 remaining=0 target=-1 takes=0
-    local word flag value j prefix= file_mode= candidate
+    local word flag value j prefix= file_mode= candidate ignore_case=0
     COMPREPLY=()
     for ((i=1; i<${#words[@]}-1; i++)); do
         word=${words[i]}
@@ -205,6 +205,13 @@ _tsc_2a97516c354b6884() {
         _files -/
     elif [[ $file_mode == file ]]; then
         _files
+    elif ((ignore_case)); then
+        # Filter explicitly: native matcher character classes miss accented pairs.
+        local -a matches=()
+        for candidate in "${candidates[@]}"; do
+            if [[ ${(L)candidate} == "${(L)cur}"* ]]; then matches+=("$candidate"); fi
+        done
+        compadd -U -i "$IPREFIX" -- "${matches[@]}"
     else
         compadd -d descriptions -- "${candidates[@]}"
     fi

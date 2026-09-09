@@ -58,6 +58,7 @@ def value_slots(param: Param) -> tuple[Param, ...]:
                 param,
                 value_kind=value.value_kind,
                 choices=value.choices,
+                case_sensitive=value.case_sensitive,
                 values=(),
                 nargs=1,
             )

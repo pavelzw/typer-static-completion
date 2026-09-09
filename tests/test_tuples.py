@@ -22,6 +22,7 @@ from typer_static_completions import (
 
 def test_tuple_metadata():
     command = from_app(tuple_fixture(), "demo").find(["paint"])
+    assert command is not None
     pair = next(p for p in command.options if p.name == "pair")
     assert pair.nargs == 2
     assert [v.value_kind for v in pair.values] == [ValueKind.CHOICE, ValueKind.CHOICE]

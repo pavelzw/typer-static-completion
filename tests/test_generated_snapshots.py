@@ -3,7 +3,13 @@
 from pathlib import Path
 
 import pytest
-from fixtures import coverage_fixture, fixture, parsing_fixture, tuple_fixture
+from fixtures import (
+    case_fixture,
+    coverage_fixture,
+    fixture,
+    parsing_fixture,
+    tuple_fixture,
+)
 from snapshot_assertions import assert_snapshot
 
 from typer_static_completions import generate
@@ -20,6 +26,7 @@ from typer_static_completions.verify import check_syntax, is_available
         ("cli", build_cli),
         ("coverage", coverage_fixture),
         ("tuple", tuple_fixture),
+        ("case", case_fixture),
     ],
 )
 def test_generated_file(shell, name, make_app):

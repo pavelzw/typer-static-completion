@@ -1,0 +1,17 @@
+Input: demo --mode=bL<TAB>
+
+Shell: bash
+
+> demo --mode=Blue ▏
+
+---
+
+Shell: fish
+
+> demo --mode=Blue ▏
+
+---
+
+Shell: zsh
+
+> demo --mode=Blue ▏

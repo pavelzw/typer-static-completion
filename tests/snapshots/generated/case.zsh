@@ -1,5 +1,9 @@
+#compdef demo
 # Generated - do not edit.
-_tsc_a0400f50fb4ab9f2() {
+_tsc_2a97516c354b6884() {
+    setopt localoptions ksharrays
+    local COMP_LINE=$BUFFER COMP_POINT=$CURSOR
+    local -a COMPREPLY
     local line=${COMP_LINE:0:$COMP_POINT} char quote= token= escaped=0 started=0 i
     local -a words=() candidates=() descriptions=()
     # Tokenize only the text before the cursor, without eval or external tools.
@@ -34,12 +38,11 @@ _tsc_a0400f50fb4ab9f2() {
             [[ $word == *=* ]] && value=1
             target=-1; takes=0
             case "$node:$flag" in
-0:--help) target=0; takes=0 ;;
-1:--prog-name) target=2; takes=1 ;;
-1:--shell) target=3; takes=1 ;;
-1:--output) target=4; takes=1 ;;
-1:-o) target=4; takes=1 ;;
-1:--help) target=5; takes=0 ;;
+0:--mode) target=1; takes=1 ;;
+0:-m) target=1; takes=1 ;;
+0:--strict) target=2; takes=1 ;;
+0:--pair) target=3; takes=2 ;;
+0:--help) target=5; takes=0 ;;
             esac
             if ((target >= 0)); then
                 remaining=$((takes-value))
@@ -51,12 +54,11 @@ _tsc_a0400f50fb4ab9f2() {
                 for ((j=1; j<${#word}; j++)); do
                     flag=-${word:$j:1}; target=-1; takes=0
                     case "$node:$flag" in
-0:--help) target=0; takes=0 ;;
-1:--prog-name) target=2; takes=1 ;;
-1:--shell) target=3; takes=1 ;;
-1:--output) target=4; takes=1 ;;
-1:-o) target=4; takes=1 ;;
-1:--help) target=5; takes=0 ;;
+0:--mode) target=1; takes=1 ;;
+0:-m) target=1; takes=1 ;;
+0:--strict) target=2; takes=1 ;;
+0:--pair) target=3; takes=2 ;;
+0:--help) target=5; takes=0 ;;
                     esac
                     ((target < 0)) && return 0
                     if ((takes)); then
@@ -72,11 +74,11 @@ _tsc_a0400f50fb4ab9f2() {
             return 0
         fi
         case "$node:$word" in
-0:generate) node=1; position=0; ended=0; continue ;;
+
         esac
         # Groups without arguments require the next operand to be a command.
         case $node in
-0) return 0 ;;
+
         esac
         ((position+=1))
     done
@@ -84,12 +86,11 @@ _tsc_a0400f50fb4ab9f2() {
     if ((target < 0 && ended == 0)) && [[ $cur == --*=* ]]; then
         flag=${cur%%=*}; takes=0
         case "$node:$flag" in
-0:--help) target=0; takes=0 ;;
-1:--prog-name) target=2; takes=1 ;;
-1:--shell) target=3; takes=1 ;;
-1:--output) target=4; takes=1 ;;
-1:-o) target=4; takes=1 ;;
-1:--help) target=5; takes=0 ;;
+0:--mode) target=1; takes=1 ;;
+0:-m) target=1; takes=1 ;;
+0:--strict) target=2; takes=1 ;;
+0:--pair) target=3; takes=2 ;;
+0:--help) target=5; takes=0 ;;
         esac
         ((takes)) || return 0
         prefix=$flag=; cur=${cur#*=}
@@ -97,12 +98,11 @@ _tsc_a0400f50fb4ab9f2() {
         for ((j=1; j<${#cur}; j++)); do
             flag=-${cur:$j:1}; target=-1; takes=0
             case "$node:$flag" in
-0:--help) target=0; takes=0 ;;
-1:--prog-name) target=2; takes=1 ;;
-1:--shell) target=3; takes=1 ;;
-1:--output) target=4; takes=1 ;;
-1:-o) target=4; takes=1 ;;
-1:--help) target=5; takes=0 ;;
+0:--mode) target=1; takes=1 ;;
+0:-m) target=1; takes=1 ;;
+0:--strict) target=2; takes=1 ;;
+0:--pair) target=3; takes=2 ;;
+0:--help) target=5; takes=0 ;;
             esac
             if ((takes)); then prefix=${cur:0:$((j+1))}; cur=${cur:$((j+1))}; break; fi
             target=-1
@@ -110,64 +110,44 @@ _tsc_a0400f50fb4ab9f2() {
     fi
     if ((target < 0)); then
         case $node in
-0) candidates=(generate); if [[ $cur == -* && $ended == 0 ]]; then candidates=(--help); fi ;;
-1) candidates=(); if [[ $cur == -* && $ended == 0 ]]; then candidates=(--prog-name --shell --output -o --help); fi ;;
+0) candidates=(); if [[ $cur == -* && $ended == 0 ]]; then candidates=(--mode -m --strict --pair --help); fi; descriptions=(); if [[ $cur == -* && $ended == 0 ]]; then descriptions=(--mode -m --strict --pair '--help -- Show this message and exit.'); fi ;;
         esac
         if [[ $cur != -* || $ended == 1 ]]; then
             case "$node:$position" in
-1:0) target=1 ;;
+0:0) target=0 ;;
             esac
         fi
     fi
     if ((target >= 0)); then
         candidates=(); descriptions=()
         case $target in
-0) candidates=() ;;
-1) candidates=() ;;
-2) candidates=() ;;
-3) candidates=(bash fish zsh); compopt -o filenames 2>/dev/null || : ;;
-4) file_mode=file ;;
+0) candidates=(Blue RED Rose 'Two Words' 'Café'); :; ignore_case=1 ;;
+1) candidates=(Blue RED Rose 'Two Words' 'Café'); :; ignore_case=1 ;;
+2) candidates=(Blue RED Rose 'Two Words' 'Café'); : ;;
+3) candidates=(Blue RED Rose 'Two Words' 'Café'); :; ignore_case=1 ;;
+4) candidates=(Blue RED Rose 'Two Words' 'Café'); :; ignore_case=1 ;;
 5) candidates=() ;;
         esac
     fi
-    if [[ -n $file_mode ]]; then
-        while IFS= read -r candidate; do candidates+=("$candidate"); done < <(compgen -A "$file_mode" -- "$cur")
-        compopt -o filenames 2>/dev/null || :
+
+    unsetopt ksharrays
+    if [[ -n $prefix ]]; then
+        # Tell Zsh that the attached flag is already present in the input.
+        compset -P "${(b)prefix}"
     fi
-    # Readline replaces only the part after its last word-break character.
-    local trim= full=$prefix$cur k
-    for ((k=0; k<${#full}; k++)); do
-        char=${full:$k:1}
-        if [[ $char != ' ' && $char != "'" && $char != '"' && $char != '\' && $COMP_WORDBREAKS == *"$char"* ]]; then trim=${full:0:k+1}; fi
-    done
-    # Readline's filename quoting leaves command substitutions executable.
-    # Quote literal candidates ourselves when they contain expansion syntax.
-    local quote_literals=0
-    for candidate in "${candidates[@]}"; do
-        if [[ $candidate == *'$'* || $candidate == *'`'* ]]; then
-            if compopt -o noquote 2>/dev/null; then quote_literals=1; fi
-            break
-        fi
-    done
-    for candidate in "${candidates[@]}"; do
-        if [[ $candidate == "$cur"* ]] || { ((ignore_case)) && [[ ${candidate,,} == "${cur,,}"* ]]; }; then
-            candidate=$prefix$candidate
-            candidate=${candidate#"$trim"}
-            if ((quote_literals)); then
-                if [[ $quote == '"' ]]; then
-                    candidate=${candidate//\\/\\\\}
-                    candidate=${candidate//\"/\\\"}
-                    candidate=${candidate//\$/\\\$}
-                    candidate=${candidate//\`/\\\`}
-                elif [[ $quote == "'" ]]; then
-                    candidate=${candidate//\'/\'\\\'\'}
-                else
-                    printf -v candidate '%q' "$candidate"
-                fi
-            fi
-            COMPREPLY+=("$candidate")
-        fi
-    done
-    return 0
+    if [[ $file_mode == directory ]]; then
+        _files -/
+    elif [[ $file_mode == file ]]; then
+        _files
+    elif ((ignore_case)); then
+        # Filter explicitly: native matcher character classes miss accented pairs.
+        local -a matches=()
+        for candidate in "${candidates[@]}"; do
+            if [[ ${(L)candidate} == "${(L)cur}"* ]]; then matches+=("$candidate"); fi
+        done
+        compadd -U -i "$IPREFIX" -- "${matches[@]}"
+    else
+        compadd -d descriptions -- "${candidates[@]}"
+    fi
 }
-complete -F _tsc_a0400f50fb4ab9f2 -- typer-static-completions
+if (( $+compstate )); then _tsc_2a97516c354b6884 "$@"; elif (( $+functions[compdef] )); then compdef _tsc_2a97516c354b6884 demo; fi

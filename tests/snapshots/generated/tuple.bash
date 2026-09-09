@@ -19,7 +19,7 @@ _tsc_2a97516c354b6884() {
     done
     words+=("$token")
     local cur=$token node=0 position=0 ended=0 pending=-1 remaining=0 target=-1 takes=0
-    local word flag value j prefix= file_mode= candidate
+    local word flag value j prefix= file_mode= candidate ignore_case=0
     COMPREPLY=()
     for ((i=1; i<${#words[@]}-1; i++)); do
         word=${words[i]}
@@ -168,7 +168,7 @@ _tsc_2a97516c354b6884() {
         fi
     done
     for candidate in "${candidates[@]}"; do
-        if [[ $candidate == "$cur"* ]]; then
+        if [[ $candidate == "$cur"* ]] || { ((ignore_case)) && [[ ${candidate,,} == "${cur,,}"* ]]; }; then
             candidate=$prefix$candidate
             candidate=${candidate#"$trim"}
             if ((quote_literals)); then

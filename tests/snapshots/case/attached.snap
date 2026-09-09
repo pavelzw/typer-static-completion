@@ -1,0 +1,17 @@
+Input: demo -mbL<TAB>
+
+Shell: bash
+
+> demo -mBlue ▏
+
+---
+
+Shell: fish
+
+> demo -mBlue ▏
+
+---
+
+Shell: zsh
+
+> demo -mBlue ▏

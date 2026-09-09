@@ -1,0 +1,17 @@
+Input: demo --pair bL<TAB>
+
+Shell: bash
+
+> demo --pair Blue ▏
+
+---
+
+Shell: fish
+
+> demo --pair Blue ▏
+
+---
+
+Shell: zsh
+
+> demo --pair Blue ▏

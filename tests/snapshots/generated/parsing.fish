@@ -116,6 +116,7 @@ case 2; return
     set -l candidates
     set -l descriptions
     set -l file_mode ''
+    set -l choice_mode ''
     if test $target -lt 0; and test $ended -eq 0
         if string match -q -- '--*=*' "$current"
             set -l parts (string split -m 1 = -- "$current")
@@ -186,27 +187,27 @@ if test $node -eq 3; and test $position -ge 1; set target 17; end
         set candidates
         set descriptions
         switch $target
-case 0; set candidates 'root' 'remote'
+case 0; set candidates 'root' 'remote'; set choice_mode sensitive
 case 1; set candidates
 case 2; set candidates
 case 3; set candidates
 case 4; set candidates
-case 5; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'
-case 6; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'
-case 7; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'
-case 8; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'
-case 9; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'
+case 5; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
+case 6; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
+case 7; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
+case 8; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
+case 9; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
 case 10; set candidates
 case 11; set candidates
 case 12; set candidates
 case 13; set candidates
-case 14; set candidates 'group' 'green'
+case 14; set candidates 'group' 'green'; set choice_mode sensitive
 case 15; set candidates
-case 16; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'
-case 17; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'
-case 18; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'
-case 19; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'
-case 20; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'
+case 16; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
+case 17; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
+case 18; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
+case 19; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
+case 20; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
 case 21; set candidates
 case 22; set candidates
 case 23; set candidates
@@ -215,7 +216,15 @@ case 24; set candidates
     end
     set -l index 1
     for candidate in $candidates
-        printf '%s\t%s\n' "$prefix$candidate" "$descriptions[$index]"
+        set -l match_candidate "$candidate"
+        set -l match_current "$current"
+        if test "$choice_mode" = insensitive
+            set match_candidate (string lower -- "$candidate")
+            set match_current (string lower -- "$current")
+        end
+        if test -z "$choice_mode"; or string match -qr -- '^'(string escape --style=regex -- "$match_current") "$match_candidate"
+            printf '%s\t%s\n' "$prefix$candidate" "$descriptions[$index]"
+        end
         set index (math $index + 1)
     end
     if test -n "$file_mode"

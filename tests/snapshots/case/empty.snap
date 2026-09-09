@@ -1,0 +1,23 @@
+Input: demo --mode <TAB:3>
+
+Shell: bash
+
+> demo --mode
+Blue       Café       RED        Rose       Two Words
+> demo --mode
+Blue       Café       RED        Rose       Two Words
+> demo --mode ▏
+
+---
+
+Shell: fish
+
+> demo --mode Café ▏
+Blue  Café  RED  Rose  Two Words
+
+---
+
+Shell: zsh
+
+> demo --mode ▏
+Blue        Café        RED         Rose        Two\ Words

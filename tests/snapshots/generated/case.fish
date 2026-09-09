@@ -1,15 +1,14 @@
 # Generated - do not edit.
-function __tsc_a0400f50fb4ab9f2_option
-if test "$argv[1]:$argv[2]" = '0:--help'; printf "%s\n" 0 0; return; end
-if test "$argv[1]:$argv[2]" = '1:--prog-name'; printf "%s\n" 2 1; return; end
-if test "$argv[1]:$argv[2]" = '1:--shell'; printf "%s\n" 3 1; return; end
-if test "$argv[1]:$argv[2]" = '1:--output'; printf "%s\n" 4 1; return; end
-if test "$argv[1]:$argv[2]" = '1:-o'; printf "%s\n" 4 1; return; end
-if test "$argv[1]:$argv[2]" = '1:--help'; printf "%s\n" 5 0; return; end
+function __tsc_2a97516c354b6884_option
+if test "$argv[1]:$argv[2]" = '0:--mode'; printf "%s\n" 1 1; return; end
+if test "$argv[1]:$argv[2]" = '0:-m'; printf "%s\n" 1 1; return; end
+if test "$argv[1]:$argv[2]" = '0:--strict'; printf "%s\n" 2 1; return; end
+if test "$argv[1]:$argv[2]" = '0:--pair'; printf "%s\n" 3 2; return; end
+if test "$argv[1]:$argv[2]" = '0:--help'; printf "%s\n" 5 0; return; end
     printf '%s\n' -1 0
 end
 
-function __tsc_a0400f50fb4ab9f2
+function __tsc_2a97516c354b6884
     set -l tokens (commandline -xpc)
     set -l current (commandline -ct)
     set -l unescaped (string unescape -- "$current")
@@ -37,7 +36,7 @@ function __tsc_a0400f50fb4ab9f2
         end
         if string match -qr '^-.+' -- "$word"; and test $ended -eq 0
             set -l flag (string split -m 1 = -- "$word")[1]
-            set -l info (__tsc_a0400f50fb4ab9f2_option $node "$flag")
+            set -l info (__tsc_2a97516c354b6884_option $node "$flag")
             if test $info[1] -ge 0
                 set -l consumed 0
                 string match -q '*=*' -- "$word"; and set consumed 1
@@ -52,7 +51,7 @@ function __tsc_a0400f50fb4ab9f2
                 while test -n "$rest"
                     set flag -(string sub -l 1 -- "$rest")
                     set rest (string sub -s 2 -- "$rest")
-                    set info (__tsc_a0400f50fb4ab9f2_option $node "$flag")
+                    set info (__tsc_2a97516c354b6884_option $node "$flag")
                     if test $info[1] -lt 0
                         return
                     end
@@ -70,9 +69,9 @@ function __tsc_a0400f50fb4ab9f2
             end
             return
         end
-if test "$node:$word" = '0:generate'; set node 1; set position 0; set ended 0; continue; end
+
         switch $node
-case 0; return
+
         end
         set position (math $position + 1)
     end
@@ -85,7 +84,7 @@ case 0; return
     if test $target -lt 0; and test $ended -eq 0
         if string match -q -- '--*=*' "$current"
             set -l parts (string split -m 1 = -- "$current")
-            set -l info (__tsc_a0400f50fb4ab9f2_option $node "$parts[1]")
+            set -l info (__tsc_2a97516c354b6884_option $node "$parts[1]")
             test $info[2] -gt 0; or return
             set target $info[1]
             set prefix "$parts[1]="
@@ -97,7 +96,7 @@ case 0; return
                 set -l flag -(string sub -l 1 -- "$rest")
                 set attached "$attached"(string sub -l 1 -- "$rest")
                 set rest (string sub -s 2 -- "$rest")
-                set -l info (__tsc_a0400f50fb4ab9f2_option $node "$flag")
+                set -l info (__tsc_2a97516c354b6884_option $node "$flag")
                 if test $info[1] -lt 0
                     break
                 end
@@ -113,33 +112,26 @@ case 0; return
     if test $target -lt 0
         switch $node
 case 0
-set candidates 'generate'
-set descriptions 'Render one app\'s completion script.'
-if test $ended -eq 0; and string match -q -- '-*' "$current"
-set candidates '--help'
-set descriptions 'Show this message and exit.'
-end
-case 1
 set candidates
 set descriptions
 if test $ended -eq 0; and string match -q -- '-*' "$current"
-set candidates '--prog-name' '--shell' '--output' '-o' '--help'
-set descriptions 'Command name users type.' 'Target shell.' 'Output file; omit or use - for stdout.' 'Output file; omit or use - for stdout.' 'Show this message and exit.'
+set candidates '--mode' '-m' '--strict' '--pair' '--help'
+set descriptions '' '' '' '' 'Show this message and exit.'
 end
         end
         if test $ended -eq 1; or not string match -q -- '-*' "$current"
-if test $node -eq 1; and test $position -eq 0; set target 1; end
+if test $node -eq 0; and test $position -eq 0; set target 0; end
         end
     end
     if test $target -ge 0
         set candidates
         set descriptions
         switch $target
-case 0; set candidates
-case 1; set candidates
-case 2; set candidates
-case 3; set candidates 'bash' 'fish' 'zsh'; set choice_mode sensitive; set descriptions 'Target shell.' 'Target shell.' 'Target shell.'
-case 4; set file_mode file
+case 0; set candidates 'Blue' 'RED' 'Rose' 'Two Words' 'Café'; set choice_mode insensitive
+case 1; set candidates 'Blue' 'RED' 'Rose' 'Two Words' 'Café'; set choice_mode insensitive
+case 2; set candidates 'Blue' 'RED' 'Rose' 'Two Words' 'Café'; set choice_mode sensitive
+case 3; set candidates 'Blue' 'RED' 'Rose' 'Two Words' 'Café'; set choice_mode insensitive
+case 4; set candidates 'Blue' 'RED' 'Rose' 'Two Words' 'Café'; set choice_mode insensitive
 case 5; set candidates
         end
     end
@@ -169,4 +161,4 @@ case 5; set candidates
         end
     end
 end
-complete -c 'typer-static-completions' -f -a '(__tsc_a0400f50fb4ab9f2)'
+complete -c 'demo' -f -a '(__tsc_2a97516c354b6884)'

@@ -1,0 +1,17 @@
+Input: demo --mode tW<TAB>
+
+Shell: bash
+
+> demo --mode Two\ Words ▏
+
+---
+
+Shell: fish
+
+> demo --mode 'Two Words' ▏
+
+---
+
+Shell: zsh
+
+> demo --mode Two\ Words ▏

@@ -1,0 +1,17 @@
+Input: demo --pair=blue rO<TAB>
+
+Shell: bash
+
+> demo --pair=blue Rose ▏
+
+---
+
+Shell: fish
+
+> demo --pair=blue Rose ▏
+
+---
+
+Shell: zsh
+
+> demo --pair=blue Rose ▏

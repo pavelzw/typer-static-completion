@@ -54,6 +54,7 @@ class ValueSpec:
 
     value_kind: ValueKind
     choices: tuple[str, ...] = ()
+    case_sensitive: bool = True
 
 
 @dataclass(frozen=True)
@@ -87,6 +88,8 @@ class Param:
     is_help: bool = False
     #: Per-position metadata for a tuple option; empty for scalar parameters.
     values: tuple[ValueSpec, ...] = ()
+    #: Whether static choice matching distinguishes upper and lower case.
+    case_sensitive: bool = True
 
     @property
     def takes_value(self) -> bool:

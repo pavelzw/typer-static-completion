@@ -1,0 +1,21 @@
+Input: demo --mode r<TAB:3>
+
+Shell: bash
+
+> demo --mode R
+RED   Rose
+> demo --mode R▏
+
+---
+
+Shell: fish
+
+> demo --mode Rose ▏
+RED  Rose
+
+---
+
+Shell: zsh
+
+> demo --mode R▏
+RED   Rose

@@ -84,6 +84,7 @@ case 0; return
     set -l candidates
     set -l descriptions
     set -l file_mode ''
+    set -l choice_mode ''
     if test $target -lt 0; and test $ended -eq 0
         if string match -q -- '--*=*' "$current"
             set -l parts (string split -m 1 = -- "$current")
@@ -152,14 +153,22 @@ end
         set descriptions
         switch $target
 case 0; set candidates
-case 1; set candidates 'apos\'trophe' 'café' 'bracket[one]:two' 'dollar$(demo)' 'tick`demo`' 'quote"double' 'slash\\path'; set descriptions 'Use [x]: "$HOME", `demo`, and $(demo).' 'Use [x]: "$HOME", `demo`, and $(demo).' 'Use [x]: "$HOME", `demo`, and $(demo).' 'Use [x]: "$HOME", `demo`, and $(demo).' 'Use [x]: "$HOME", `demo`, and $(demo).' 'Use [x]: "$HOME", `demo`, and $(demo).' 'Use [x]: "$HOME", `demo`, and $(demo).'
+case 1; set candidates 'apos\'trophe' 'café' 'bracket[one]:two' 'dollar$(demo)' 'tick`demo`' 'quote"double' 'slash\\path'; set choice_mode sensitive; set descriptions 'Use [x]: "$HOME", `demo`, and $(demo).' 'Use [x]: "$HOME", `demo`, and $(demo).' 'Use [x]: "$HOME", `demo`, and $(demo).' 'Use [x]: "$HOME", `demo`, and $(demo).' 'Use [x]: "$HOME", `demo`, and $(demo).' 'Use [x]: "$HOME", `demo`, and $(demo).' 'Use [x]: "$HOME", `demo`, and $(demo).'
 case 2; set candidates
 case 3; set candidates
         end
     end
     set -l index 1
     for candidate in $candidates
-        printf '%s\t%s\n' "$prefix$candidate" "$descriptions[$index]"
+        set -l match_candidate "$candidate"
+        set -l match_current "$current"
+        if test "$choice_mode" = insensitive
+            set match_candidate (string lower -- "$candidate")
+            set match_current (string lower -- "$current")
+        end
+        if test -z "$choice_mode"; or string match -qr -- '^'(string escape --style=regex -- "$match_current") "$match_candidate"
+            printf '%s\t%s\n' "$prefix$candidate" "$descriptions[$index]"
+        end
         set index (math $index + 1)
     end
     if test -n "$file_mode"

@@ -142,10 +142,6 @@ def from_command(
                 elif getattr(p, "_custom_shell_complete", None):
                     value_kind = ValueKind.DYNAMIC
                 elif hasattr(type_, "choices"):
-                    if not getattr(type_, "case_sensitive", True):
-                        raise IntrospectionError(
-                            "Case-insensitive choices are not supported yet"
-                        )
                     value_kind = ValueKind.CHOICE
                 elif type_.name in DIRECTORY_TYPE_NAMES or (
                     type_.name == "path" and not type_.file_okay
@@ -159,6 +155,7 @@ def from_command(
                         str(getattr(c, "value", c))
                         for c in getattr(type_, "choices", ())
                     ),
+                    case_sensitive=getattr(type_, "case_sensitive", True),
                 )
 
             value = describe(p.type)
@@ -182,6 +179,7 @@ def from_command(
                     else (),
                     choices=value.choices,
                     values=values,
+                    case_sensitive=value.case_sensitive,
                     help=(getattr(p, "help", None) or "").split("\n")[0].strip(),
                     metavar=p.metavar,
                     required=p.required,

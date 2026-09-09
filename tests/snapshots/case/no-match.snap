@@ -1,0 +1,17 @@
+Input: demo --mode zz<TAB>
+
+Shell: bash
+
+> demo --mode zz▏
+
+---
+
+Shell: fish
+
+> demo --mode zz▏
+
+---
+
+Shell: zsh
+
+> demo --mode zz▏

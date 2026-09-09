@@ -107,6 +107,7 @@ class BashGenerator(Generator):
                     + " ".join(self.quote(c) for c in param.choices)
                     + "); "
                     + self.choice_options()
+                    + ("; ignore_case=1" if not param.case_sensitive else "")
                 )
             elif kind in (ValueKind.FILE, ValueKind.DIRECTORY):
                 action = f"file_mode={'directory' if kind is ValueKind.DIRECTORY else 'file'}"
@@ -155,7 +156,7 @@ _PARSER = r"""@NAME@() {
     done
     words+=("$token")
     local cur=$token node=0 position=0 ended=0 pending=-1 remaining=0 target=-1 takes=0
-    local word flag value j prefix= file_mode= candidate
+    local word flag value j prefix= file_mode= candidate ignore_case=0
     COMPREPLY=()
     for ((i=1; i<${#words[@]}-1; i++)); do
         word=${words[i]}
@@ -262,7 +263,7 @@ _OUTPUT = r"""    if [[ -n $file_mode ]]; then
         fi
     done
     for candidate in "${candidates[@]}"; do
-        if [[ $candidate == "$cur"* ]]; then
+        if [[ $candidate == "$cur"* ]] || { ((ignore_case)) && [[ ${candidate,,} == "${cur,,}"* ]]; }; then
             candidate=$prefix$candidate
             candidate=${candidate#"$trim"}
             if ((quote_literals)); then

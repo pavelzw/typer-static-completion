@@ -8,6 +8,7 @@ import pytest
 pytest.importorskip("pexpect")
 pytest.importorskip("pyte")
 
+from case_cases import CASES as CASE_CHOICE_CASES
 from coverage_cases import CASES as COVERAGE_CASES
 from fixtures import fixture, parsing_fixture
 from parsing_cases import CASES as PARSING_CASES
@@ -277,4 +278,58 @@ def test_tuple_screen(case):
     actual = f"Input: {case.input}\n\n" + "\n---\n\n".join(sections)
     assert_snapshot(
         Path(__file__).with_name("snapshots") / "tuple" / f"{case.name}.snap", actual
+    )
+
+
+@pytest.mark.parametrize("case", CASE_CHOICE_CASES, ids=lambda case: case.name)
+def test_case_choice_screen(case):
+    from fixtures import case_fixture
+
+    sections = []
+    for shell in ("bash", "fish", "zsh"):
+        screen = capture(
+            generate(case_fixture(), "demo", shell),
+            case.input,
+            shell=shell,
+            locale="C.UTF-8",
+        )
+        completed = case.completed
+        if shell == "fish":
+            # Native Fish quotes a replacement containing spaces and also
+            # matches flag names without regard to case.
+            completed = {
+                "space": "demo --mode 'Two Words' ",
+                "native-flag-matching": "demo --mode ",
+            }.get(case.name, completed)
+        assert screen == f"> {completed}▏\n", f"{shell}: {case.name}\n{screen}"
+        sections.append(f"Shell: {shell}\n\n{screen}")
+    actual = f"Input: {case.input}\n\n" + "\n---\n\n".join(sections)
+    assert_snapshot(
+        Path(__file__).with_name("snapshots") / "case" / f"{case.name}.snap", actual
+    )
+
+
+@pytest.mark.parametrize("prefix", ["r", ""], ids=["ambiguous", "empty"])
+def test_case_choice_ambiguous_screen(prefix):
+    from fixtures import case_fixture
+
+    sections = []
+    input = f"demo --mode {prefix}<TAB:3>"
+    for shell in ("bash", "fish", "zsh"):
+        screen = capture(
+            generate(case_fixture(), "demo", shell),
+            input,
+            shell=shell,
+            locale="C.UTF-8",
+        )
+        assert "RED" in screen and "Rose" in screen, (shell, screen)
+        assert ("Blue" in screen) == (prefix == "")
+        assert ("Café" in screen) == (prefix == "")
+        sections.append(f"Shell: {shell}\n\n{screen}")
+    actual = f"Input: {input}\n\n" + "\n---\n\n".join(sections)
+    assert_snapshot(
+        Path(__file__).with_name("snapshots")
+        / "case"
+        / ("ambiguous.snap" if prefix else "empty.snap"),
+        actual,
     )

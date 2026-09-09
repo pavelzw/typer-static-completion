@@ -44,7 +44,7 @@ class FishGenerator(Generator):
             return f"set file_mode {kind.value}"
         if kind is ValueKind.CHOICE:
             values = " ".join(self.quote(c) for c in param.choices)
-            action = f"set candidates {values}"
+            action = f"set candidates {values}; set choice_mode {'sensitive' if param.case_sensitive else 'insensitive'}"
             if self.options.include_help and param.help:
                 descriptions = " ".join(self.quote(param.help) for _ in param.choices)
                 action += f"; set descriptions {descriptions}"
@@ -210,6 +210,7 @@ function @NAME@
     set -l candidates
     set -l descriptions
     set -l file_mode ''
+    set -l choice_mode ''
     if test $target -lt 0; and test $ended -eq 0
         if string match -q -- '--*=*' "$current"
             set -l parts (string split -m 1 = -- "$current")
@@ -255,7 +256,15 @@ function @NAME@
     end
     set -l index 1
     for candidate in $candidates
-        printf '%s\t%s\n' "$prefix$candidate" "$descriptions[$index]"
+        set -l match_candidate "$candidate"
+        set -l match_current "$current"
+        if test "$choice_mode" = insensitive
+            set match_candidate (string lower -- "$candidate")
+            set match_current (string lower -- "$current")
+        end
+        if test -z "$choice_mode"; or string match -qr -- '^'(string escape --style=regex -- "$match_current") "$match_candidate"
+            printf '%s\t%s\n' "$prefix$candidate" "$descriptions[$index]"
+        end
         set index (math $index + 1)
     end
     if test -n "$file_mode"

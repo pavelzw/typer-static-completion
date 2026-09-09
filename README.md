@@ -24,13 +24,18 @@ Pass `"fish"` or `"zsh"` to target those shells. Write the returned script to a
 file and source it in the corresponding shell (after `compinit` for Zsh). Completion stays
 static: dynamic callback values are omitted by default. Explicit file fallback
 is supported; hybrid delegation currently raises an error. Chain groups, group
-arguments, tuple positional arguments, and case-insensitive choices are not yet supported and
+arguments, and tuple positional arguments are not yet supported and
 raise errors instead of generating approximate completions.
 
 Tuple options such as `pair: tuple[Color, Path]` complete each value using its
 own type. All three shells support `--pair blue path`, `--pair=blue path`,
 attached short values, and repeated occurrences. `Param.values` holds the
 per-position `ValueSpec` metadata for callers constructing command trees by hand.
+
+Choices configured with `case_sensitive=False` accept differently cased prefixes
+and insert the declared spelling, including in tuple options. Case-sensitive
+choices retain exact prefix matching. Matching uses lowercase prefixes, as in
+Typer's completion, with non-ASCII casing governed by the shell locale.
 
 The public `Shell` enum lists the three implemented shells. Generator subclasses
 implement `render()` and `quote()`; custom generators can be registered under
@@ -192,6 +197,11 @@ aliases retain their configured order for deterministic output across processes.
 
 The tuple cases in `tests/tuple_cases.py` have interactive screen snapshots and a
 full generated-script fixture alongside the existing parsing matrix.
+
+The case-matching fixture adds 21 shared interactive screens for insensitive
+options, arguments, tuple positions, ambiguous matches, and accented values,
+plus sensitive-choice regressions. Full scripts live in
+`tests/snapshots/generated/case.{bash,fish,zsh}`.
 
 Current snapshot baselines target the locked Bash 5.x, Fish 4.x, and Zsh 5.9 environment. Broader Unicode coverage (including wide and combining characters),
 custom word-break settings, unusual shell parsing modes, and filenames containing

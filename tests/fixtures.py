@@ -155,3 +155,28 @@ def tuple_fixture() -> typer.Typer:
         typer.echo(repr(pair))
 
     return app
+
+
+class MixedCase(str, Enum):
+    blue = "Blue"
+    red = "RED"
+    rose = "Rose"
+    spaced = "Two Words"
+    accent = "Café"
+
+
+def case_fixture() -> typer.Typer:
+    app = typer.Typer(add_completion=False)
+
+    @app.command()
+    def paint(
+        color: MixedCase = typer.Argument(MixedCase.blue, case_sensitive=False),
+        mode: MixedCase = typer.Option(
+            MixedCase.blue, "--mode", "-m", case_sensitive=False
+        ),
+        strict: MixedCase = typer.Option(MixedCase.blue),
+        pair: tuple[MixedCase, MixedCase] = typer.Option(None, case_sensitive=False),
+    ):
+        typer.echo(color.value + ":" + mode.value)
+
+    return app
