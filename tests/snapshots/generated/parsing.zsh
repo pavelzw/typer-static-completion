@@ -139,12 +139,16 @@ _tsc_2a97516c354b6884() {
             fi
             return 0
         fi
+        # Group operands precede the command and end group option parsing.
+        case $node in
+
+        esac
         case "$node:$word" in
 0:paint) node=1; position=0; ended=0; continue ;;
 0:remote) node=2; position=0; ended=0; continue ;;
 2:paint) node=3; position=0; ended=0; continue ;;
         esac
-        # Groups without arguments require the next operand to be a command.
+        # Once group arguments are consumed, the next operand must be a command.
         case $node in
 0) return 0 ;;
 2) return 0 ;;

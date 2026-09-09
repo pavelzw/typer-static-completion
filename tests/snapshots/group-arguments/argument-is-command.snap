@@ -1,0 +1,17 @@
+Input: demo remote rem<TAB>
+
+Shell: bash
+
+> demo remote remote ▏
+
+---
+
+Shell: fish
+
+> demo remote remote ▏
+
+---
+
+Shell: zsh
+
+> demo remote remote ▏

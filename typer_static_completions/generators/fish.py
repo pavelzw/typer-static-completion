@@ -57,12 +57,11 @@ class FishGenerator(Generator):
         ids = {c.path: i for i, c in enumerate(nodes)}
         params: list[Param] = []
         options, children, groups, arguments, suggestions = [], [], [], [], []
+        operands = []
         prog = self.quote(tree.prog_name)
         for node, command in enumerate(nodes):
             if command.chain:
                 raise IntrospectionError("Chain groups are not supported yet")
-            if (command.is_group or command.subcommands) and command.arguments:
-                raise IntrospectionError("Group arguments are not supported yet")
             if command.is_group or command.subcommands:
                 groups.append(f"case {node}; return")
             position = 0
@@ -90,6 +89,15 @@ class FishGenerator(Generator):
                             f"if test $node -eq {node}; and test $position {comparison} {position}; set target {param_id + offset}; end"
                         )
                         position += 1
+            if (command.is_group or command.subcommands) and command.arguments:
+                condition = (
+                    "true"
+                    if any(p.nargs == -1 for p in command.arguments)
+                    else f"test $position -lt {position}"
+                )
+                operands.append(
+                    f"if test $node -eq {node}; and {condition}; set ended 1; set position (math $position + 1); continue; end"
+                )
             command_names = []
             command_helps = []
             for child_name, child in command.subcommands.items():
@@ -116,6 +124,7 @@ class FishGenerator(Generator):
             ("OPTIONS", options),
             ("CHILDREN", children),
             ("GROUPS", groups),
+            ("OPERANDS", operands),
             ("ARGUMENTS", arguments),
             ("SUGGESTIONS", suggestions),
             ("ACTIONS", actions),
@@ -201,6 +210,7 @@ function @NAME@
             end
             return
         end
+@OPERANDS@
 @CHILDREN@
         switch $node
 @GROUPS@

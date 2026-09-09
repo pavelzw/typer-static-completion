@@ -1,0 +1,17 @@
+Input: demo root deploy --mode ro<TAB>
+
+Shell: bash
+
+> demo root deploy --mode rose ▏
+
+---
+
+Shell: fish
+
+> demo root deploy --mode rose ▏
+
+---
+
+Shell: zsh
+
+> demo root deploy --mode rose ▏

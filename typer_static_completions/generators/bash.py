@@ -44,11 +44,10 @@ class BashGenerator(Generator):
         params: list[Param] = []
         option_cases, command_cases, argument_cases, suggestion_cases = [], [], [], []
         group_cases = []
+        operand_cases = []
         for node_id, command in enumerate(nodes):
             if command.chain:
                 raise IntrospectionError("Chain groups are not supported yet")
-            if (command.is_group or command.subcommands) and command.arguments:
-                raise IntrospectionError("Group arguments are not supported yet")
             if command.is_group or command.subcommands:
                 group_cases.append(f"{node_id}) return 0 ;;")
             flags: list[str] = []
@@ -76,6 +75,15 @@ class BashGenerator(Generator):
                             f"{pattern}) target={param_id + offset} ;;"
                         )
                         argument_index += 1
+            if (command.is_group or command.subcommands) and command.arguments:
+                condition = (
+                    "1"
+                    if any(p.nargs == -1 for p in command.arguments)
+                    else f"position < {argument_index}"
+                )
+                operand_cases.append(
+                    f"{node_id}) if (({condition})); then ended=1; ((position+=1)); continue; fi ;;"
+                )
             for name, child in command.subcommands.items():
                 command_cases.append(
                     f"{self.quote(f'{node_id}:{name}')}) node={ids[child.path]}; position=0; ended=0; continue ;;"
@@ -132,6 +140,7 @@ class BashGenerator(Generator):
             ("OPTIONS", option_cases),
             ("COMMANDS", command_cases),
             ("GROUPS", group_cases),
+            ("OPERANDS", operand_cases),
             ("ARGUMENTS", argument_cases),
             ("SUGGESTIONS", suggestion_cases),
             ("ACTIONS", actions),
@@ -202,10 +211,14 @@ _PARSER = r"""@NAME@() {
             fi
             return 0
         fi
+        # Group operands precede the command and end group option parsing.
+        case $node in
+@OPERANDS@
+        esac
         case "$node:$word" in
 @COMMANDS@
         esac
-        # Groups without arguments require the next operand to be a command.
+        # Once group arguments are consumed, the next operand must be a command.
         case $node in
 @GROUPS@
         esac

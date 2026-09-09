@@ -1,0 +1,17 @@
+Input: demo root remote --mode ro<TAB>
+
+Shell: bash
+
+> demo root remote --mode rose ▏
+
+---
+
+Shell: fish
+
+> demo root remote --mode rose ▏
+
+---
+
+Shell: zsh
+
+> demo root remote --mode rose ▏

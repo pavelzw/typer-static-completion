@@ -1,0 +1,17 @@
+Input: demo root --pro<TAB>
+
+Shell: bash
+
+> demo root --pro▏
+
+---
+
+Shell: fish
+
+> demo root --pro▏
+
+---
+
+Shell: zsh
+
+> demo root --pro▏

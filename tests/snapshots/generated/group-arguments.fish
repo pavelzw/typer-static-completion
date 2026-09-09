@@ -1,21 +1,23 @@
 # Generated - do not edit.
 function __tsc_2a97516c354b6884_option
-if test "$argv[1]:$argv[2]" = '0:--profile'; printf "%s\n" 0 1; return; end
-if test "$argv[1]:$argv[2]" = '0:--verbose'; printf "%s\n" 1 0; return; end
-if test "$argv[1]:$argv[2]" = '0:--no-verbose'; printf "%s\n" 1 0; return; end
+if test "$argv[1]:$argv[2]" = '0:--profile'; printf "%s\n" 1 1; return; end
+if test "$argv[1]:$argv[2]" = '0:-p'; printf "%s\n" 1 1; return; end
 if test "$argv[1]:$argv[2]" = '0:--help'; printf "%s\n" 2 0; return; end
-if test "$argv[1]:$argv[2]" = '1:--color'; printf "%s\n" 3 1; return; end
-if test "$argv[1]:$argv[2]" = '1:-c'; printf "%s\n" 3 1; return; end
-if test "$argv[1]:$argv[2]" = '1:--config'; printf "%s\n" 4 1; return; end
-if test "$argv[1]:$argv[2]" = '1:--directory'; printf "%s\n" 5 1; return; end
-if test "$argv[1]:$argv[2]" = '1:--cache'; printf "%s\n" 6 0; return; end
-if test "$argv[1]:$argv[2]" = '1:--no-cache'; printf "%s\n" 6 0; return; end
-if test "$argv[1]:$argv[2]" = '1:--help'; printf "%s\n" 7 0; return; end
-if test "$argv[1]:$argv[2]" = '2:--help'; printf "%s\n" 8 0; return; end
-if test "$argv[1]:$argv[2]" = '3:--help'; printf "%s\n" 9 0; return; end
-if test "$argv[1]:$argv[2]" = '4:--help'; printf "%s\n" 10 0; return; end
-if test "$argv[1]:$argv[2]" = '5:--help'; printf "%s\n" 12 0; return; end
-if test "$argv[1]:$argv[2]" = '6:--help'; printf "%s\n" 14 0; return; end
+if test "$argv[1]:$argv[2]" = '1:--mode'; printf "%s\n" 4 1; return; end
+if test "$argv[1]:$argv[2]" = '1:-m'; printf "%s\n" 4 1; return; end
+if test "$argv[1]:$argv[2]" = '1:--help'; printf "%s\n" 5 0; return; end
+if test "$argv[1]:$argv[2]" = '2:--mode'; printf "%s\n" 8 1; return; end
+if test "$argv[1]:$argv[2]" = '2:-m'; printf "%s\n" 8 1; return; end
+if test "$argv[1]:$argv[2]" = '2:--help'; printf "%s\n" 9 0; return; end
+if test "$argv[1]:$argv[2]" = '3:--mode'; printf "%s\n" 11 1; return; end
+if test "$argv[1]:$argv[2]" = '3:-m'; printf "%s\n" 11 1; return; end
+if test "$argv[1]:$argv[2]" = '3:--help'; printf "%s\n" 12 0; return; end
+if test "$argv[1]:$argv[2]" = '4:--help'; printf "%s\n" 14 0; return; end
+if test "$argv[1]:$argv[2]" = '5:--help'; printf "%s\n" 15 0; return; end
+if test "$argv[1]:$argv[2]" = '6:--help'; printf "%s\n" 17 0; return; end
+if test "$argv[1]:$argv[2]" = '7:--help'; printf "%s\n" 18 0; return; end
+if test "$argv[1]:$argv[2]" = '8:--help'; printf "%s\n" 20 0; return; end
+if test "$argv[1]:$argv[2]" = '9:--help'; printf "%s\n" 21 0; return; end
     printf '%s\n' -1 0
 end
 
@@ -80,16 +82,26 @@ function __tsc_2a97516c354b6884
             end
             return
         end
-
+if test $node -eq 0; and test $position -lt 1; set ended 1; set position (math $position + 1); continue; end
+if test $node -eq 2; and test $position -lt 2; set ended 1; set position (math $position + 1); continue; end
+if test $node -eq 4; and test $position -lt 1; set ended 1; set position (math $position + 1); continue; end
+if test $node -eq 6; and test $position -lt 1; set ended 1; set position (math $position + 1); continue; end
+if test $node -eq 8; and true; set ended 1; set position (math $position + 1); continue; end
 if test "$node:$word" = '0:deploy'; set node 1; set position 0; set ended 0; continue; end
-if test "$node:$word" = '0:tasks'; set node 2; set position 0; set ended 0; continue; end
-if test "$node:$word" = '0:tags'; set node 3; set position 0; set ended 0; continue; end
-if test "$node:$word" = '0:remote'; set node 4; set position 0; set ended 0; continue; end
-if test "$node:$word" = '4:add'; set node 5; set position 0; set ended 0; continue; end
-if test "$node:$word" = '4:remove'; set node 6; set position 0; set ended 0; continue; end
+if test "$node:$word" = '0:remote'; set node 2; set position 0; set ended 0; continue; end
+if test "$node:$word" = '0:files'; set node 4; set position 0; set ended 0; continue; end
+if test "$node:$word" = '0:optional'; set node 6; set position 0; set ended 0; continue; end
+if test "$node:$word" = '0:many'; set node 8; set position 0; set ended 0; continue; end
+if test "$node:$word" = '2:paint'; set node 3; set position 0; set ended 0; continue; end
+if test "$node:$word" = '4:show'; set node 5; set position 0; set ended 0; continue; end
+if test "$node:$word" = '6:show'; set node 7; set position 0; set ended 0; continue; end
+if test "$node:$word" = '8:show'; set node 9; set position 0; set ended 0; continue; end
         switch $node
 case 0; return
+case 2; return
 case 4; return
+case 6; return
+case 8; return
         end
         set position (math $position + 1)
     end
@@ -130,36 +142,36 @@ case 4; return
     if test $target -lt 0
         switch $node
 case 0
-set candidates 'deploy' 'tasks' 'tags' 'remote'
-set descriptions 'Deploy an application.' 'List tasks.' 'List tags.' ''
+set candidates 'deploy' 'remote' 'files' 'optional' 'many'
+set descriptions '' '' '' '' ''
 if test $ended -eq 0; and string match -q -- '-*' "$current"
-set candidates '--profile' '--verbose' '--no-verbose' '--help'
-set descriptions '' '' '' 'Show this message and exit.'
+set candidates '--profile' '-p' '--help'
+set descriptions '' '' 'Show this message and exit.'
 end
 case 1
 set candidates
 set descriptions
 if test $ended -eq 0; and string match -q -- '-*' "$current"
-set candidates '--color' '-c' '--config' '--directory' '--cache' '--no-cache' '--help'
-set descriptions '' '' '' '' '' '' 'Show this message and exit.'
+set candidates '--mode' '-m' '--help'
+set descriptions '' '' 'Show this message and exit.'
 end
 case 2
-set candidates
-set descriptions
+set candidates 'paint'
+set descriptions ''
 if test $ended -eq 0; and string match -q -- '-*' "$current"
-set candidates '--help'
-set descriptions 'Show this message and exit.'
+set candidates '--mode' '-m' '--help'
+set descriptions '' '' 'Show this message and exit.'
 end
 case 3
 set candidates
 set descriptions
 if test $ended -eq 0; and string match -q -- '-*' "$current"
-set candidates '--help'
-set descriptions 'Show this message and exit.'
+set candidates '--mode' '-m' '--help'
+set descriptions '' '' 'Show this message and exit.'
 end
 case 4
-set candidates 'add' 'remove'
-set descriptions 'Add a remote.' 'Remove a remote.'
+set candidates 'show'
+set descriptions ''
 if test $ended -eq 0; and string match -q -- '-*' "$current"
 set candidates '--help'
 set descriptions 'Show this message and exit.'
@@ -172,6 +184,27 @@ set candidates '--help'
 set descriptions 'Show this message and exit.'
 end
 case 6
+set candidates 'show'
+set descriptions ''
+if test $ended -eq 0; and string match -q -- '-*' "$current"
+set candidates '--help'
+set descriptions 'Show this message and exit.'
+end
+case 7
+set candidates
+set descriptions
+if test $ended -eq 0; and string match -q -- '-*' "$current"
+set candidates '--help'
+set descriptions 'Show this message and exit.'
+end
+case 8
+set candidates 'show'
+set descriptions ''
+if test $ended -eq 0; and string match -q -- '-*' "$current"
+set candidates '--help'
+set descriptions 'Show this message and exit.'
+end
+case 9
 set candidates
 set descriptions
 if test $ended -eq 0; and string match -q -- '-*' "$current"
@@ -180,29 +213,42 @@ set descriptions 'Show this message and exit.'
 end
         end
         if test $ended -eq 1; or not string match -q -- '-*' "$current"
-if test $node -eq 5; and test $position -eq 0; set target 11; end
-if test $node -eq 6; and test $position -eq 0; set target 13; end
+if test $node -eq 0; and test $position -eq 0; set target 0; end
+if test $node -eq 1; and test $position -eq 0; set target 3; end
+if test $node -eq 2; and test $position -eq 0; set target 6; end
+if test $node -eq 2; and test $position -eq 1; set target 7; end
+if test $node -eq 3; and test $position -eq 0; set target 10; end
+if test $node -eq 4; and test $position -eq 0; set target 13; end
+if test $node -eq 6; and test $position -eq 0; set target 16; end
+if test $node -eq 8; and test $position -ge 0; set target 19; end
         end
     end
     if test $target -ge 0
         set candidates
         set descriptions
         switch $target
-case 0; set candidates
-case 1; set candidates
+case 0; set candidates 'root' 'remote'; set choice_mode sensitive
+case 1; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
 case 2; set candidates
 case 3; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
-case 4; set file_mode file
-case 5; set file_mode directory
-case 6; set candidates
-case 7; set candidates
-case 8; set candidates
+case 4; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
+case 5; set candidates
+case 6; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
+case 7; set candidates 'group' 'green'; set choice_mode sensitive
+case 8; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
 case 9; set candidates
-case 10; set candidates
-case 11; set candidates
+case 10; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
+case 11; set candidates 'Blue' 'RED' 'Rose' 'Two Words' 'Café'; set choice_mode insensitive
 case 12; set candidates
-case 13; set candidates
+case 13; set file_mode directory
 case 14; set candidates
+case 15; set candidates
+case 16; set candidates
+case 17; set candidates
+case 18; set candidates
+case 19; set candidates 'red' 'rose' 'blue' 'two words' 'quote\'s'; set choice_mode sensitive
+case 20; set candidates
+case 21; set candidates
         end
     end
     set -l index 1

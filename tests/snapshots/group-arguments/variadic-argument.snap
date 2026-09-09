@@ -1,0 +1,17 @@
+Input: demo root many blue ro<TAB>
+
+Shell: bash
+
+> demo root many blue rose ▏
+
+---
+
+Shell: fish
+
+> demo root many blue rose ▏
+
+---
+
+Shell: zsh
+
+> demo root many blue rose ▏

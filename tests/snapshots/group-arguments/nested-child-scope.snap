@@ -1,0 +1,17 @@
+Input: demo root remote blue green paint --mode bL<TAB>
+
+Shell: bash
+
+> demo root remote blue green paint --mode Blue ▏
+
+---
+
+Shell: fish
+
+> demo root remote blue green paint --mode Blue ▏
+
+---
+
+Shell: zsh
+
+> demo root remote blue green paint --mode Blue ▏

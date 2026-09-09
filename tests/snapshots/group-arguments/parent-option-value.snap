@@ -1,0 +1,17 @@
+Input: demo --profile bl<TAB>
+
+Shell: bash
+
+> demo --profile blue ▏
+
+---
+
+Shell: fish
+
+> demo --profile blue ▏
+
+---
+
+Shell: zsh
+
+> demo --profile blue ▏

@@ -124,6 +124,8 @@ def from_command(
                 "Token normalization and unknown-option passthrough are not supported yet"
             )
         is_group = hasattr(cmd, "commands")
+        if is_group and ctx.allow_interspersed_args:
+            raise IntrospectionError("Interspersed group options are not supported yet")
         if not is_group and not ctx.allow_interspersed_args:
             raise IntrospectionError(
                 "Non-interspersed leaf options are not supported yet"

@@ -1,0 +1,17 @@
+Input: demo root unknown remote bl<TAB>
+
+Shell: bash
+
+> demo root unknown remote bl▏
+
+---
+
+Shell: fish
+
+> demo root unknown remote bl▏
+
+---
+
+Shell: zsh
+
+> demo root unknown remote bl▏

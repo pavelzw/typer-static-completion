@@ -70,6 +70,7 @@ function __tsc_a0400f50fb4ab9f2
             end
             return
         end
+
 if test "$node:$word" = '0:generate'; set node 1; set position 0; set ended 0; continue; end
         switch $node
 case 0; return

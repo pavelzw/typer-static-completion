@@ -1,0 +1,17 @@
+Input: demo root dep<TAB>
+
+Shell: bash
+
+> demo root deploy ▏
+
+---
+
+Shell: fish
+
+> demo root deploy ▏
+
+---
+
+Shell: zsh
+
+> demo root deploy ▏

@@ -1,0 +1,17 @@
+Input: demo root files nested\ directory sh<TAB>
+
+Shell: bash
+
+> demo root files nested\ directory show ▏
+
+---
+
+Shell: fish
+
+> demo root files nested\ directory show ▏
+
+---
+
+Shell: zsh
+
+> demo root files nested\ directory show ▏

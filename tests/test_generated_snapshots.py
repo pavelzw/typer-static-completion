@@ -7,6 +7,7 @@ from fixtures import (
     case_fixture,
     coverage_fixture,
     fixture,
+    group_argument_fixture,
     parsing_fixture,
     tuple_argument_fixture,
     tuple_fixture,
@@ -29,6 +30,7 @@ from typer_static_completions.verify import check_syntax, is_available
         ("tuple", tuple_fixture),
         ("case", case_fixture),
         ("tuple-arguments", tuple_argument_fixture),
+        ("group-arguments", group_argument_fixture),
     ],
 )
 def test_generated_file(shell, name, make_app):

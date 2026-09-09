@@ -1,0 +1,17 @@
+Input: demo root remote bl<TAB>
+
+Shell: bash
+
+> demo root remote blue ▏
+
+---
+
+Shell: fish
+
+> demo root remote blue ▏
+
+---
+
+Shell: zsh
+
+> demo root remote blue ▏

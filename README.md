@@ -23,7 +23,7 @@ script = generate(app, "myapp", "bash")
 Pass `"fish"` or `"zsh"` to target those shells. Write the returned script to a
 file and source it in the corresponding shell (after `compinit` for Zsh). Completion stays
 static: dynamic callback values are omitted by default. Explicit file fallback
-is supported; hybrid delegation currently raises an error. Chain groups and group arguments
+is supported; hybrid delegation currently raises an error. Chain groups
 are not yet supported and raise errors instead of generating approximate completions.
 
 Tuple options such as `pair: tuple[Color, Path]` complete each value using its
@@ -33,6 +33,13 @@ per-position `ValueSpec` metadata for callers constructing command trees by hand
 Tuple positional arguments also complete each position using its own type;
 options may appear between values, and subsequent scalar or variadic arguments
 receive their own completions.
+
+Groups can take scalar, tuple, or variadic arguments. Completion consumes their
+values before offering subcommands, then switches to the child's scope. Like
+Typer's default parser, group options must precede the first argument; a child
+starts its own option parsing. Optional arguments still consume available words,
+and variadic group arguments consume the remainder, including command names.
+Custom groups with `allow_interspersed_args=True` are diagnosed as unsupported.
 
 Choices configured with `case_sensitive=False` accept differently cased prefixes
 and insert the declared spelling, including in tuple parameters. Case-sensitive
@@ -203,6 +210,10 @@ full generated-script fixture alongside the existing parsing matrix.
 The tuple-argument fixture adds 24 shared screens covering interspersed options,
 `--`, following scalar/variadic arguments, choices, paths, and directories.
 Full scripts live in `tests/snapshots/generated/tuple-arguments.{bash,fish,zsh}`.
+
+The group-argument fixture adds 27 shared screens for parent arguments, nested
+groups, option boundaries, `--`, paths, and optional/variadic arguments.
+Full scripts live in `tests/snapshots/generated/group-arguments.{bash,fish,zsh}`.
 
 The case-matching fixture adds 21 shared interactive screens for insensitive
 options, arguments, tuple positions, ambiguous matches, and accented values,

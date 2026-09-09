@@ -213,3 +213,68 @@ def tuple_argument_fixture() -> typer.Typer:
         pass
 
     return app
+
+
+def group_argument_fixture() -> typer.Typer:
+    app = typer.Typer(add_completion=False)
+    remote = typer.Typer()
+    files = typer.Typer()
+    optional = typer.Typer()
+    many = typer.Typer(invoke_without_command=True)
+
+    @app.callback()
+    def root(
+        workspace: RootTarget,
+        profile: Color = typer.Option(Color.red, "--profile", "-p"),
+    ):
+        pass
+
+    @app.command()
+    def deploy(color: Color, mode: Color = typer.Option(Color.red, "--mode", "-m")):
+        pass
+
+    @remote.callback()
+    def remote_root(
+        pair: tuple[Color, GroupTarget],
+        mode: Color = typer.Option(Color.red, "--mode", "-m"),
+    ):
+        pass
+
+    @remote.command()
+    def paint(
+        color: Color,
+        mode: MixedCase = typer.Option(
+            MixedCase.blue, "--mode", "-m", case_sensitive=False
+        ),
+    ):
+        pass
+
+    @files.callback()
+    def files_root(directory: Path = typer.Argument(..., file_okay=False)):
+        pass
+
+    @files.command("show")
+    def files_show():
+        pass
+
+    @optional.callback()
+    def optional_root(label: str = typer.Argument("default")):
+        pass
+
+    @optional.command("show")
+    def optional_show():
+        pass
+
+    @many.callback()
+    def many_root(colors: list[Color] = typer.Argument(None)):
+        pass
+
+    @many.command("show")
+    def many_show():
+        pass
+
+    app.add_typer(remote, name="remote")
+    app.add_typer(files, name="files")
+    app.add_typer(optional, name="optional")
+    app.add_typer(many, name="many")
+    return app

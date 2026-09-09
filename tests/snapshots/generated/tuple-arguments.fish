@@ -74,6 +74,7 @@ function __tsc_2a97516c354b6884
             end
             return
         end
+
 if test "$node:$word" = '0:paint'; set node 1; set position 0; set ended 0; continue; end
 if test "$node:$word" = '0:framed'; set node 2; set position 0; set ended 0; continue; end
 if test "$node:$word" = '0:resource'; set node 3; set position 0; set ended 0; continue; end

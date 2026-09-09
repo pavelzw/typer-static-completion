@@ -1,0 +1,17 @@
+Input: demo --profile=red rem<TAB>
+
+Shell: bash
+
+> demo --profile=red remote ▏
+
+---
+
+Shell: fish
+
+> demo --profile=red remote ▏
+
+---
+
+Shell: zsh
+
+> demo --profile=red remote ▏

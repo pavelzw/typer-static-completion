@@ -1,0 +1,17 @@
+Input: demo root remote blue --mod<TAB>
+
+Shell: bash
+
+> demo root remote blue --mod▏
+
+---
+
+Shell: fish
+
+> demo root remote blue --mod▏
+
+---
+
+Shell: zsh
+
+> demo root remote blue --mod▏

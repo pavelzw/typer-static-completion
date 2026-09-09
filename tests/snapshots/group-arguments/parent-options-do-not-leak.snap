@@ -1,0 +1,17 @@
+Input: demo root deploy --pro<TAB>
+
+Shell: bash
+
+> demo root deploy --pro▏
+
+---
+
+Shell: fish
+
+> demo root deploy --pro▏
+
+---
+
+Shell: zsh
+
+> demo root deploy --pro▏

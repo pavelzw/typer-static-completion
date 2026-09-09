@@ -1,0 +1,17 @@
+Input: demo root optional "" sh<TAB>
+
+Shell: bash
+
+> demo root optional "" show ▏
+
+---
+
+Shell: fish
+
+> demo root optional "" show ▏
+
+---
+
+Shell: zsh
+
+> demo root optional "" show ▏

@@ -11,6 +11,7 @@ pytest.importorskip("pyte")
 from case_cases import CASES as CASE_CHOICE_CASES
 from coverage_cases import CASES as COVERAGE_CASES
 from fixtures import fixture, parsing_fixture
+from group_argument_cases import CASES as GROUP_ARGUMENT_CASES
 from parsing_cases import CASES as PARSING_CASES
 from snapshot_assertions import assert_snapshot
 from snapshot_harness import capture
@@ -350,5 +351,23 @@ def test_tuple_argument_screen(case):
     actual = f"Input: {case.input}\n\n" + "\n---\n\n".join(sections)
     assert_snapshot(
         Path(__file__).with_name("snapshots") / "tuple-arguments" / f"{case.name}.snap",
+        actual,
+    )
+
+
+@pytest.mark.parametrize("case", GROUP_ARGUMENT_CASES, ids=lambda case: case.name)
+def test_group_argument_screen(case):
+    from fixtures import group_argument_fixture
+
+    sections = []
+    for shell in ("bash", "fish", "zsh"):
+        screen = capture(
+            generate(group_argument_fixture(), "demo", shell), case.input, shell=shell
+        )
+        assert screen == f"> {case.completed}▏\n", f"{shell}: {case.name}\n{screen}"
+        sections.append(f"Shell: {shell}\n\n{screen}")
+    actual = f"Input: {case.input}\n\n" + "\n---\n\n".join(sections)
+    assert_snapshot(
+        Path(__file__).with_name("snapshots") / "group-arguments" / f"{case.name}.snap",
         actual,
     )

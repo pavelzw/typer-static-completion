@@ -73,6 +73,7 @@ function __tsc_2a97516c354b6884
             end
             return
         end
+
 if test "$node:$word" = '0:paint'; set node 1; set position 0; set ended 0; continue; end
         switch $node
 case 0; return
