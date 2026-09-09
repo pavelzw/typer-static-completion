@@ -215,9 +215,38 @@ def load_app(target: str) -> typer.Typer:
 
     Raises:
         AppLoadError: if the import fails, the attribute is missing, or the
-            object is neither a ``Typer`` app nor a command.
+            object is not a ``Typer`` app. Wrapper functions and factories are never
+            called; pass an explicit app instance to CompletionSet instead.
     """
-    raise NotImplementedError
+    import importlib
+
+    import typer
+
+    from .errors import AppLoadError
+
+    module_name, separator, attribute = target.partition(":")
+    try:
+        module = importlib.import_module(module_name)
+        if separator:
+            obj: Any = module
+            for part in attribute.split("."):
+                obj = getattr(obj, part)
+        else:
+            obj = next(
+                (
+                    getattr(module, name)
+                    for name in ("app", "cli", "main")
+                    if isinstance(getattr(module, name, None), typer.Typer)
+                ),
+                None,
+            )
+        if not isinstance(obj, typer.Typer):
+            raise TypeError(
+                "Target must be a Typer instance; wrappers and factories are not called"
+            )
+        return obj
+    except (Exception, SystemExit) as exc:
+        raise AppLoadError(f"Cannot load {target!r}: {exc}") from exc
 
 
 def entrypoints(pyproject: Any = None) -> dict[str, str]:

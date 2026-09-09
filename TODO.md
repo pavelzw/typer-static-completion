@@ -4,8 +4,9 @@ Bash, Fish, and Zsh now implement model traversal, Typer extraction, generation,
 syntax checks, and shared interactive screen snapshots. Full generated completion
 files are snapshot-tested alongside those screens. `write()` supports build-time
 generation with validated layouts, dry runs, and unchanged-file detection.
-Set management, the CLI,
-PowerShell generation, and the public candidate-verification helper remain scaffolds.
+`CompletionSet` now syncs/checks explicit app mappings with ownership tracking.
+Pyproject discovery, the CLI, PowerShell generation, and the public
+candidate-verification helper remain scaffolds.
 
 Use `../commander-static-completion` as the local reference, especially
 `test/snapshots.test.js`, `test/snapshot-harness.js`,
@@ -57,7 +58,7 @@ harness and scenario checklist is in section 3.
 - [x] Make third-party shell registration consistent: `Generator.shell` and
       `available_shells()` now accept arbitrary string names; only implemented
       generators are registered by default (Bash, Fish, and Zsh).
-- [ ] Define failure semantics for `CompletionSet`: failed imports must make
+- [x] Define failure semantics for `CompletionSet`: failed imports must make
       checks fail visibly and must never turn existing files into prune targets.
       Track file ownership; retain handwritten files, and validate custom layouts
       for collisions and paths escaping the managed output directory.
@@ -151,8 +152,13 @@ before snapshot comparison, with separate tests against Typer's actual parser.
 - [x] Implement `write()`: dry runs, default/custom layouts, unchanged mtimes,
       render-before-write validation, and atomic replacement per file. Reject
       escaping paths, symlinks, and layout collisions.
-- [ ] Implement `CompletionSet`: deterministic diffs, missing/stale/orphan reports,
-      bounded report output, and the failure/pruning rules above.
+- [x] Implement `CompletionSet`: deterministic diffs, missing/stale/orphan reports,
+      bounded report output, and the failure/pruning rules above. A versioned
+      ownership manifest protects handwritten files and failed-import outputs;
+      edited orphans and conflicting unmanaged destinations block writes.
+- [ ] Implement `entrypoints()` and `CompletionSet.from_pyproject()` with explicit
+      wrapper-target handling and Python 3.10 TOML support. Direct mappings and
+      `load_app()` now support Typer instances without calling wrappers/factories.
 - [ ] Implement CLI generate/sync/check/verify with stdout/stderr and exit-code
       tests. Treat installation as a later feature with explicit destinations;
       avoid automatic shell-profile changes.

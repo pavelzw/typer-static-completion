@@ -120,26 +120,13 @@ def write(
     settings = options or GenerationOptions()
     tree = _tree(app, prog_name, settings)
     root = Path(output_dir)
-    resolved_root = root.resolve()
     rendered: dict[Path, str] = {}
     destinations: set[Path] = set()
     for shell in dict.fromkeys(DEFAULT_SHELLS if shells is None else shells):
         generator = get_generator(shell, settings)
         template = (layout or {}).get(shell, generator.shell + "/" + generator.filename)
-        relative = Path(template.format(prog=tree.prog_name))
-        if relative.is_absolute() or ".." in relative.parts or relative == Path("."):
-            raise ValueError(
-                f"Completion layout must be a relative file path: {relative}"
-            )
-        path = root / relative
+        path = _output_path(root, template.format(prog=tree.prog_name))
         destination = path.resolve()
-        if (
-            not destination.is_relative_to(resolved_root)
-            or destination == resolved_root
-        ):
-            raise ValueError(f"Completion path escapes output_dir: {path}")
-        if any((root / part).is_symlink() for part in (relative, *relative.parents)):
-            raise ValueError(f"Completion path must not contain symlinks: {path}")
         if any(
             destination == other
             or destination in other.parents
@@ -163,6 +150,21 @@ def write(
         for path, data in changed.items():
             _replace_file(path, data)
     return rendered
+
+
+def _output_path(root: Path, name: str) -> Path:
+    """Validate a destination without creating its parents."""
+    relative = Path(name)
+    if relative.is_absolute() or ".." in relative.parts or relative == Path("."):
+        raise ValueError(f"Completion layout must be a relative file path: {relative}")
+    path = root / relative
+    destination = path.resolve()
+    resolved_root = root.resolve()
+    if not destination.is_relative_to(resolved_root) or destination == resolved_root:
+        raise ValueError(f"Completion path escapes output_dir: {path}")
+    if any((root / part).is_symlink() for part in (relative, *relative.parents)):
+        raise ValueError(f"Completion path must not contain symlinks: {path}")
+    return path
 
 
 def _replace_file(path: Path, data: bytes) -> None:
@@ -201,22 +203,70 @@ class CheckResult:
     orphaned: tuple[Path, ...] = ()
     #: Unified diffs keyed by path, for the stale files.
     diffs: Mapping[Path, str] = field(default_factory=dict)
+    #: Failed imports also make the check fail, even if existing files match.
+    skipped: Mapping[str, str] = field(default_factory=dict)
+    #: Unmanaged destinations or edited orphans that sync refuses to replace/delete.
+    conflicts: Mapping[Path, str] = field(default_factory=dict)
 
     @property
     def ok(self) -> bool:
-        raise NotImplementedError
+        return not (
+            self.stale
+            or self.missing
+            or self.orphaned
+            or self.skipped
+            or self.conflicts
+        )
 
     def __bool__(self) -> bool:
-        raise NotImplementedError
+        return self.ok
 
     def report(self, *, max_files: int = 5, show_diffs: bool = True) -> str:
-        """A human-readable summary suitable for stderr in CI."""
-        raise NotImplementedError
+        """A human-readable summary; show at most max_files details and 80 diff lines per file."""
+        if max_files < 0:
+            raise ValueError("max_files must be nonnegative")
+        if self.ok:
+            return "Completions are up to date."
+        lines = [
+            f"Completions: {len(self.stale)} stale, {len(self.missing)} missing, "
+            f"{len(self.orphaned)} orphaned, {len(self.skipped)} skipped, "
+            f"{len(self.conflicts)} conflicts."
+        ]
+        details = [
+            (f"{label}: {path}", self.diffs.get(path, "") if show_diffs else "")
+            for label, paths in (
+                ("stale", self.stale),
+                ("missing", self.missing),
+                ("orphaned", self.orphaned),
+            )
+            for path in paths
+        ]
+        details.extend(
+            (f"skipped: {name}: {reason}", "")
+            for name, reason in sorted(self.skipped.items())
+        )
+        details.extend(
+            (f"conflict: {path}: {reason}", "")
+            for path, reason in sorted(self.conflicts.items())
+        )
+        for message, diff in details[:max_files]:
+            lines.append(message[:1000])
+            if diff:
+                diff_lines = diff.splitlines()
+                lines.extend(line[:1000] for line in diff_lines[:80])
+                if len(diff_lines) > 80:
+                    lines.append("... diff truncated")
+        if len(details) > max_files:
+            lines.append(f"... {len(details) - max_files} more entries")
+        return "\n".join(lines)
 
     def raise_for_status(self) -> None:
         """Raise :exc:`~typer_static_completions.errors.StaleCompletionsError`
         unless everything is up to date."""
-        raise NotImplementedError
+        from .errors import StaleCompletionsError
+
+        if not self.ok:
+            raise StaleCompletionsError(self.report())
 
 
 @dataclass(frozen=True)
@@ -233,7 +283,17 @@ class SyncResult:
     skipped: Mapping[str, str] = field(default_factory=dict)
 
     def report(self) -> str:
-        raise NotImplementedError
+        """Summarize writes and at most five import failures."""
+        lines = [
+            f"Completions: {len(self.written)} written, {len(self.unchanged)} unchanged, {len(self.removed)} removed, {len(self.skipped)} skipped."
+        ]
+        lines.extend(
+            f"skipped: {name}: {reason}"[:1000]
+            for name, reason in sorted(self.skipped.items())[:5]
+        )
+        if len(self.skipped) > 5:
+            lines.append(f"... {len(self.skipped) - 5} more skipped")
+        return "\n".join(lines)
 
 
 class CompletionSet:
@@ -243,8 +303,9 @@ class CompletionSet:
     verify committed copies are current, and delete ones that no longer belong.
 
     Example:
-        >>> completions = CompletionSet.from_pyproject(
-        ...     output_dir="completions",
+        >>> from myapp.cli import app
+        >>> completions = CompletionSet(
+        ...     {"myapp": app}, output_dir="completions",
         ...     options=GenerationOptions(regenerate_command="pixi run completions"),
         ... )
         >>> completions.sync()                     # write
@@ -270,7 +331,22 @@ class CompletionSet:
                 :data:`~typer_static_completions.shells.DEFAULT_SHELLS`.
             layout: Per-shell path template; see :func:`write`.
         """
-        raise NotImplementedError
+        from .generators import get_generator
+
+        self.apps = dict(apps)
+        self.output_dir = Path(output_dir)
+        self.shells = tuple(dict.fromkeys(DEFAULT_SHELLS if shells is None else shells))
+        self.options = options or GenerationOptions()
+        self.layout = dict(layout or {})
+        for shell in self.shells:
+            get_generator(shell, self.options)
+        for name, app in self.apps.items():
+            if not name or any(ord(char) < 32 for char in name):
+                raise ValueError(
+                    "Program names must be nonempty and contain no controls"
+                )
+            if isinstance(app, CommandTree) and app.prog_name != name:
+                raise ValueError(f"Tree program name must match mapping key {name!r}")
 
     @classmethod
     def from_pyproject(
@@ -283,7 +359,7 @@ class CompletionSet:
         options: GenerationOptions | None = None,
         layout: Mapping[ShellName, str] | None = None,
     ) -> CompletionSet:
-        """Build a set from ``[project.scripts]``.
+        """Build a set from ``[project.scripts]`` (not implemented yet).
 
         Args:
             pyproject: Defaults to the nearest ``pyproject.toml`` at or above the
@@ -296,39 +372,159 @@ class CompletionSet:
         """
         raise NotImplementedError
 
-    def render(self) -> dict[Path, str]:
-        """Compute ``{path: content}`` for the whole set without writing.
+    def _trees(self) -> tuple[dict[str, CommandTree], dict[str, str]]:
+        from .errors import AppLoadError
+        from .introspect import load_app
 
-        Skips apps that fail to import; :meth:`sync` reports those.
+        trees: dict[str, CommandTree] = {}
+        skipped: dict[str, str] = {}
+        for name, app in sorted(self.apps.items()):
+            try:
+                loaded = load_app(app) if isinstance(app, str) else app
+            except AppLoadError as exc:
+                skipped[name] = str(exc)
+                continue
+            trees[name] = _tree(
+                loaded, None if isinstance(loaded, CommandTree) else name, self.options
+            )
+        return trees, skipped
+
+    def _render(self) -> tuple[dict[Path, str], dict[Path, str], dict[str, str]]:
+        trees, skipped = self._trees()
+        outputs: dict[Path, str] = {}
+        owners: dict[Path, str] = {}
+        for name, tree in trees.items():
+            for path, content in write(
+                tree,
+                output_dir=self.output_dir,
+                shells=self.shells,
+                options=self.options,
+                layout=self.layout,
+                dry_run=True,
+            ).items():
+                resolved = path.resolve()
+                if any(
+                    resolved == other.resolve()
+                    or resolved in other.resolve().parents
+                    or other.resolve() in resolved.parents
+                    for other in outputs
+                ):
+                    raise ValueError(f"Completion layout collision: {path}")
+                outputs[path] = content
+                owners[path] = name
+        return outputs, owners, skipped
+
+    def render(self) -> dict[Path, str]:
+        """Render scripts without writes; raise AppLoadError on any failed import.
+
+        Use sync/check for partial results with explicit skipped-app diagnostics.
+        Ownership metadata is not included in this mapping.
         """
-        raise NotImplementedError
+        from .errors import AppLoadError
+
+        outputs, _, skipped = self._render()
+        if skipped:
+            raise AppLoadError(
+                "; ".join(f"{name}: {reason}" for name, reason in skipped.items())
+            )
+        return outputs
 
     def sync(self, *, prune: bool = True) -> SyncResult:
-        """Write every script, optionally deleting orphans.
+        """Write scripts and ownership metadata, optionally deleting owned orphans.
 
-        Only the managed per-shell subdirectories are swept, so hand-written
-        loader files sitting directly in ``output_dir`` are left alone.
-
-        Args:
-            prune: Delete files under managed directories that this set does not
-                produce.
+        Only files recorded by a previous sync can be pruned. Failed imports
+        retain their previous files. Unmanaged files with differing content and
+        edited orphans raise ValueError before any writes. Matching unmanaged
+        scripts can be adopted (for example, outputs from write()).
+        Replacements are atomic per file, not across the set. Use one manager
+        per output directory; concurrent syncs are not supported.
         """
-        raise NotImplementedError
+        from ._management import MANIFEST, prepare
+
+        outputs, owners, skipped = self._render()
+        plan = prepare(self.output_dir, outputs, owners, skipped, prune=prune)
+        if plan.conflicts:
+            raise ValueError(
+                "Completion ownership conflicts: "
+                + "; ".join(
+                    f"{path}: {reason}" for path, reason in plan.conflicts.items()
+                )
+            )
+        written: list[Path] = []
+        unchanged: list[Path] = []
+
+        def update(path: Path, content: bytes) -> None:
+            if path.exists() and path.read_bytes() == content:
+                unchanged.append(path)
+            else:
+                _replace_file(path, content)
+                written.append(path)
+
+        manifest = self.output_dir / MANIFEST
+        for path, content in plan.outputs.items():
+            if path != manifest:
+                update(path, content)
+        for path in plan.orphaned:
+            path.unlink()
+        # Publish ownership last: failed writes/deletions remain recoverable.
+        update(manifest, plan.outputs[manifest])
+        return SyncResult(tuple(written), tuple(unchanged), plan.orphaned, skipped)
 
     def check(self, *, prune: bool = True, diffs: bool = True) -> CheckResult:
-        """Compare committed files against freshly generated ones.
+        """Compare scripts and ownership metadata without writing.
 
-        A generated script is a snapshot: if it drifts from the app, users get
-        wrong completions with no error. Run this in CI the way you would check a
-        lockfile.
+        Failed imports make the result falsy and preserve that app's ownership.
+        prune=False ignores old outputs while retaining them for future pruning.
+        Diffs use UTF-8 with replacement for undecodable existing content.
         """
-        raise NotImplementedError
+        import difflib
+
+        from ._management import prepare
+
+        outputs, owners, skipped = self._render()
+        plan = prepare(self.output_dir, outputs, owners, skipped, prune=prune)
+        stale: list[Path] = []
+        missing: list[Path] = []
+        changes: dict[Path, str] = {}
+        for path, content in plan.outputs.items():
+            if not path.exists():
+                missing.append(path)
+                continue
+            current = path.read_bytes()
+            if current != content:
+                stale.append(path)
+                if diffs:
+                    lines = difflib.unified_diff(
+                        current.decode("utf-8", errors="replace").splitlines(
+                            keepends=True
+                        ),
+                        content.decode("utf-8").splitlines(keepends=True),
+                        fromfile=str(path),
+                        tofile=str(path) + " (generated)",
+                    )
+                    changes[path] = "".join(
+                        line
+                        if line.endswith("\n")
+                        else line + "\n\\ No newline at end of file\n"
+                        for line in lines
+                    )
+
+        return CheckResult(
+            tuple(stale),
+            tuple(missing),
+            plan.orphaned,
+            changes,
+            skipped,
+            plan.conflicts,
+        )
 
     def trees(self) -> dict[str, CommandTree]:
-        """Introspect every app, keyed by program name.
+        """Introspect every app; raise AppLoadError rather than silently omitting failures."""
+        from .errors import AppLoadError
 
-        Exposed so projects can assert on the model directly -- e.g. that every
-        command in the tree shows up in the generated script, so a new
-        subcommand cannot be silently omitted.
-        """
-        raise NotImplementedError
+        trees, skipped = self._trees()
+        if skipped:
+            raise AppLoadError(
+                "; ".join(f"{name}: {reason}" for name, reason in skipped.items())
+            )
+        return trees

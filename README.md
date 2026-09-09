@@ -9,8 +9,8 @@ Generate static shell completions for typer applications
 
 Status: initial Bash, Fish, and Zsh implementation. Typer introspection and generation work
 for nested commands, flags, choices, scalar/variadic arguments, and paths.
-The `write()` API supports build-time file generation. `CompletionSet`, PowerShell,
-and CLI commands are still scaffolds. See
+The `write()` and `CompletionSet` APIs support build-time file generation and
+staleness checks. Pyproject discovery, PowerShell, and CLI commands are still scaffolds. See
 [TODO.md](TODO.md) for the remaining work.
 
 ```python
@@ -102,6 +102,50 @@ These installation steps are manual; generation does not edit shell profiles.
 After changing the CLI, rerun `pixi run example-completions` and source or install
 the updated files. For your own application, replace that task with your build's
 generation command. The banner records the regeneration command for reference.
+
+## Managing several CLIs and checking committed files
+
+```python
+from typer_static_completions import CompletionSet
+from myapp.cli import app
+
+completions = CompletionSet(
+    {"myapp": app, "myadmin": "myapp.admin:app"},
+    output_dir="completions",
+)
+print(completions.sync().report())
+completions.check().raise_for_status()  # Use this line alone in CI.
+```
+
+Run `sync()` during generation and commit the resulting shell scripts **and**
+`completions/.typer-static-completions.json`. Run only `check()` in CI so stale
+files fail instead of being silently regenerated. Checks return missing, stale,
+and orphaned paths, optional unified diffs, import failures (`skipped`), and
+ownership conflicts. `check(diffs=False)` omits diffs, and `report(max_files=5)`
+bounds the displayed details. The manifest itself appears in write/check results
+when missing or changed. No check creates directories or modifies files.
+
+The manifest records each file's owning CLI and content hash. By default, `sync()`
+prunes recorded outputs that are no longer generated, including renamed commands
+and removed shells. Handwritten files elsewhere in the directory remain intact.
+An unmanaged destination with different content, or an orphan edited since its
+last sync, blocks syncing before writes; inspect and move or remove the conflicting
+file before retrying. Identical outputs from `write()` can be adopted. Use
+`prune=False` to retain old outputs and their ownership for later cleanup.
+
+String targets import a module and read a Typer instance, including nested
+attributes such as `"myapp.cli:commands.app"`. Importing executes module code, but
+wrapper functions and factories are never called to discover an app. Construct
+factory-backed apps explicitly and pass their instances. A failed import appears
+in `sync().skipped` while other apps are updated; its previous files and ownership
+are retained. Any skipped app makes `check()` fail. `render()` and `trees()` raise
+on failed imports to avoid silently returning incomplete results. Generation and
+layout errors abort the operation before writing.
+
+Use one `CompletionSet` per output directory. Writes are atomic per file; the
+manifest is updated last so an interrupted sync can be retried. Concurrent syncs
+are not supported. `CompletionSet.from_pyproject()` is still unimplemented;
+explicit mappings let projects distinguish Typer apps from console-script wrappers.
 
 ## Interactive screen snapshots
 
