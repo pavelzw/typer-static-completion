@@ -10,6 +10,26 @@ Use `../commander-static-completion` as the local reference, especially
 `test/bash-readline.test.js`. Its interactive snapshots already exist; its
 representative generated-script snapshots are still a TODO.
 
+## First milestone: working completion with interactive screen snapshots
+
+Interactive screen snapshots like Commander's are a top priority. Build the PTY
+harness alongside the first working generator and extend both to Bash, Zsh, and
+Fish before starting file management or CLI convenience features.
+
+- [ ] Deliver a minimal end-to-end path from a Typer fixture to a generated script
+      to a real interactive shell screen snapshot. Capture visible suggestions,
+      inserted text, and cursor position from the start.
+- [ ] Require reviewed interactive snapshots for each shell's initial support:
+      unique and ambiguous completion, nested commands, choices, quoted paths,
+      and cursor-in-the-middle editing.
+- [ ] Include explicit local snapshot updates and a required shell-integration
+      CI check in this milestone. Expand the shared case matrix with each new
+      completion feature.
+
+Generated-script snapshots and candidate assertions supplement this milestone;
+real interactive screen coverage is part of the acceptance criteria. The detailed
+harness and scenario checklist is in section 3.
+
 ## 1. Resolve contracts before implementation
 
 - [ ] Decide the static guarantee. Commander never invokes the CLI at completion
@@ -72,7 +92,7 @@ representative generated-script snapshots are still a TODO.
       in each shell. Keep versions/timestamps out by default; assert identical
       output across repeated generation. Review these alongside behavioral tests.
 
-### Interactive screen snapshots like Commander
+### Interactive screen snapshots like Commander (first-milestone requirement)
 
 - [ ] Build `tests/snapshot_harness.py`: launch actual interactive Bash, Zsh,
       and Fish in a PTY, source generated scripts, and drive their line editors.
@@ -136,7 +156,8 @@ representative generated-script snapshots are still a TODO.
 - [ ] Benchmark script size and completion latency on large/deep real Typer apps,
       and turn compatibility failures into small regression fixtures.
 
-Suggested order: resolve static/parser contracts, implement one complete shell
-path with fixtures and snapshots, extend to the other two shells, then add file
-management and CLI convenience. Keep the current scaffold explicitly unreleased
+Suggested order: resolve the contracts needed for the first fixture, build the
+interactive harness alongside one working shell path, add reviewed screen
+snapshots and CI, then extend generators and interactive snapshots to the other
+two shells. File management and CLI convenience follow that milestone. Keep the current scaffold explicitly unreleased
 as functionality until that first path works.
