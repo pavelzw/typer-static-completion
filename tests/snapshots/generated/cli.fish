@@ -6,25 +6,6 @@ if test "$argv[1]:$argv[2]" = '1:--shell'; printf "%s\n" 3 1; return; end
 if test "$argv[1]:$argv[2]" = '1:--output'; printf "%s\n" 4 1; return; end
 if test "$argv[1]:$argv[2]" = '1:-o'; printf "%s\n" 4 1; return; end
 if test "$argv[1]:$argv[2]" = '1:--help'; printf "%s\n" 5 0; return; end
-if test "$argv[1]:$argv[2]" = '2:--pyproject'; printf "%s\n" 6 1; return; end
-if test "$argv[1]:$argv[2]" = '2:--output-dir'; printf "%s\n" 7 1; return; end
-if test "$argv[1]:$argv[2]" = '2:--shell'; printf "%s\n" 8 1; return; end
-if test "$argv[1]:$argv[2]" = '2:--only'; printf "%s\n" 9 1; return; end
-if test "$argv[1]:$argv[2]" = '2:--app'; printf "%s\n" 10 1; return; end
-if test "$argv[1]:$argv[2]" = '2:--prune'; printf "%s\n" 11 0; return; end
-if test "$argv[1]:$argv[2]" = '2:--no-prune'; printf "%s\n" 11 0; return; end
-if test "$argv[1]:$argv[2]" = '2:--help'; printf "%s\n" 12 0; return; end
-if test "$argv[1]:$argv[2]" = '3:--pyproject'; printf "%s\n" 13 1; return; end
-if test "$argv[1]:$argv[2]" = '3:--output-dir'; printf "%s\n" 14 1; return; end
-if test "$argv[1]:$argv[2]" = '3:--shell'; printf "%s\n" 15 1; return; end
-if test "$argv[1]:$argv[2]" = '3:--only'; printf "%s\n" 16 1; return; end
-if test "$argv[1]:$argv[2]" = '3:--app'; printf "%s\n" 17 1; return; end
-if test "$argv[1]:$argv[2]" = '3:--prune'; printf "%s\n" 18 0; return; end
-if test "$argv[1]:$argv[2]" = '3:--no-prune'; printf "%s\n" 18 0; return; end
-if test "$argv[1]:$argv[2]" = '3:--diff'; printf "%s\n" 19 0; return; end
-if test "$argv[1]:$argv[2]" = '3:--no-diff'; printf "%s\n" 19 0; return; end
-if test "$argv[1]:$argv[2]" = '3:--max-files'; printf "%s\n" 20 1; return; end
-if test "$argv[1]:$argv[2]" = '3:--help'; printf "%s\n" 21 0; return; end
     printf '%s\n' -1 0
 end
 
@@ -78,8 +59,6 @@ function __tsc_a0400f50fb4ab9f2
             return
         end
 if test "$node:$word" = '0:generate'; set node 1; set position 0; set ended 0; continue; end
-if test "$node:$word" = '0:sync'; set node 2; set position 0; set ended 0; continue; end
-if test "$node:$word" = '0:check'; set node 3; set position 0; set ended 0; continue; end
         switch $node
 case 0; return
         end
@@ -121,8 +100,8 @@ case 0; return
     if test $target -lt 0
         switch $node
 case 0
-set candidates 'generate' 'sync' 'check'
-set descriptions 'Render one app\'s completion script.' 'Write project completions and their ownership manifest.' 'Fail if committed completions differ, without writing files.'
+set candidates 'generate'
+set descriptions 'Render one app\'s completion script.'
 if test $ended -eq 0; and string match -q -- '-*' "$current"
 set candidates '--help'
 set descriptions 'Show this message and exit.'
@@ -133,20 +112,6 @@ set descriptions
 if test $ended -eq 0; and string match -q -- '-*' "$current"
 set candidates '--prog-name' '--shell' '--output' '-o' '--help'
 set descriptions 'Command name users type.' 'Target shell.' 'Output file; omit or use - for stdout.' 'Output file; omit or use - for stdout.' 'Show this message and exit.'
-end
-case 2
-set candidates
-set descriptions
-if test $ended -eq 0; and string match -q -- '-*' "$current"
-set candidates '--pyproject' '--output-dir' '--shell' '--only' '--app' '--prune' '--no-prune' '--help'
-set descriptions 'Project metadata; defaults to nearest pyproject.toml.' 'Output directory; defaults to completions beside pyproject.' 'Shell to generate; repeat to select several.' 'Script name to manage; repeat to select several.' 'Override a declared script: NAME=MODULE:APP.' 'Remove unchanged owned orphan files.' 'Remove unchanged owned orphan files.' 'Show this message and exit.'
-end
-case 3
-set candidates
-set descriptions
-if test $ended -eq 0; and string match -q -- '-*' "$current"
-set candidates '--pyproject' '--output-dir' '--shell' '--only' '--app' '--prune' '--no-prune' '--diff' '--no-diff' '--max-files' '--help'
-set descriptions 'Project metadata; defaults to nearest pyproject.toml.' 'Output directory; defaults to completions beside pyproject.' 'Shell to check; repeat to select several.' 'Script name to manage; repeat to select several.' 'Override a declared script: NAME=MODULE:APP.' 'Report owned orphan files.' 'Report owned orphan files.' 'Include unified diffs.' 'Include unified diffs.' 'Maximum diagnostic entries to display.' 'Show this message and exit.'
 end
         end
         if test $ended -eq 1; or not string match -q -- '-*' "$current"
@@ -163,22 +128,6 @@ case 2; set candidates
 case 3; set candidates 'bash' 'fish' 'zsh'; set descriptions 'Target shell.' 'Target shell.' 'Target shell.'
 case 4; set file_mode file
 case 5; set candidates
-case 6; set file_mode file
-case 7; set file_mode file
-case 8; set candidates 'bash' 'fish' 'zsh'; set descriptions 'Shell to generate; repeat to select several.' 'Shell to generate; repeat to select several.' 'Shell to generate; repeat to select several.'
-case 9; set candidates
-case 10; set candidates
-case 11; set candidates
-case 12; set candidates
-case 13; set file_mode file
-case 14; set file_mode file
-case 15; set candidates 'bash' 'fish' 'zsh'; set descriptions 'Shell to check; repeat to select several.' 'Shell to check; repeat to select several.' 'Shell to check; repeat to select several.'
-case 16; set candidates
-case 17; set candidates
-case 18; set candidates
-case 19; set candidates
-case 20; set candidates
-case 21; set candidates
         end
     end
     set -l index 1

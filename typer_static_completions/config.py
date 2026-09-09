@@ -35,7 +35,7 @@ class DynamicPolicy(str, Enum):
 class GenerationOptions:
     """Everything that changes the *content* of a generated script.
 
-    Frozen and value-comparable so it can key a cache and so ``--check`` can
+    Frozen and value-comparable so it can key a cache and callers can
     prove it regenerated under the same settings as the committed file.
     """
 

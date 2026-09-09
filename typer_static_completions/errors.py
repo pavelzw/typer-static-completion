@@ -22,13 +22,6 @@ class IntrospectionError(StaticCompletionError):
     """
 
 
-class StaleCompletionsError(StaticCompletionError):
-    """Committed completion scripts do not match the current app.
-
-    Raised by :meth:`typer_static_completions.CheckResult.raise_for_status`.
-    """
-
-
 class ShellUnavailableError(StaticCompletionError):
     """A shell binary needed to verify a generated script is not installed."""
 

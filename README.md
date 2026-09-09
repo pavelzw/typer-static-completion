@@ -9,9 +9,8 @@ Generate static shell completions for typer applications. Requires Python 3.11 o
 
 Status: initial Bash, Fish, and Zsh implementation. Typer introspection and generation work
 for nested commands, flags, choices, scalar/variadic arguments, and paths.
-The `write()` and `CompletionSet` APIs support build-time file generation and
-staleness checks, including pyproject discovery. The CLI implements `generate`,
-`sync`, and `check`; PowerShell, installation automation, and `verify` remain unimplemented. See
+The CLI provides `generate`; the Python API provides `generate()` and `write()`.
+PowerShell and dynamic delegation remain unimplemented. See
 [TODO.md](TODO.md) for the remaining work.
 
 ```python
@@ -104,74 +103,6 @@ After changing the CLI, rerun `pixi run example-completions` and source or insta
 the updated files. For your own application, replace that task with your build's
 generation command. The banner records the regeneration command for reference.
 
-## Managing several CLIs and checking committed files
-
-```python
-from typer_static_completions import CompletionSet
-from myapp.cli import app
-
-completions = CompletionSet(
-    {"myapp": app, "myadmin": "myapp.admin:app"},
-    output_dir="completions",
-)
-print(completions.sync().report())
-completions.check().raise_for_status()  # Use this line alone in CI.
-```
-
-Run `sync()` during generation and commit the resulting shell scripts **and**
-`completions/.typer-static-completions.json`. Run only `check()` in CI so stale
-files fail instead of being silently regenerated. Checks return missing, stale,
-and orphaned paths, optional unified diffs, import failures (`skipped`), and
-ownership conflicts. `check(diffs=False)` omits diffs, and `report(max_files=5)`
-bounds the displayed details. The manifest itself appears in write/check results
-when missing or changed. No check creates directories or modifies files.
-
-The manifest records each file's owning CLI and content hash. By default, `sync()`
-prunes recorded outputs that are no longer generated, including renamed commands
-and removed shells. Handwritten files elsewhere in the directory remain intact.
-An unmanaged destination with different content, or an orphan edited since its
-last sync, blocks syncing before writes; inspect and move or remove the conflicting
-file before retrying. Identical outputs from `write()` can be adopted. Use
-`prune=False` to retain old outputs and their ownership for later cleanup.
-
-String targets import a module and read a Typer instance, including nested
-attributes such as `"myapp.cli:commands.app"`. Importing executes module code, but
-wrapper functions and factories are never called to discover an app. Construct
-factory-backed apps explicitly and pass their instances. A failed import appears
-in `sync().skipped` while other apps are updated; its previous files and ownership
-are retained. Any skipped app makes `check()` fail. `render()` and `trees()` raise
-on failed imports to avoid silently returning incomplete results. Generation and
-layout errors abort the operation before writing.
-
-Use one `CompletionSet` per output directory. Writes are atomic per file; the
-manifest is updated last so an interrupted sync can be retried. Concurrent syncs
-are not supported.
-
-### Discovering project entrypoints
-
-```python
-completions = CompletionSet.from_pyproject(
-    "pyproject.toml",  # Omit to find the nearest one at or above cwd.
-    output_dir="completions",
-    overrides={"myapp": "myapp.cli:app"},  # If project.scripts points to main().
-)
-completions.sync()
-```
-
-Discovery reads `[project.scripts]` without importing modules. Overrides replace
-**declared** script targets with import strings, Typer instances, or CommandTrees;
-unknown names are errors. Factories must be called explicitly by your build code.
-Targets need to be importable in the current environment: discovery does not
-modify `sys.path` or change directories. Relative `output_dir` paths are relative
-to cwd, even when the pyproject lives elsewhere.
-
-Use `only=["myapp"]` to manage a subset. Outputs owned by other CLIs are preserved,
-including previously removed entrypoints, and their targets are not imported.
-Omit `only` for a full sync that can prune removed entrypoints; `only=[]` selects
-no apps. Missing tables and malformed metadata fail rather than becoming empty
-sets. An explicitly empty `[project.scripts]` table is allowed for projects that
-have removed all their commands. TOML parsing uses the standard-library `tomllib`.
-
 ## Command line interface
 
 Generate one shell's script from an importable Typer app:
@@ -180,35 +111,24 @@ Generate one shell's script from an importable Typer app:
 pixi run typer-static-completions generate myapp.cli:app --prog-name myapp --shell fish -o myapp.fish
 ```
 
-`generate` requires `--shell`; it has no default shell.
-Omit `-o` (or use `-o -`) to emit only the script on stdout. Python import output
-is redirected to stderr so it cannot corrupt the generated script.
+`generate` requires `--shell` and `--prog-name`. Omit `-o` (or use `-o -`) to emit
+the script on stdout. Otherwise, it writes to exactly the specified path, creating
+parent directories as needed. Relative paths are relative to the current working
+directory. Import output goes to stderr so it cannot corrupt the generated script.
 
-For a project with `[project.scripts]`, generate or check all its completions:
+Targets must point to Typer instances, such as `myapp.cli:app`; wrapper functions
+and factories are never called to discover an app. Targets must already be
+importable in the current environment. For factory-backed applications, construct
+the app explicitly and use the Python API.
 
-```bash
-pixi run typer-static-completions sync --app myapp=myapp.cli:app
-pixi run typer-static-completions check --app myapp=myapp.cli:app --no-diff
-```
+Exit codes are **0** for success and **2** for usage or operation errors. There is
+no project discovery, ownership manifest, or automatic installation. Regenerate
+and install scripts through your project's build process when its CLI changes.
 
-`--app NAME=MODULE:APP` overrides a declared wrapper entrypoint. Repeat `--app`,
-`--only NAME`, or `--shell bash --shell fish` to select several apps or shells.
-`--pyproject PATH` selects metadata explicitly; otherwise the nearest pyproject
-is used. `sync` and `check` select all three shells unless `--shell` narrows them.
-The default output is `completions/` beside that file. An explicit
-`--output-dir` is relative to cwd. `--no-prune` retains old outputs, and
-`check --max-files 5` bounds diagnostics. Commit the scripts and ownership manifest,
-then run `check` without `sync` in CI.
-
-Exit codes are **0** for success, **1** for a failed check or a sync with skipped
-apps, and **2** for usage, configuration, or operation errors. Sync reports go to
-stdout; check reports and errors go to stderr. Import targets must already be
-installed or importable in your environment.
-
-To generate this CLI's own completions from the checkout:
+To generate this CLI's own Fish completion:
 
 ```bash
-pixi run typer-static-completions sync --app typer-static-completions=typer_static_completions.cli:app
+pixi run typer-static-completions generate typer_static_completions.cli:app --prog-name typer-static-completions --shell fish -o typer-static-completions.fish
 ```
 
 The CLI is also available as `pixi run python -m typer_static_completions.cli`.

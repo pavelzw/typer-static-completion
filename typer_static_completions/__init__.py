@@ -15,8 +15,7 @@ callbacks are not yet implemented. Dynamic values are omitted by default.
     >>> print(generate(app, "myapp", "bash"))
 
 The trade-off is that a generated script is a snapshot and can drift from the
-app. Use :class:`CompletionSet` to check committed scripts in CI, the same way
-you would check a lockfile.
+app. Regenerate scripts when the command tree changes.
 
 What can and cannot be baked in:
 
@@ -40,13 +39,12 @@ import importlib.metadata
 import warnings
 
 from .config import DynamicPolicy, GenerationOptions
-from .core import CheckResult, CompletionSet, SyncResult, generate, write
+from .core import generate, write
 from .errors import (
     AppLoadError,
     IntrospectionError,
     ScriptSyntaxError,
     ShellUnavailableError,
-    StaleCompletionsError,
     StaticCompletionError,
     UnsupportedShellError,
 )
@@ -64,12 +62,10 @@ __all__ = [
     "DEFAULT_SHELLS",
     # errors
     "AppLoadError",
-    "CheckResult",
     # model
     "Command",
     "CommandTree",
     # core
-    "CompletionSet",
     # config
     "DynamicPolicy",
     "GenerationOptions",
@@ -79,9 +75,7 @@ __all__ = [
     "ScriptSyntaxError",
     "Shell",
     "ShellUnavailableError",
-    "StaleCompletionsError",
     "StaticCompletionError",
-    "SyncResult",
     "UnsupportedShellError",
     "ValueKind",
     "__version__",

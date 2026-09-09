@@ -36,25 +36,6 @@ _tsc_a0400f50fb4ab9f2() {
 1:--output) target=4; takes=1 ;;
 1:-o) target=4; takes=1 ;;
 1:--help) target=5; takes=0 ;;
-2:--pyproject) target=6; takes=1 ;;
-2:--output-dir) target=7; takes=1 ;;
-2:--shell) target=8; takes=1 ;;
-2:--only) target=9; takes=1 ;;
-2:--app) target=10; takes=1 ;;
-2:--prune) target=11; takes=0 ;;
-2:--no-prune) target=11; takes=0 ;;
-2:--help) target=12; takes=0 ;;
-3:--pyproject) target=13; takes=1 ;;
-3:--output-dir) target=14; takes=1 ;;
-3:--shell) target=15; takes=1 ;;
-3:--only) target=16; takes=1 ;;
-3:--app) target=17; takes=1 ;;
-3:--prune) target=18; takes=0 ;;
-3:--no-prune) target=18; takes=0 ;;
-3:--diff) target=19; takes=0 ;;
-3:--no-diff) target=19; takes=0 ;;
-3:--max-files) target=20; takes=1 ;;
-3:--help) target=21; takes=0 ;;
             esac
             if ((target >= 0)); then
                 if ((takes && !value)); then pending=$target; fi
@@ -71,25 +52,6 @@ _tsc_a0400f50fb4ab9f2() {
 1:--output) target=4; takes=1 ;;
 1:-o) target=4; takes=1 ;;
 1:--help) target=5; takes=0 ;;
-2:--pyproject) target=6; takes=1 ;;
-2:--output-dir) target=7; takes=1 ;;
-2:--shell) target=8; takes=1 ;;
-2:--only) target=9; takes=1 ;;
-2:--app) target=10; takes=1 ;;
-2:--prune) target=11; takes=0 ;;
-2:--no-prune) target=11; takes=0 ;;
-2:--help) target=12; takes=0 ;;
-3:--pyproject) target=13; takes=1 ;;
-3:--output-dir) target=14; takes=1 ;;
-3:--shell) target=15; takes=1 ;;
-3:--only) target=16; takes=1 ;;
-3:--app) target=17; takes=1 ;;
-3:--prune) target=18; takes=0 ;;
-3:--no-prune) target=18; takes=0 ;;
-3:--diff) target=19; takes=0 ;;
-3:--no-diff) target=19; takes=0 ;;
-3:--max-files) target=20; takes=1 ;;
-3:--help) target=21; takes=0 ;;
                     esac
                     ((target < 0)) && return 0
                     if ((takes)); then
@@ -103,8 +65,6 @@ _tsc_a0400f50fb4ab9f2() {
         fi
         case "$node:$word" in
 0:generate) node=1; position=0; ended=0; continue ;;
-0:sync) node=2; position=0; ended=0; continue ;;
-0:check) node=3; position=0; ended=0; continue ;;
         esac
         # Groups without arguments require the next operand to be a command.
         case $node in
@@ -122,25 +82,6 @@ _tsc_a0400f50fb4ab9f2() {
 1:--output) target=4; takes=1 ;;
 1:-o) target=4; takes=1 ;;
 1:--help) target=5; takes=0 ;;
-2:--pyproject) target=6; takes=1 ;;
-2:--output-dir) target=7; takes=1 ;;
-2:--shell) target=8; takes=1 ;;
-2:--only) target=9; takes=1 ;;
-2:--app) target=10; takes=1 ;;
-2:--prune) target=11; takes=0 ;;
-2:--no-prune) target=11; takes=0 ;;
-2:--help) target=12; takes=0 ;;
-3:--pyproject) target=13; takes=1 ;;
-3:--output-dir) target=14; takes=1 ;;
-3:--shell) target=15; takes=1 ;;
-3:--only) target=16; takes=1 ;;
-3:--app) target=17; takes=1 ;;
-3:--prune) target=18; takes=0 ;;
-3:--no-prune) target=18; takes=0 ;;
-3:--diff) target=19; takes=0 ;;
-3:--no-diff) target=19; takes=0 ;;
-3:--max-files) target=20; takes=1 ;;
-3:--help) target=21; takes=0 ;;
         esac
         ((takes)) || return 0
         prefix=$flag=; cur=${cur#*=}
@@ -154,25 +95,6 @@ _tsc_a0400f50fb4ab9f2() {
 1:--output) target=4; takes=1 ;;
 1:-o) target=4; takes=1 ;;
 1:--help) target=5; takes=0 ;;
-2:--pyproject) target=6; takes=1 ;;
-2:--output-dir) target=7; takes=1 ;;
-2:--shell) target=8; takes=1 ;;
-2:--only) target=9; takes=1 ;;
-2:--app) target=10; takes=1 ;;
-2:--prune) target=11; takes=0 ;;
-2:--no-prune) target=11; takes=0 ;;
-2:--help) target=12; takes=0 ;;
-3:--pyproject) target=13; takes=1 ;;
-3:--output-dir) target=14; takes=1 ;;
-3:--shell) target=15; takes=1 ;;
-3:--only) target=16; takes=1 ;;
-3:--app) target=17; takes=1 ;;
-3:--prune) target=18; takes=0 ;;
-3:--no-prune) target=18; takes=0 ;;
-3:--diff) target=19; takes=0 ;;
-3:--no-diff) target=19; takes=0 ;;
-3:--max-files) target=20; takes=1 ;;
-3:--help) target=21; takes=0 ;;
             esac
             if ((takes)); then prefix=${cur:0:$((j+1))}; cur=${cur:$((j+1))}; break; fi
             target=-1
@@ -180,10 +102,8 @@ _tsc_a0400f50fb4ab9f2() {
     fi
     if ((target < 0)); then
         case $node in
-0) candidates=(generate sync check); if [[ $cur == -* && $ended == 0 ]]; then candidates=(--help); fi ;;
+0) candidates=(generate); if [[ $cur == -* && $ended == 0 ]]; then candidates=(--help); fi ;;
 1) candidates=(); if [[ $cur == -* && $ended == 0 ]]; then candidates=(--prog-name --shell --output -o --help); fi ;;
-2) candidates=(); if [[ $cur == -* && $ended == 0 ]]; then candidates=(--pyproject --output-dir --shell --only --app --prune --no-prune --help); fi ;;
-3) candidates=(); if [[ $cur == -* && $ended == 0 ]]; then candidates=(--pyproject --output-dir --shell --only --app --prune --no-prune --diff --no-diff --max-files --help); fi ;;
         esac
         if [[ $cur != -* || $ended == 1 ]]; then
             case "$node:$position" in
@@ -200,22 +120,6 @@ _tsc_a0400f50fb4ab9f2() {
 3) candidates=(bash fish zsh); compopt -o filenames 2>/dev/null || : ;;
 4) file_mode=file ;;
 5) candidates=() ;;
-6) file_mode=file ;;
-7) file_mode=file ;;
-8) candidates=(bash fish zsh); compopt -o filenames 2>/dev/null || : ;;
-9) candidates=() ;;
-10) candidates=() ;;
-11) candidates=() ;;
-12) candidates=() ;;
-13) file_mode=file ;;
-14) file_mode=file ;;
-15) candidates=(bash fish zsh); compopt -o filenames 2>/dev/null || : ;;
-16) candidates=() ;;
-17) candidates=() ;;
-18) candidates=() ;;
-19) candidates=() ;;
-20) candidates=() ;;
-21) candidates=() ;;
         esac
     fi
     if [[ -n $file_mode ]]; then

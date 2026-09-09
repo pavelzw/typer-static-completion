@@ -1,0 +1,17 @@
+Input: typer-static-completions generate --prog-n<TAB>
+
+Shell: bash
+
+> typer-static-completions generate --prog-name ▏
+
+---
+
+Shell: fish
+
+> typer-static-completions generate --prog-name ▏
+
+---
+
+Shell: zsh
+
+> typer-static-completions generate --prog-name ▏

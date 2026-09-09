@@ -26,7 +26,6 @@ def test_errors_share_a_base():
         tsc.UnsupportedShellError,
         tsc.AppLoadError,
         tsc.IntrospectionError,
-        tsc.StaleCompletionsError,
         tsc.ShellUnavailableError,
         tsc.ScriptSyntaxError,
     ):
@@ -68,7 +67,7 @@ def test_model_is_frozen():
 
 
 def test_generation_options_are_value_comparable():
-    """--check must be able to prove it regenerated under the same settings."""
+    """Callers can compare generation settings."""
     assert tsc.GenerationOptions() == tsc.GenerationOptions()
     assert tsc.GenerationOptions(include_help=False) != tsc.GenerationOptions()
 

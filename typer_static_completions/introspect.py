@@ -24,8 +24,6 @@ wrong* script rather than an error:
 
 from __future__ import annotations
 
-import tomllib
-from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from .errors import IntrospectionError
@@ -218,7 +216,7 @@ def load_app(target: str) -> typer.Typer:
     Raises:
         AppLoadError: if the import fails, the attribute is missing, or the
             object is not a ``Typer`` app. Wrapper functions and factories are never
-            called; pass an explicit app instance to CompletionSet instead.
+            called; pass an explicit app instance to generate() or write() instead.
     """
     import importlib
 
@@ -249,60 +247,3 @@ def load_app(target: str) -> typer.Typer:
         return obj
     except (Exception, SystemExit) as exc:
         raise AppLoadError(f"Cannot load {target!r}: {exc}") from exc
-
-
-def entrypoints(pyproject: Path | str | None = None) -> dict[str, str]:
-    """Read ``[project.scripts]`` as ``{prog_name: "module:attribute"}``.
-
-    Args:
-        pyproject: Path to a ``pyproject.toml``. Defaults to the nearest one at
-            or above the current directory.
-
-    Raises:
-        AppLoadError: if the file is unreadable, invalid TOML, or has no valid
-            ``[project.scripts]`` table. An explicitly empty table is allowed.
-
-    Discovery never imports target modules or changes the import path. The nearest
-    pyproject is authoritative, even when it has no scripts.
-    """
-    from .errors import AppLoadError
-
-    if pyproject is None:
-        current = Path.cwd()
-        path = next(
-            (
-                parent / "pyproject.toml"
-                for parent in (current, *current.parents)
-                if (parent / "pyproject.toml").exists()
-            ),
-            None,
-        )
-        if path is None:
-            raise AppLoadError(f"No pyproject.toml found at or above {current}")
-    else:
-        path = Path(pyproject)
-    try:
-        with path.open("rb") as stream:
-            document = tomllib.load(stream)
-        project = document.get("project")
-        if not isinstance(project, dict) or not isinstance(
-            project.get("scripts"), dict
-        ):
-            raise ValueError("Expected a [project.scripts] table")
-        scripts = project["scripts"]
-        for name, target in scripts.items():
-            if not name or any(ord(char) < 32 or ord(char) == 127 for char in name):
-                raise ValueError(f"Invalid console script name: {name!r}")
-            if not isinstance(target, str):
-                raise ValueError(f"Script {name!r} must have a string target")
-            module, separator, attribute = target.partition(":")
-            if not separator or not all(
-                part.isidentifier()
-                for part in (*module.split("."), *attribute.split("."))
-            ):
-                raise ValueError(
-                    f"Script {name!r} must target module:attribute, got {target!r}"
-                )
-        return dict(sorted(scripts.items()))
-    except (OSError, ValueError) as exc:
-        raise AppLoadError(f"Cannot read entrypoints from {path}: {exc}") from exc

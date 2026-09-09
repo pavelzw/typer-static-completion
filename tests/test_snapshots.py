@@ -135,14 +135,14 @@ def test_multiple_scripts_and_repeated_sourcing(program, line, completed):
             "typer-static-completions generate --shell fish ",
         ),
         (
-            "repeated-shell",
-            "typer-static-completions sync --shell bash --shell z",
-            "typer-static-completions sync --shell bash --shell zsh ",
+            "output-option",
+            "typer-static-completions generate --out",
+            "typer-static-completions generate --output ",
         ),
         (
-            "no-diff",
-            "typer-static-completions check --no-d",
-            "typer-static-completions check --no-diff ",
+            "program-name-option",
+            "typer-static-completions generate --prog-n",
+            "typer-static-completions generate --prog-name ",
         ),
     ],
 )
