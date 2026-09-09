@@ -157,7 +157,7 @@ before snapshot comparison, with separate tests against Typer's actual parser.
       ownership manifest protects handwritten files and failed-import outputs;
       edited orphans and conflicting unmanaged destinations block writes.
 - [x] Implement `entrypoints()` and `CompletionSet.from_pyproject()` with explicit
-      wrapper-target handling and Python 3.10 TOML support. Direct mappings and
+      wrapper-target handling and standard-library TOML parsing. Direct mappings and
       `load_app()` now support Typer instances without calling wrappers/factories.
       Filtered `only` sets preserve ownership outside the selection.
 - [ ] Implement CLI generate/sync/check/verify with stdout/stderr and exit-code
@@ -167,9 +167,9 @@ before snapshot comparison, with separate tests against Typer's actual parser.
       time generation, installation per shell, regeneration, and static limits.
 - [ ] Validate built wheels/sdists in clean environments, including subpackages,
       runtime dependencies, the console entrypoint, and typed API distribution.
-      Pixi runtime requirements are now explicit for Python, Typer, and tomli;
+      Pixi runtime requirements are now explicit for Python and Typer;
       clean wheel/entrypoint validation remains outstanding.
-- [ ] Test the declared Typer range and Python 3.10 fallback for TOML parsing.
+- [ ] Test the declared Typer range on supported Python versions (3.11+).
       Keep compatibility tests for private Typer access; the current upstream
       Click comparison skips when Click is absent, so decide whether to provide
       Click as a test dependency or replace that check with a useful invariant.

@@ -5,7 +5,7 @@
 [![pypi-version](https://img.shields.io/pypi/v/typer-static-completions.svg?logo=pypi&logoColor=white&style=flat-square)](https://pypi.org/project/typer-static-completions)
 [![python-version](https://img.shields.io/pypi/pyversions/typer-static-completions?logoColor=white&logo=python&style=flat-square)](https://pypi.org/project/typer-static-completions)
 
-Generate static shell completions for typer applications
+Generate static shell completions for typer applications. Requires Python 3.11 or newer.
 
 Status: initial Bash, Fish, and Zsh implementation. Typer introspection and generation work
 for nested commands, flags, choices, scalar/variadic arguments, and paths.
@@ -170,8 +170,7 @@ including previously removed entrypoints, and their targets are not imported.
 Omit `only` for a full sync that can prune removed entrypoints; `only=[]` selects
 no apps. Missing tables and malformed metadata fail rather than becoming empty
 sets. An explicitly empty `[project.scripts]` table is allowed for projects that
-have removed all their commands. Python 3.11+ uses `tomllib`; Python 3.10 uses the
-packaged `tomli` dependency.
+have removed all their commands. TOML parsing uses the standard-library `tomllib`.
 
 ## Interactive screen snapshots
 

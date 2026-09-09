@@ -10,15 +10,14 @@ authors = [{ name = "Pavel Zwerschke", email = "pavelzw@gmail.com" }]
 version = "0.0.0"
 classifiers = [
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 readme = "README.md"
-dependencies = ["typer >=0.26,<0.27", "tomli >=2,<3; python_version < '3.11'"]
+dependencies = ["typer >=0.26,<0.27"]
 
 [project.urls]
 repository = "https://github.com/pavelzw/typer-static-completions"
@@ -34,9 +33,10 @@ line-length = 88
 
 [tool.ruff.lint]
 ignore = [
-  "N803", # https://docs.astral.sh/ruff/rules/invalid-argument-name
-  "N806", # https://docs.astral.sh/ruff/rules/non-lowercase-variable-in-function
-  "E501", # https://docs.astral.sh/ruff/faq/#is-the-ruff-linter-compatible-with-black
+  "UP042", # Preserve existing enum string representations; StrEnum changes them.
+  "N803",  # https://docs.astral.sh/ruff/rules/invalid-argument-name
+  "N806",  # https://docs.astral.sh/ruff/rules/non-lowercase-variable-in-function
+  "E501",  # https://docs.astral.sh/ruff/faq/#is-the-ruff-linter-compatible-with-black
 ]
 select = [
   # pyflakes
@@ -57,7 +57,7 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.mypy]
-python_version = '3.10'
+python_version = '3.11'
 no_implicit_optional = true
 check_untyped_defs = true
 

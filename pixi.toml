@@ -11,14 +11,13 @@ name = "typer-static-completions"
 name = "pixi-build-python"
 version = "*"
 [package.host-dependencies]
-python = ">=3.10"
+python = ">=3.11"
 hatchling = "*"
 uv = "*"
 
 [package.run-dependencies]
-python = ">=3.10"
+python = ">=3.11"
 typer = ">=0.26,<0.27"
-tomli = ">=2,<3"
 
 [dependencies]
 typer-static-completions = { path = "." }
@@ -69,8 +68,6 @@ zizmor = "*"
 pre-commit-install = "lefthook install"
 lint = "lefthook run pre-commit --all-files"
 
-[feature.py310.dependencies]
-python = "3.10.*"
 [feature.py311.dependencies]
 python = "3.11.*"
 [feature.py312.dependencies]
@@ -83,7 +80,6 @@ python = "3.14.*"
 [environments]
 default = ["test", "build", "lint"]
 snapshots = ["test", "snapshots"]
-py310 = ["py310", "test"]
 py311 = ["py311", "test"]
 py312 = ["py312", "test"]
 py313 = ["py313", "test"]

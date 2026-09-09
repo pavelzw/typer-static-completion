@@ -24,7 +24,7 @@ wrong* script rather than an error:
 
 from __future__ import annotations
 
-import sys
+import tomllib
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -266,11 +266,6 @@ def entrypoints(pyproject: Path | str | None = None) -> dict[str, str]:
     pyproject is authoritative, even when it has no scripts.
     """
     from .errors import AppLoadError
-
-    if sys.version_info >= (3, 11):
-        import tomllib
-    else:
-        import tomli as tomllib
 
     if pyproject is None:
         current = Path.cwd()
