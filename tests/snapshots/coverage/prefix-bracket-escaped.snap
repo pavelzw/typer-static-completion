@@ -1,0 +1,17 @@
+Input: demo show --value bracket\[o<TAB>
+
+Shell: bash
+
+> demo show --value bracket\[one\]:two ▏
+
+---
+
+Shell: fish
+
+> demo show --value bracket\[one\]:two ▏
+
+---
+
+Shell: zsh
+
+> demo show --value bracket\[one\]:two ▏

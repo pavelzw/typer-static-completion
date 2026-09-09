@@ -197,15 +197,18 @@ completion files. Separate tests verify the tricky cases against Typer's parser.
 The CLI itself has four shared interactive cases in `tests/snapshots/cli/` and
 full scripts in `tests/snapshots/generated/cli.{bash,fish,zsh}`.
 
-The coverage fixture adds 25 shared screens for custom/disabled help flags,
+The coverage fixture adds 45 shared screens for custom/disabled help flags,
 hidden commands/options, deprecated commands, literal help descriptions, Unicode,
-and escaped values. These cases use `C.UTF-8` and live in `tests/snapshots/coverage/`,
+and escaped values, including metacharacters already in the typed prefix. These cases use `C.UTF-8` and live in `tests/snapshots/coverage/`,
 with full scripts in `tests/snapshots/generated/coverage.{bash,fish,zsh}`.
 Completed lines are parsed by the actual shell using a controlled stub to verify
 argument values and reject executable substitutions before snapshots can update.
 Bash explicitly quotes literal candidates containing expansion syntax because
 Readline's filename quoting alone can leave backticks executable. Custom help
 aliases retain their configured order for deterministic output across processes.
+Bash respects quotes and escapes when finding the part Readline will replace,
+including prefixes with embedded quotes. Zsh avoids inserting a literal trailing
+space inside an already-closed quoted value.
 
 The tuple cases in `tests/tuple_cases.py` have interactive screen snapshots and a
 full generated-script fixture alongside the existing parsing matrix.

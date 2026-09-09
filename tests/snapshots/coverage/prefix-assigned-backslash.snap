@@ -1,0 +1,17 @@
+Input: demo show --value=slash\\p<TAB>
+
+Shell: bash
+
+> demo show --value=slash\\path ▏
+
+---
+
+Shell: fish
+
+> demo show --value=slash\\path ▏
+
+---
+
+Shell: zsh
+
+> demo show --value=slash\\path ▏

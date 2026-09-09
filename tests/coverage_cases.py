@@ -93,3 +93,43 @@ CASES = [
         ]
     ],
 ]
+
+
+CASES += [
+    CoverageCase(
+        "prefix-" + name,
+        "demo show --value " + prefix,
+        ("demo", "show", "--value", value),
+    )
+    for name, prefix, value in [
+        ("dollar-single-quoted", "'dollar$(d", "dollar$(demo)"),
+        ("dollar-escaped", r"dollar\$\(d", "dollar$(demo)"),
+        ("dollar-double-quoted", '"dollar\\$(d', "dollar$(demo)"),
+        ("backtick-single-quoted", "'tick`d", "tick`demo`"),
+        ("backtick-escaped", r"tick\`d", "tick`demo`"),
+        ("dollar-closed-quote", "'dollar$(d'", "dollar$(demo)"),
+        ("dollar-concatenated-quote", "dollar'$(d", "dollar$(demo)"),
+        ("colon-double-quoted", '"bracket[one]:t', "bracket[one]:two"),
+        ("colon-closed-quote", "'bracket[one]:t'", "bracket[one]:two"),
+        ("bracket-escaped", r"bracket\[o", "bracket[one]:two"),
+        ("bracket-single-quoted", "'bracket[o", "bracket[one]:two"),
+        ("colon-escaped", r"bracket\[one\]:t", "bracket[one]:two"),
+        ("colon-single-quoted", "'bracket[one]:t", "bracket[one]:two"),
+        ("backslash-escaped", r"slash\\p", r"slash\path"),
+        ("backslash-single-quoted", r"'slash\p", r"slash\path"),
+        ("double-quote-escaped", r"quote\"d", 'quote"double'),
+        ("apostrophe-escaped", r"apos\'t", "apos'trophe"),
+    ]
+]
+CASES += [
+    CoverageCase(
+        "prefix-assigned-" + name,
+        "demo show --value=" + prefix,
+        ("demo", "show", "--value=" + value),
+    )
+    for name, prefix, value in [
+        ("dollar", "'dollar$(d", "dollar$(demo)"),
+        ("colon", "'bracket[one]:t", "bracket[one]:two"),
+        ("backslash", r"slash\\p", r"slash\path"),
+    ]
+]

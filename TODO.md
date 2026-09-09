@@ -20,7 +20,7 @@ interactive screen harness and behavioral tests.
 - [x] Implement CLI `generate` with required shell selection, stdout/file output,
       error handling, and stream/exit-code tests.
 - [x] Record full generated scripts for demo, parsing, CLI, coverage, tuple, tuple-argument, group-argument, and case-matching fixtures in all
-      three shells, alongside 170 shared interactive screen cases.
+      three shells, alongside 190 shared interactive screen cases.
 - [x] Test interactive completion for choices, quoted files, nested commands,
       assignments, short clusters, repeated flags, positional values, `--`, parent
       scope, two CLIs loaded together, and repeated sourcing.
@@ -36,9 +36,11 @@ interactive screen harness and behavioral tests.
 - [x] Cover accented Unicode, colons, brackets, dollars, backticks, quotes, and
       backslashes. Verify completed argument values through the actual shell
       and reject substitution execution, alongside interactive screens.
-- [ ] Extend to wide/combining Unicode, unusual word-break settings, literal
-      metacharacters already present in the typed prefix, and control-character
-      filenames.
+- [x] Cover literal metacharacters already in escaped/quoted prefixes, including
+      assignments, embedded quotes, and closed quotes. Check the actual argument
+      values and reject substitution execution in every shell.
+- [ ] Extend to wide/combining Unicode, unusual word-break settings, and
+      control-character filenames.
 - [x] Add cases for custom/disabled help flags, hidden commands/options,
       deprecated commands, and literal descriptions with descriptions disabled.
 - [x] Support tuple options with per-position types, repeated occurrences, assigned

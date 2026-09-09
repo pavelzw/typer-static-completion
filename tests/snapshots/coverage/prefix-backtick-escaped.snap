@@ -1,0 +1,17 @@
+Input: demo show --value tick\`d<TAB>
+
+Shell: bash
+
+> demo show --value tick\`demo\` ▏
+
+---
+
+Shell: fish
+
+> demo show --value tick\`demo` ▏
+
+---
+
+Shell: zsh
+
+> demo show --value tick\`demo\` ▏

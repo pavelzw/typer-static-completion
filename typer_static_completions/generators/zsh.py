@@ -36,7 +36,7 @@ class ZshGenerator(BashGenerator):
     def runtime(self) -> str:
         # The scanner uses zero-based arrays. Keep that emulation local and
         # restore native Zsh options before invoking its completion helpers.
-        parser = _PARSER.replace(
+        parser = _PARSER.replace("@WORD_BREAK@", ":").replace(
             "@SETUP@",
             "    setopt localoptions ksharrays\n"
             "    local COMP_LINE=$BUFFER COMP_POINT=$CURSOR\n"
@@ -46,6 +46,9 @@ class ZshGenerator(BashGenerator):
             parser
             + r"""
     unsetopt ksharrays
+    # A closing quote already in the buffer must not receive a literal space.
+    local -a suffix_args=()
+    [[ -n $QISUFFIX ]] && suffix_args=(-S '')
     if [[ -n $prefix ]]; then
         # Tell Zsh that the attached flag is already present in the input.
         compset -P "${(b)prefix}"
@@ -60,9 +63,9 @@ class ZshGenerator(BashGenerator):
         for candidate in "${candidates[@]}"; do
             if [[ ${(L)candidate} == "${(L)cur}"* ]]; then matches+=("$candidate"); fi
         done
-        compadd -U -i "$IPREFIX" -- "${matches[@]}"
+        compadd "${suffix_args[@]}" -U -i "$IPREFIX" -- "${matches[@]}"
     else
-        compadd -d descriptions -- "${candidates[@]}"
+        compadd "${suffix_args[@]}" -d descriptions -- "${candidates[@]}"
     fi
 }
 """

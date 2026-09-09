@@ -25,7 +25,13 @@ class BashGenerator(Generator):
         return shlex.quote(text)
 
     def runtime(self) -> str:
-        return _PARSER.replace("@SETUP@", "") + _OUTPUT
+        return (
+            _PARSER.replace("@SETUP@", "").replace(
+                "@WORD_BREAK@",
+                'if [[ $COMP_WORDBREAKS == *"$char"* ]]; then trim=$token; fi',
+            )
+            + _OUTPUT
+        )
 
     def registration(self, name: str, prog_name: str) -> str:
         return f"complete -F {name} -- {self.quote(prog_name)}\n"
@@ -150,7 +156,7 @@ class BashGenerator(Generator):
 
 
 _PARSER = r"""@NAME@() {
-@SETUP@    local line=${COMP_LINE:0:$COMP_POINT} char quote= token= escaped=0 started=0 i
+@SETUP@    local line=${COMP_LINE:0:$COMP_POINT} char quote= quote_prefix= token= trim= escaped=0 started=0 i
     local -a words=() candidates=() descriptions=()
     # Tokenize only the text before the cursor, without eval or external tools.
     for ((i=0; i<${#line}; i++)); do
@@ -161,10 +167,12 @@ _PARSER = r"""@NAME@() {
         elif [[ $char == '\' && $quote != "'" ]]; then escaped=1; started=1
         elif [[ -n $quote ]]; then
             if [[ $char == "$quote" ]]; then quote=; else token+=$char; fi
-        elif [[ $char == "'" || $char == '"' ]]; then quote=$char; started=1
+        elif [[ $char == "'" || $char == '"' ]]; then quote=$char; quote_prefix=$token; started=1
         elif [[ $char == ' ' || $char == $'\t' ]]; then
-            if ((started)); then words+=("$token"); token=; started=0; fi
-        else token+=$char; started=1
+            if ((started)); then words+=("$token"); token=; trim=; started=0; fi
+        else
+            token+=$char; started=1
+            @WORD_BREAK@
         fi
     done
     words+=("$token")
@@ -264,12 +272,9 @@ _OUTPUT = r"""    if [[ -n $file_mode ]]; then
         while IFS= read -r candidate; do candidates+=("$candidate"); done < <(compgen -A "$file_mode" -- "$cur")
         compopt -o filenames 2>/dev/null || :
     fi
-    # Readline replaces only the part after its last word-break character.
-    local trim= full=$prefix$cur k
-    for ((k=0; k<${#full}; k++)); do
-        char=${full:$k:1}
-        if [[ $char != ' ' && $char != "'" && $char != '"' && $char != '\' && $COMP_WORDBREAKS == *"$char"* ]]; then trim=${full:0:k+1}; fi
-    done
+    # An open quote makes Readline replace only the portion inside it.
+    if [[ -n $quote ]]; then trim=$quote_prefix; fi
+    # Otherwise the scanner records unquoted, unescaped Readline word breaks.
     # Readline's filename quoting leaves command substitutions executable.
     # Quote literal candidates ourselves when they contain expansion syntax.
     local quote_literals=0

@@ -4,7 +4,7 @@ _tsc_a0400f50fb4ab9f2() {
     setopt localoptions ksharrays
     local COMP_LINE=$BUFFER COMP_POINT=$CURSOR
     local -a COMPREPLY
-    local line=${COMP_LINE:0:$COMP_POINT} char quote= token= escaped=0 started=0 i
+    local line=${COMP_LINE:0:$COMP_POINT} char quote= quote_prefix= token= trim= escaped=0 started=0 i
     local -a words=() candidates=() descriptions=()
     # Tokenize only the text before the cursor, without eval or external tools.
     for ((i=0; i<${#line}; i++)); do
@@ -15,10 +15,12 @@ _tsc_a0400f50fb4ab9f2() {
         elif [[ $char == '\' && $quote != "'" ]]; then escaped=1; started=1
         elif [[ -n $quote ]]; then
             if [[ $char == "$quote" ]]; then quote=; else token+=$char; fi
-        elif [[ $char == "'" || $char == '"' ]]; then quote=$char; started=1
+        elif [[ $char == "'" || $char == '"' ]]; then quote=$char; quote_prefix=$token; started=1
         elif [[ $char == ' ' || $char == $'\t' ]]; then
-            if ((started)); then words+=("$token"); token=; started=0; fi
-        else token+=$char; started=1
+            if ((started)); then words+=("$token"); token=; trim=; started=0; fi
+        else
+            token+=$char; started=1
+            :
         fi
     done
     words+=("$token")
@@ -140,6 +142,9 @@ _tsc_a0400f50fb4ab9f2() {
     fi
 
     unsetopt ksharrays
+    # A closing quote already in the buffer must not receive a literal space.
+    local -a suffix_args=()
+    [[ -n $QISUFFIX ]] && suffix_args=(-S '')
     if [[ -n $prefix ]]; then
         # Tell Zsh that the attached flag is already present in the input.
         compset -P "${(b)prefix}"
@@ -154,9 +159,9 @@ _tsc_a0400f50fb4ab9f2() {
         for candidate in "${candidates[@]}"; do
             if [[ ${(L)candidate} == "${(L)cur}"* ]]; then matches+=("$candidate"); fi
         done
-        compadd -U -i "$IPREFIX" -- "${matches[@]}"
+        compadd "${suffix_args[@]}" -U -i "$IPREFIX" -- "${matches[@]}"
     else
-        compadd -d descriptions -- "${candidates[@]}"
+        compadd "${suffix_args[@]}" -d descriptions -- "${candidates[@]}"
     fi
 }
 if (( $+compstate )); then _tsc_a0400f50fb4ab9f2 "$@"; elif (( $+functions[compdef] )); then compdef _tsc_a0400f50fb4ab9f2 typer-static-completions; fi
