@@ -74,24 +74,24 @@ class Param:
     multiple: bool = False
     hidden: bool = False
     deprecated: bool = False
+    is_help: bool = False
 
     @property
     def takes_value(self) -> bool:
         """Whether a value follows the flag."""
-        raise NotImplementedError
+        return self.value_kind is not ValueKind.FLAG
 
     @property
     def is_dynamic(self) -> bool:
-        raise NotImplementedError
+        return self.value_kind is ValueKind.DYNAMIC
 
 
 @dataclass(frozen=True)
 class Command:
     """One node of the command tree.
 
-    A node is a group exactly when :attr:`subcommands` is non-empty; there is no
-    separate type, because a typer app with a single command collapses to a leaf
-    root and generators should handle that without a special case.
+    ``is_group`` preserves empty groups. A single-command Typer app collapses
+    to a leaf root; hand-built nodes with subcommands also behave as groups.
     """
 
     #: Path from the root, excluding the program name. Empty tuple for the root.
@@ -105,25 +105,28 @@ class Command:
     #: True for ``chain=True`` groups, where several subcommands may be given in
     #: one invocation. Generators must keep offering siblings after the first.
     chain: bool = False
+    is_group: bool = False
 
     @property
     def name(self) -> str:
         """Last path segment, or ``""`` for the root."""
-        raise NotImplementedError
+        return self.path[-1] if self.path else ""
 
     @property
     def options(self) -> tuple[Param, ...]:
-        """Visible options, in declaration order."""
-        raise NotImplementedError
+        """Options retained by introspection, in declaration order."""
+        return tuple(p for p in self.params if p.kind is ParamKind.OPTION)
 
     @property
     def arguments(self) -> tuple[Param, ...]:
-        """Visible positional arguments, in declaration order."""
-        raise NotImplementedError
+        """Arguments retained by introspection, in declaration order."""
+        return tuple(p for p in self.params if p.kind is ParamKind.ARGUMENT)
 
     def walk(self) -> Iterator[Command]:
         """Yield this node and every descendant, depth-first, root first."""
-        raise NotImplementedError
+        yield self
+        for child in self.subcommands.values():
+            yield from child.walk()
 
 
 @dataclass(frozen=True)
@@ -138,7 +141,7 @@ class CommandTree:
     complete_var: str | None = None
 
     def walk(self) -> Iterator[Command]:
-        raise NotImplementedError
+        return self.root.walk()
 
     def paths(self) -> tuple[str, ...]:
         """Every reachable subcommand path, space-joined, excluding the root.
@@ -147,12 +150,17 @@ class CommandTree:
         in. Resolving by "non-flag words before the cursor" instead is wrong:
         option values and positional arguments are non-flag words too.
         """
-        raise NotImplementedError
+        return tuple(" ".join(c.path) for c in self.walk() if c.path)
 
     def find(self, path: Sequence[str]) -> Command | None:
         """Look up a command by path, or ``None`` if it does not exist."""
-        raise NotImplementedError
+        node = self.root
+        for name in path:
+            if name not in node.subcommands:
+                return None
+            node = node.subcommands[name]
+        return node
 
     @property
     def has_dynamic_params(self) -> bool:
-        raise NotImplementedError
+        return any(p.is_dynamic for c in self.walk() for p in c.params)

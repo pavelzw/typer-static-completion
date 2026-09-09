@@ -1,6 +1,6 @@
 """Contract tests for the public interface.
 
-The implementation is still stubs, so these assert the *shape* of the API: that
+These assert the *shape* of the API alongside the behavioral tests: that
 the exports exist, that the model is usable without typer, and that the typer
 internals :mod:`typer_static_completions.introspect` relies on are present in the
 installed typer. That last group is the valuable one -- it is what will fail
@@ -73,8 +73,8 @@ def test_generation_options_are_value_comparable():
     assert tsc.GenerationOptions(include_help=False) != tsc.GenerationOptions()
 
 
-def test_dynamic_policy_defaults_to_hybrid():
-    assert tsc.GenerationOptions().dynamic is tsc.DynamicPolicy.DELEGATE
+def test_dynamic_policy_defaults_to_static():
+    assert tsc.GenerationOptions().dynamic is tsc.DynamicPolicy.OMIT
 
 
 @pytest.mark.parametrize(

@@ -26,7 +26,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from .model import CommandTree
+from .errors import IntrospectionError
+from .model import Command, CommandTree, Param, ParamKind, ValueKind
 
 if TYPE_CHECKING:
     import typer
@@ -63,7 +64,19 @@ def from_app(
     Raises:
         IntrospectionError: if the command tree cannot be read.
     """
-    raise NotImplementedError
+    from typer.main import get_command
+
+    try:
+        command = get_command(app)
+    except Exception as exc:
+        raise IntrospectionError(f"Cannot read Typer app: {exc}") from exc
+    return from_command(
+        command,
+        prog_name,
+        include_hidden=include_hidden,
+        include_deprecated=include_deprecated,
+        max_depth=max_depth,
+    )
 
 
 def from_command(
@@ -84,7 +97,110 @@ def from_command(
     Raises:
         IntrospectionError: if the object is not a command-like object.
     """
-    raise NotImplementedError
+    if not prog_name or any(ord(c) < 32 for c in prog_name):
+        raise IntrospectionError(
+            "Program name must be nonempty and contain no controls"
+        )
+    if max_depth is not None and max_depth < 0:
+        raise IntrospectionError("max_depth must be nonnegative")
+
+    def retained(obj: Any) -> bool:
+        return (include_hidden or not getattr(obj, "hidden", False)) and (
+            include_deprecated or not getattr(obj, "deprecated", False)
+        )
+
+    def visit(cmd: Any, path: tuple[str, ...], parent: Any = None) -> Command:
+        if not hasattr(cmd, "params") or not hasattr(cmd, "context_class"):
+            raise IntrospectionError("Expected a Typer command")
+        ctx = cmd.context_class(
+            cmd,
+            info_name=path[-1] if path else prog_name,
+            parent=parent,
+            resilient_parsing=True,
+            **(cmd.context_settings or {}),
+        )
+        if ctx.token_normalize_func or ctx.ignore_unknown_options:
+            raise IntrospectionError(
+                "Token normalization and unknown-option passthrough are not supported yet"
+            )
+        is_group = hasattr(cmd, "commands")
+        if not is_group and not ctx.allow_interspersed_args:
+            raise IntrospectionError(
+                "Non-interspersed leaf options are not supported yet"
+            )
+        help_option = cmd.get_help_option(ctx)
+        params = []
+        for p in cmd.get_params(ctx):
+            if not retained(p):
+                continue
+            kind = ParamKind(p.param_type_name)
+            value_kind = ValueKind.OPAQUE
+            if getattr(p, "is_flag", False) or getattr(p, "count", False):
+                value_kind = ValueKind.FLAG
+            elif getattr(p, "_custom_shell_complete", None):
+                value_kind = ValueKind.DYNAMIC
+            elif hasattr(p.type, "choices"):
+                if not getattr(p.type, "case_sensitive", True):
+                    raise IntrospectionError(
+                        "Case-insensitive choices are not supported yet"
+                    )
+                value_kind = ValueKind.CHOICE
+            elif p.type.name in DIRECTORY_TYPE_NAMES or (
+                p.type.name == "path" and not p.type.file_okay
+            ):
+                value_kind = ValueKind.DIRECTORY
+            elif p.type.name in FILE_TYPE_NAMES:
+                value_kind = ValueKind.FILE
+            choices = tuple(
+                str(getattr(c, "value", c)) for c in getattr(p.type, "choices", ())
+            )
+            params.append(
+                Param(
+                    kind=kind,
+                    name=p.name or "",
+                    value_kind=value_kind,
+                    flags=tuple(p.opts + p.secondary_opts)
+                    if kind is ParamKind.OPTION
+                    else (),
+                    negation_flags=tuple(p.secondary_opts)
+                    if kind is ParamKind.OPTION
+                    else (),
+                    choices=choices,
+                    help=(getattr(p, "help", None) or "").split("\n")[0].strip(),
+                    metavar=p.metavar,
+                    required=p.required,
+                    nargs=p.nargs,
+                    multiple=getattr(p, "multiple", False)
+                    or getattr(p, "count", False),
+                    hidden=getattr(p, "hidden", False),
+                    deprecated=bool(getattr(p, "deprecated", False)),
+                    is_help=p is help_option,
+                )
+            )
+        children = {}
+        if max_depth is None or len(path) < max_depth:
+            children = {
+                name: visit(child, (*path, name), ctx)
+                for name, child in getattr(cmd, "commands", {}).items()
+                if retained(child)
+            }
+        return Command(
+            path=path,
+            help=(cmd.help or "").split("\n")[0].strip(),
+            params=tuple(params),
+            subcommands=children,
+            is_group=is_group,
+            hidden=cmd.hidden,
+            deprecated=bool(cmd.deprecated),
+            chain=getattr(cmd, "chain", False),
+        )
+
+    try:
+        return CommandTree(prog_name=prog_name, root=visit(command, ()))
+    except IntrospectionError:
+        raise
+    except Exception as exc:
+        raise IntrospectionError(f"Cannot read command tree: {exc}") from exc
 
 
 def load_app(target: str) -> typer.Typer:

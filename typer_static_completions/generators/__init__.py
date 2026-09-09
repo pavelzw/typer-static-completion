@@ -5,8 +5,12 @@ from __future__ import annotations
 from collections.abc import Iterator
 
 from ..config import GenerationOptions
-from ..shells import Shell, ShellName
+from ..errors import UnsupportedShellError
+from ..shells import ShellName
 from .base import Generator
+from .bash import BashGenerator
+
+_REGISTRY: dict[str, type[Generator]] = {"bash": BashGenerator}
 
 
 def get_generator(
@@ -17,7 +21,10 @@ def get_generator(
     Raises:
         UnsupportedShellError: if nothing is registered for ``shell``.
     """
-    raise NotImplementedError
+    try:
+        return _REGISTRY[shell](options)
+    except KeyError as exc:
+        raise UnsupportedShellError(f"No implemented generator for {shell!r}") from exc
 
 
 def register(generator: type[Generator], *, override: bool = False) -> type[Generator]:
@@ -29,12 +36,15 @@ def register(generator: type[Generator], *, override: bool = False) -> type[Gene
     Raises:
         ValueError: if ``shell`` is already registered and ``override`` is False.
     """
-    raise NotImplementedError
+    if generator.shell in _REGISTRY and not override:
+        raise ValueError(f"Generator already registered for {generator.shell!r}")
+    _REGISTRY[generator.shell] = generator
+    return generator
 
 
-def available_shells() -> Iterator[Shell]:
+def available_shells() -> Iterator[str]:
     """Yield every registered shell, built-in and third-party."""
-    raise NotImplementedError
+    return iter(_REGISTRY)
 
 
 __all__ = [

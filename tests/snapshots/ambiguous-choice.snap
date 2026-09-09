@@ -1,0 +1,7 @@
+Input: demo deploy --color r<TAB><TAB>
+
+Shell: bash
+
+> demo deploy --color r
+red   rose
+> demo deploy --color r▏

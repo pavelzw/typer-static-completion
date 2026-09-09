@@ -1,0 +1,5 @@
+Input: demo deploy --no-c<TAB>
+
+Shell: bash
+
+> demo deploy --no-cache ▏

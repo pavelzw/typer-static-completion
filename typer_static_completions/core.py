@@ -55,7 +55,25 @@ def generate(
         >>> from myapp.cli import app
         >>> script = generate(app, "myapp", "fish")
     """
-    raise NotImplementedError
+    from .generators import get_generator
+    from .introspect import from_app
+
+    settings = options or GenerationOptions()
+    generator = get_generator(shell, settings)
+    if isinstance(app, CommandTree):
+        if prog_name is not None:
+            raise ValueError("prog_name must be omitted for a CommandTree")
+        tree = app
+    else:
+        if not prog_name:
+            raise ValueError("prog_name is required for a Typer app")
+        tree = from_app(
+            app,
+            prog_name,
+            include_hidden=settings.include_hidden,
+            include_deprecated=settings.include_deprecated,
+        )
+    return generator.render(tree)
 
 
 def write(

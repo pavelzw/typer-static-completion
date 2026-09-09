@@ -1,0 +1,5 @@
+Input: demo --profile "" dep<TAB>
+
+Shell: bash
+
+> demo --profile "" deploy ▏

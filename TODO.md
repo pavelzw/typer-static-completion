@@ -1,8 +1,10 @@
 # Implementation and testing TODO
 
-The current changes define an API scaffold. All generation, introspection,
-management, CLI, and verification operations still raise `NotImplementedError`.
-The interface tests do not establish working shell completion.
+The first Bash path is implemented: model traversal, Typer extraction, generation,
+syntax checks, and real interactive screen snapshots. File management, the CLI,
+Zsh/Fish/PowerShell generation, and the public candidate-verification helper are
+still scaffolds. The first milestone remains open until Zsh and Fish have the
+same interactive coverage.
 
 Use `../commander-static-completion` as the local reference, especially
 `test/snapshots.test.js`, `test/snapshot-harness.js`,
@@ -16,8 +18,8 @@ Interactive screen snapshots like Commander's are a top priority. Build the PTY
 harness alongside the first working generator and extend both to Bash, Zsh, and
 Fish before starting file management or CLI convenience features.
 
-- [ ] Deliver a minimal end-to-end path from a Typer fixture to a generated script
-      to a real interactive shell screen snapshot. Capture visible suggestions,
+- [x] Deliver a minimal end-to-end path from a Typer fixture to a generated script
+      to a real interactive Bash screen snapshot. Capture visible suggestions,
       inserted text, and cursor position from the start.
 - [ ] Require reviewed interactive snapshots for each shell's initial support:
       unique and ambiguous completion, nested commands, choices, quoted paths,
@@ -33,8 +35,8 @@ harness and scenario checklist is in section 3.
 ## 1. Resolve contracts before implementation
 
 - [ ] Decide the static guarantee. Commander never invokes the CLI at completion
-      time; this scaffold defaults to `DynamicPolicy.DELEGATE`. Prefer a static
-      default with explicit hybrid opt-in if matching Commander is the goal.
+      time; generation now defaults to `DynamicPolicy.OMIT`. Bash supports
+      explicit file fallback and rejects unimplemented hybrid delegation.
       Document and test all four policies, including no filesystem fallback for
       `OMIT` (Bash's unconditional `-o default` would violate that).
 - [ ] Choose deep immutability or explicitly mutable mappings for `Command` and
@@ -44,15 +46,15 @@ harness and scenario checklist is in section 3.
       group argument boundaries, directory-only paths (`file_okay=False`),
       case-insensitive choices, tuple arity, repeatable/count flags, chain groups,
       and option parsing settings. Diagnose unsupported behavior explicitly.
-- [ ] Resolve hidden filtering: `include_hidden=True` must not be undone by
+- [x] Resolve hidden filtering: `include_hidden=True` must not be undone by
       `Command.options` / `arguments` always returning only visible parameters.
 - [ ] Define entrypoint loading. Many `[project.scripts]` targets are wrapper
       functions, not Typer instances (including this package's proposed `main`).
       Support explicit app mappings/factories without executing arbitrary CLI
       entrypoints to discover an app. Align `load_app`'s return type and docs.
-- [ ] Make third-party shell registration consistent: `Generator.shell` and
-      `available_shells()` currently use the closed `Shell` enum, despite the
-      advertised support for arbitrary registered names.
+- [x] Make third-party shell registration consistent: `Generator.shell` and
+      `available_shells()` now accept arbitrary string names; only implemented
+      generators are registered by default (currently Bash).
 - [ ] Define failure semantics for `CompletionSet`: failed imports must make
       checks fail visibly and must never turn existing files into prune targets.
       Track file ownership; retain handwritten files, and validate custom layouts
@@ -60,7 +62,7 @@ harness and scenario checklist is in section 3.
 
 ## 2. First working implementation
 
-- [ ] Implement model traversal, lookup, and parameter helpers with behavioral
+- [x] Implement model traversal, lookup, and parameter helpers with behavioral
       tests; replace the placeholder assertion in `tests/test_core.py`.
 - [ ] Implement the Typer adapter with synthetic apps: single-command collapse,
       nested groups, aliases, boolean negations, enum choices, paths/files,
@@ -94,11 +96,16 @@ harness and scenario checklist is in section 3.
 
 ### Interactive screen snapshots like Commander (first-milestone requirement)
 
+Bash now has 18 reviewed screens, an isolated pexpect/pyte harness, explicit update
+and check tasks, failure/cleanup tests, and a dedicated Linux/macOS CI job. The
+cross-shell items below stay open until Zsh and Fish are covered as well.
+
 - [ ] Build `tests/snapshot_harness.py`: launch actual interactive Bash, Zsh,
       and Fish in a PTY, source generated scripts, and drive their line editors.
       Use a terminal emulator to interpret redraws and capture the final screen
       with an explicit cursor marker (`▏`); stripping ANSI escapes is insufficient.
-      Evaluate a Python PTY/emulator stack against Commander's harness behavior.
+      The initial Bash harness uses pexpect and pyte; extend it to Zsh and Fish,
+      including terminal capability negotiation where required.
 - [ ] Use readable inputs such as `demo deploy --color r<TAB>` and
       `demo deploy --color r --verbose<LEFT:10><TAB>`. Support named editing keys,
       reject raw control characters/Enter, and bound repetition counts.
@@ -124,7 +131,7 @@ harness and scenario checklist is in section 3.
 - [ ] For static cases, make the CLI executable a sentinel that records invocation
       and remove runtime executables from the child PATH after setup. Assert TAB
       never launches the CLI/Python. Test opt-in dynamic delegation separately.
-- [ ] Add proposed Pixi tasks `test-snapshots` and `update-snapshots`. Missing or
+- [x] Add Pixi tasks `test-snapshots` and `update-snapshots`. Missing or
       changed snapshots must fail normal tests; updates must be explicit, local,
       and rejected in CI. Print a focused diff and regeneration instructions.
 - [ ] Add a dedicated Linux/macOS shell-integration CI job with locked shell and
@@ -159,5 +166,4 @@ harness and scenario checklist is in section 3.
 Suggested order: resolve the contracts needed for the first fixture, build the
 interactive harness alongside one working shell path, add reviewed screen
 snapshots and CI, then extend generators and interactive snapshots to the other
-two shells. File management and CLI convenience follow that milestone. Keep the current scaffold explicitly unreleased
-as functionality until that first path works.
+two shells. File management and CLI convenience follow that milestone. Keep the documented support limited to implemented and tested shell features.

@@ -36,6 +36,16 @@ twine = ">=6"
 build-wheel = "python -m build --no-isolation ."
 check-wheel = "twine check dist/*"
 
+[feature.snapshots]
+platforms = ["osx-arm64", "osx-64", "linux-64"]
+[feature.snapshots.dependencies]
+bash = ">=5.2,<6"
+pexpect = ">=4.9,<5"
+pyte = ">=0.8,<0.9"
+[feature.snapshots.tasks]
+test-snapshots = "pytest --require-snapshots tests/test_snapshots.py tests/test_snapshot_harness.py"
+update-snapshots = { cmd = "pytest --require-snapshots tests/test_snapshots.py", env = { UPDATE_SNAPSHOTS = "1" } }
+
 [feature.lint.dependencies]
 lefthook = "*"
 ruff = "*"
@@ -61,6 +71,7 @@ python = "3.14.*"
 
 [environments]
 default = ["test", "build", "lint"]
+snapshots = ["test", "snapshots"]
 py310 = ["py310", "test"]
 py311 = ["py311", "test"]
 py312 = ["py312", "test"]

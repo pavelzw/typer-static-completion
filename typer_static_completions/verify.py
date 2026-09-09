@@ -29,9 +29,12 @@ being fish, not a bug in the script -- assertions have to account for it.
 
 from __future__ import annotations
 
+import shutil
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
+from .errors import ScriptSyntaxError, ShellUnavailableError, UnsupportedShellError
 from .shells import ShellName
 
 
@@ -43,12 +46,29 @@ def check_syntax(script: str, shell: ShellName) -> None:
             the shell's stderr.
         ShellUnavailableError: if the shell binary is not installed.
     """
-    raise NotImplementedError
+    if shell != "bash":
+        raise UnsupportedShellError(
+            f"Syntax verification is not implemented for {shell!r}"
+        )
+    executable = shutil.which("bash")
+    if not executable:
+        raise ShellUnavailableError("Bash is not installed")
+    result = subprocess.run(
+        [executable, "--noprofile", "--norc", "-n"],
+        input=script,
+        text=True,
+        capture_output=True,
+        timeout=10,
+    )
+    if result.returncode:
+        raise ScriptSyntaxError(result.stderr.strip())
 
 
 def is_available(shell: ShellName) -> bool:
     """Whether the shell binary needed to verify this shell is installed."""
-    raise NotImplementedError
+    return (
+        shutil.which("pwsh" if shell in ("powershell", "pwsh") else shell) is not None
+    )
 
 
 @dataclass(frozen=True)

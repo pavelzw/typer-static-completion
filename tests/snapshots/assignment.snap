@@ -1,0 +1,5 @@
+Input: demo deploy --color=bl<TAB>
+
+Shell: bash
+
+> demo deploy --color=blue ▏

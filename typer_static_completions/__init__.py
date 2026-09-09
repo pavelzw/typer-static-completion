@@ -7,11 +7,12 @@ is seconds on a CLI with heavy transitive imports.
 
 This library bakes the command names, option flags and enum choices into plain
 shell code. Static candidates do not start Python; delegated dynamic parameters
-still invoke the app. This API is currently a scaffold, not an implementation.
+would invoke the app. Bash generation is implemented; other shells and delegated
+callbacks are not yet implemented. Dynamic values are omitted by default.
 
     >>> from typer_static_completions import generate
     >>> from myapp.cli import app
-    >>> print(generate(app, "myapp", "fish"))
+    >>> print(generate(app, "myapp", "bash"))
 
 The trade-off is that a generated script is a snapshot and can drift from the
 app. Use :class:`CompletionSet` to check committed scripts in CI, the same way
@@ -29,8 +30,8 @@ Help texts                           Anything reading the filesystem or net
 File fallback for ``Path`` params
 ===================================  ========================================
 
-For the runtime column, :class:`DynamicPolicy` lets you keep dynamic completion
-for just those parameters, so only they pay the interpreter startup.
+For the runtime column, :class:`DynamicPolicy` controls omission, file fallback,
+or generation errors. Hybrid delegation is reserved for a future implementation.
 """
 
 from __future__ import annotations

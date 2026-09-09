@@ -1,0 +1,5 @@
+Input: demo deploy --config two<TAB>
+
+Shell: bash
+
+> demo deploy --config two\ words.json ▏

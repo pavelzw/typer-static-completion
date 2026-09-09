@@ -1,0 +1,5 @@
+Input: demo deploy --directory nest<TAB>
+
+Shell: bash
+
+> demo deploy --directory nested\ directory/▏

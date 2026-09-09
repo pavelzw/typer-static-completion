@@ -12,14 +12,13 @@ from abc import ABC, abstractmethod
 
 from ..config import GenerationOptions
 from ..model import CommandTree, Param
-from ..shells import Shell
 
 
 class Generator(ABC):
     """Base class for shell script generators."""
 
     #: Shell this generator produces scripts for.
-    shell: Shell
+    shell: str
 
     #: Where the shell looks for completion files, relative to an install root,
     #: with ``{prog}`` substituted. E.g. ``"share/fish/vendor_completions.d/\
@@ -31,7 +30,7 @@ class Generator(ABC):
     filename: str
 
     def __init__(self, options: GenerationOptions | None = None) -> None:
-        raise NotImplementedError
+        self.options = options or GenerationOptions()
 
     @abstractmethod
     def render(self, tree: CommandTree) -> str:

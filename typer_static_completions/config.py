@@ -18,7 +18,7 @@ class DynamicPolicy(str, Enum):
     - :attr:`DELEGATE` -- emit a command substitution that calls back into the
       app using typer's own completion protocol. Only *that* parameter pays the
       interpreter startup; command names, flags and choices stay instant. This is
-      the hybrid mode and usually what you want.
+      the opt-in hybrid mode (not yet implemented).
     - :attr:`FILE` -- fall back to filesystem completion, which is what most
       shells would have done anyway.
     - :attr:`ERROR` -- refuse to generate. For projects that want a build-time
@@ -39,7 +39,7 @@ class GenerationOptions:
     prove it regenerated under the same settings as the committed file.
     """
 
-    dynamic: DynamicPolicy = DynamicPolicy.DELEGATE
+    dynamic: DynamicPolicy = DynamicPolicy.OMIT
     #: Include one-line descriptions next to candidates. Only zsh and fish show
     #: them; bash ignores this. Turn off for smaller scripts.
     include_help: bool = True

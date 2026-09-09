@@ -1,0 +1,5 @@
+Input: demo --profile remote dep<TAB>
+
+Shell: bash
+
+> demo --profile remote deploy ▏
