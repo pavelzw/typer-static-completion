@@ -158,7 +158,7 @@ def test_invalid_api_and_unsupported_shapes():
         generate(fixture(), "demo", "powershell")
     with pytest.raises(IntrospectionError, match="[Cc]hain"):
         generate(CommandTree("demo", Command((), chain=True)))
-    with pytest.raises(IntrospectionError, match="scalar"):
+    with pytest.raises(IntrospectionError, match="metadata for every value"):
         generate(
             CommandTree(
                 "demo",

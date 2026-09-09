@@ -1,0 +1,17 @@
+Input: demo directory blue nest<TAB>
+
+Shell: bash
+
+> demo directory blue nested\ directory/▏
+
+---
+
+Shell: fish
+
+> demo directory blue nested\ directory/▏
+
+---
+
+Shell: zsh
+
+> demo directory blue nested\ directory/▏

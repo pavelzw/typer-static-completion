@@ -49,10 +49,12 @@ class Generator(ABC):
 
 
 def value_slots(param: Param) -> tuple[Param, ...]:
-    """Flatten option values into consecutive parser targets."""
-    if param.flags and param.nargs > 1:
+    """Flatten parameter values into consecutive parser targets."""
+    if param.nargs > 1:
         if len(param.values) != param.nargs:
-            raise IntrospectionError("Tuple options require metadata for every value")
+            raise IntrospectionError(
+                "Tuple parameters require metadata for every value"
+            )
         return tuple(
             replace(
                 param,
@@ -66,6 +68,6 @@ def value_slots(param: Param) -> tuple[Param, ...]:
         )
     if param.nargs not in (1, -1) or (param.flags and param.nargs != 1):
         raise IntrospectionError(
-            "Only scalar/tuple options and scalar/variadic arguments are supported yet"
+            "Only scalar/tuple options and scalar/tuple/variadic arguments are supported"
         )
     return (param,)

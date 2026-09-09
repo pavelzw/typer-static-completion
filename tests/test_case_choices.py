@@ -15,7 +15,7 @@ def test_case_metadata():
     assert params["mode"].choices == ("Blue", "RED", "Rose", "Two Words", "Café")
 
 
-@pytest.mark.parametrize("value", ["blUE", "BLUE", "Blue", "blue"])
+@pytest.mark.parametrize("value", ["bLuE", "BLUE", "Blue", "blue"])
 def test_case_parser(value):
     result = CliRunner().invoke(case_fixture(), [value, "--mode", value])
     assert result.exit_code == 0, result.output

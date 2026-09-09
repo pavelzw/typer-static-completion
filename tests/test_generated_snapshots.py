@@ -8,6 +8,7 @@ from fixtures import (
     coverage_fixture,
     fixture,
     parsing_fixture,
+    tuple_argument_fixture,
     tuple_fixture,
 )
 from snapshot_assertions import assert_snapshot
@@ -27,6 +28,7 @@ from typer_static_completions.verify import check_syntax, is_available
         ("coverage", coverage_fixture),
         ("tuple", tuple_fixture),
         ("case", case_fixture),
+        ("tuple-arguments", tuple_argument_fixture),
     ],
 )
 def test_generated_file(shell, name, make_app):

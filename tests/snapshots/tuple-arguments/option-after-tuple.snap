@@ -1,0 +1,17 @@
+Input: demo paint blue green --mod<TAB>
+
+Shell: bash
+
+> demo paint blue green --mode ▏
+
+---
+
+Shell: fish
+
+> demo paint blue green --mode ▏
+
+---
+
+Shell: zsh
+
+> demo paint blue green --mode ▏

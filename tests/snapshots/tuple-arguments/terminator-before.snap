@@ -1,0 +1,17 @@
+Input: demo paint -- bl<TAB>
+
+Shell: bash
+
+> demo paint -- blue ▏
+
+---
+
+Shell: fish
+
+> demo paint -- blue ▏
+
+---
+
+Shell: zsh
+
+> demo paint -- blue ▏

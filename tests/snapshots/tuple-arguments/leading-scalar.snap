@@ -1,0 +1,17 @@
+Input: demo framed rem<TAB>
+
+Shell: bash
+
+> demo framed remote ▏
+
+---
+
+Shell: fish
+
+> demo framed remote ▏
+
+---
+
+Shell: zsh
+
+> demo framed remote ▏

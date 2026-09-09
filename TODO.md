@@ -19,8 +19,8 @@ interactive screen harness and behavioral tests.
 - [x] Load explicit module/app targets without calling wrappers or factories.
 - [x] Implement CLI `generate` with required shell selection, stdout/file output,
       error handling, and stream/exit-code tests.
-- [x] Record full generated scripts for demo, parsing, CLI, coverage, tuple, and case-matching fixtures in all
-      three shells, alongside 119 shared interactive screen cases.
+- [x] Record full generated scripts for demo, parsing, CLI, coverage, tuple, tuple-argument, and case-matching fixtures in all
+      three shells, alongside 143 shared interactive screen cases.
 - [x] Test interactive completion for choices, quoted files, nested commands,
       assignments, short clusters, repeated flags, positional values, `--`, parent
       scope, two CLIs loaded together, and repeated sourcing.
@@ -45,8 +45,9 @@ interactive screen harness and behavioral tests.
       and attached values, and interactive/full-file snapshots in all three shells.
 - [x] Preserve case-sensitive/insensitive choice matching, with interactive and
       full-file snapshots covering options, arguments, tuples, and accented values.
-- [ ] Implement and snapshot tuple arguments, chain groups, and group arguments
-      before claiming support.
+- [x] Support tuple positional arguments, including interspersed options, `--`,
+      and following scalar/variadic arguments, with interactive/full-file snapshots.
+- [ ] Implement and snapshot chain groups and group arguments before claiming support.
 - [ ] Add opt-in dynamic delegation and test it separately from static guarantees.
       Cover all DynamicPolicy variants in each shell.
 - [ ] Expand native candidate verification while retaining interactive screens as the behavioral authority.

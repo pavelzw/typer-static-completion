@@ -180,3 +180,36 @@ def case_fixture() -> typer.Typer:
         typer.echo(color.value + ":" + mode.value)
 
     return app
+
+
+def tuple_argument_fixture() -> typer.Typer:
+    app = typer.Typer(add_completion=False)
+
+    @app.command()
+    def paint(
+        pair: tuple[Color, GroupTarget],
+        rest: list[Color] = typer.Argument(None),
+        mode: Color = typer.Option(Color.red, "--mode", "-m"),
+        verbose: bool = typer.Option(False, "--verbose", "-v"),
+    ):
+        typer.echo(repr((pair, rest, mode)))
+
+    @app.command()
+    def framed(first: RootTarget, pair: tuple[Color, GroupTarget], last: MixedCase):
+        pass
+
+    @app.command()
+    def resource(pair: tuple[Color, Path]):
+        pass
+
+    @app.command()
+    def directory(pair: tuple[Color, Path] = typer.Argument(..., file_okay=False)):
+        pass
+
+    @app.command()
+    def triple(
+        values: tuple[str, str, MixedCase] = typer.Argument(..., case_sensitive=False),
+    ):
+        pass
+
+    return app

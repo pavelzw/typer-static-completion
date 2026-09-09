@@ -1,0 +1,17 @@
+Input: demo triple bl<TAB>
+
+Shell: bash
+
+> demo triple bl▏
+
+---
+
+Shell: fish
+
+> demo triple bl▏
+
+---
+
+Shell: zsh
+
+> demo triple bl▏

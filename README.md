@@ -8,7 +8,7 @@
 Generate static shell completions for typer applications. Requires Python 3.11 or newer.
 
 Status: initial Bash, Fish, and Zsh implementation. Typer introspection and generation work
-for nested commands, flags, choices, tuple options, scalar/variadic arguments, and paths.
+for nested commands, flags, choices, tuple options, scalar/tuple/variadic arguments, and paths.
 The CLI provides `generate`; the Python API provides `generate()` and `write()`.
 PowerShell and dynamic delegation remain unimplemented. See
 [TODO.md](TODO.md) for the remaining work.
@@ -23,17 +23,19 @@ script = generate(app, "myapp", "bash")
 Pass `"fish"` or `"zsh"` to target those shells. Write the returned script to a
 file and source it in the corresponding shell (after `compinit` for Zsh). Completion stays
 static: dynamic callback values are omitted by default. Explicit file fallback
-is supported; hybrid delegation currently raises an error. Chain groups, group
-arguments, and tuple positional arguments are not yet supported and
-raise errors instead of generating approximate completions.
+is supported; hybrid delegation currently raises an error. Chain groups and group arguments
+are not yet supported and raise errors instead of generating approximate completions.
 
 Tuple options such as `pair: tuple[Color, Path]` complete each value using its
 own type. All three shells support `--pair blue path`, `--pair=blue path`,
 attached short values, and repeated occurrences. `Param.values` holds the
 per-position `ValueSpec` metadata for callers constructing command trees by hand.
+Tuple positional arguments also complete each position using its own type;
+options may appear between values, and subsequent scalar or variadic arguments
+receive their own completions.
 
 Choices configured with `case_sensitive=False` accept differently cased prefixes
-and insert the declared spelling, including in tuple options. Case-sensitive
+and insert the declared spelling, including in tuple parameters. Case-sensitive
 choices retain exact prefix matching. Matching uses lowercase prefixes, as in
 Typer's completion, with non-ASCII casing governed by the shell locale.
 
@@ -197,6 +199,10 @@ aliases retain their configured order for deterministic output across processes.
 
 The tuple cases in `tests/tuple_cases.py` have interactive screen snapshots and a
 full generated-script fixture alongside the existing parsing matrix.
+
+The tuple-argument fixture adds 24 shared screens covering interspersed options,
+`--`, following scalar/variadic arguments, choices, paths, and directories.
+Full scripts live in `tests/snapshots/generated/tuple-arguments.{bash,fish,zsh}`.
 
 The case-matching fixture adds 21 shared interactive screens for insensitive
 options, arguments, tuple positions, ambiguous matches, and accented values,

@@ -72,7 +72,8 @@ class FishGenerator(Generator):
                 if param.is_help and not self.options.include_help_option:
                     continue
                 param_id = len(params)
-                params.extend(value_slots(param))
+                slots = value_slots(param)
+                params.extend(slots)
                 if param.flags:
                     for flag in param.flags:
                         options.append(
@@ -84,10 +85,11 @@ class FishGenerator(Generator):
                         )
                 else:
                     comparison = "-ge" if param.nargs == -1 else "-eq"
-                    arguments.append(
-                        f"if test $node -eq {node}; and test $position {comparison} {position}; set target {param_id}; end"
-                    )
-                    position += 1
+                    for offset in range(len(slots)):
+                        arguments.append(
+                            f"if test $node -eq {node}; and test $position {comparison} {position}; set target {param_id + offset}; end"
+                        )
+                        position += 1
             command_names = []
             command_helps = []
             for child_name, child in command.subcommands.items():

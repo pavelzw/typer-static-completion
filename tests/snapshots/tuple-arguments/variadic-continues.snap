@@ -1,0 +1,17 @@
+Input: demo paint blue green red ro<TAB>
+
+Shell: bash
+
+> demo paint blue green red rose ▏
+
+---
+
+Shell: fish
+
+> demo paint blue green red rose ▏
+
+---
+
+Shell: zsh
+
+> demo paint blue green red rose ▏

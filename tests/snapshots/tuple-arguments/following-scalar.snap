@@ -1,0 +1,17 @@
+Input: demo framed remote blue green Bl<TAB>
+
+Shell: bash
+
+> demo framed remote blue green Blue ▏
+
+---
+
+Shell: fish
+
+> demo framed remote blue green Blue ▏
+
+---
+
+Shell: zsh
+
+> demo framed remote blue green Blue ▏

@@ -57,7 +57,8 @@ class BashGenerator(Generator):
                 if param.is_help and not self.options.include_help_option:
                     continue
                 param_id = len(params)
-                params.extend(value_slots(param))
+                slots = value_slots(param)
+                params.extend(slots)
                 if param.flags:
                     flags.extend(param.flags)
                     for flag in param.flags:
@@ -65,13 +66,16 @@ class BashGenerator(Generator):
                             f"{self.quote(f'{node_id}:{flag}')}) target={param_id}; takes={param.nargs if param.takes_value else 0} ;;"
                         )
                 else:
-                    pattern = (
-                        f"{node_id}:*"
-                        if param.nargs == -1
-                        else f"{node_id}:{argument_index}"
-                    )
-                    argument_cases.append(f"{pattern}) target={param_id} ;;")
-                    argument_index += 1
+                    for offset in range(len(slots)):
+                        pattern = (
+                            f"{node_id}:*"
+                            if param.nargs == -1
+                            else f"{node_id}:{argument_index}"
+                        )
+                        argument_cases.append(
+                            f"{pattern}) target={param_id + offset} ;;"
+                        )
+                        argument_index += 1
             for name, child in command.subcommands.items():
                 command_cases.append(
                     f"{self.quote(f'{node_id}:{name}')}) node={ids[child.path]}; position=0; ended=0; continue ;;"

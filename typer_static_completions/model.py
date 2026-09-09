@@ -50,7 +50,7 @@ VARIADIC = -1
 
 @dataclass(frozen=True)
 class ValueSpec:
-    """Static completion metadata for one position in a tuple option."""
+    """Static completion metadata for one position in a tuple parameter."""
 
     value_kind: ValueKind
     choices: tuple[str, ...] = ()
@@ -86,7 +86,7 @@ class Param:
     hidden: bool = False
     deprecated: bool = False
     is_help: bool = False
-    #: Per-position metadata for a tuple option; empty for scalar parameters.
+    #: Per-position metadata for a tuple parameter; empty for scalar parameters.
     values: tuple[ValueSpec, ...] = ()
     #: Whether static choice matching distinguishes upper and lower case.
     case_sensitive: bool = True

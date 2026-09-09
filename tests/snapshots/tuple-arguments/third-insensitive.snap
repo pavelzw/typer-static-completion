@@ -1,0 +1,17 @@
+Input: demo triple a b bL<TAB>
+
+Shell: bash
+
+> demo triple a b Blue ▏
+
+---
+
+Shell: fish
+
+> demo triple a b Blue ▏
+
+---
+
+Shell: zsh
+
+> demo triple a b Blue ▏
