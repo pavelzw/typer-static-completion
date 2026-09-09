@@ -15,6 +15,11 @@ python = ">=3.10"
 hatchling = "*"
 uv = "*"
 
+[package.run-dependencies]
+python = ">=3.10"
+typer = ">=0.26,<0.27"
+tomli = ">=2,<3"
+
 [dependencies]
 typer-static-completions = { path = "." }
 typer = ">=0.26,<0.27"

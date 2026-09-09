@@ -10,7 +10,8 @@ Generate static shell completions for typer applications
 Status: initial Bash, Fish, and Zsh implementation. Typer introspection and generation work
 for nested commands, flags, choices, scalar/variadic arguments, and paths.
 The `write()` and `CompletionSet` APIs support build-time file generation and
-staleness checks. Pyproject discovery, PowerShell, and CLI commands are still scaffolds. See
+staleness checks, including pyproject discovery. PowerShell and CLI commands are
+still scaffolds. See
 [TODO.md](TODO.md) for the remaining work.
 
 ```python
@@ -144,8 +145,33 @@ layout errors abort the operation before writing.
 
 Use one `CompletionSet` per output directory. Writes are atomic per file; the
 manifest is updated last so an interrupted sync can be retried. Concurrent syncs
-are not supported. `CompletionSet.from_pyproject()` is still unimplemented;
-explicit mappings let projects distinguish Typer apps from console-script wrappers.
+are not supported.
+
+### Discovering project entrypoints
+
+```python
+completions = CompletionSet.from_pyproject(
+    "pyproject.toml",  # Omit to find the nearest one at or above cwd.
+    output_dir="completions",
+    overrides={"myapp": "myapp.cli:app"},  # If project.scripts points to main().
+)
+completions.sync()
+```
+
+Discovery reads `[project.scripts]` without importing modules. Overrides replace
+**declared** script targets with import strings, Typer instances, or CommandTrees;
+unknown names are errors. Factories must be called explicitly by your build code.
+Targets need to be importable in the current environment: discovery does not
+modify `sys.path` or change directories. Relative `output_dir` paths are relative
+to cwd, even when the pyproject lives elsewhere.
+
+Use `only=["myapp"]` to manage a subset. Outputs owned by other CLIs are preserved,
+including previously removed entrypoints, and their targets are not imported.
+Omit `only` for a full sync that can prune removed entrypoints; `only=[]` selects
+no apps. Missing tables and malformed metadata fail rather than becoming empty
+sets. An explicitly empty `[project.scripts]` table is allowed for projects that
+have removed all their commands. Python 3.11+ uses `tomllib`; Python 3.10 uses the
+packaged `tomli` dependency.
 
 ## Interactive screen snapshots
 

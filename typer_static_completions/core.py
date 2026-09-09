@@ -333,6 +333,7 @@ class CompletionSet:
         """
         from .generators import get_generator
 
+        self._only_owners: frozenset[str] | None = None
         self.apps = dict(apps)
         self.output_dir = Path(output_dir)
         self.shells = tuple(dict.fromkeys(DEFAULT_SHELLS if shells is None else shells))
@@ -355,22 +356,52 @@ class CompletionSet:
         *,
         output_dir: Path | str,
         only: Sequence[str] | None = None,
+        overrides: Mapping[str, typer.Typer | CommandTree | str] | None = None,
         shells: Iterable[ShellName] | None = None,
         options: GenerationOptions | None = None,
         layout: Mapping[ShellName, str] | None = None,
     ) -> CompletionSet:
-        """Build a set from ``[project.scripts]`` (not implemented yet).
+        """Build a set from ``[project.scripts]`` without importing its targets.
 
         Args:
             pyproject: Defaults to the nearest ``pyproject.toml`` at or above the
                 current directory.
-            only: Limit to these console script names.
+            only: Limit to these console script names. Sync/check preserve all
+                previously owned outputs outside this selection, even if their
+                entrypoints have since been removed. An empty selection manages
+                no scripts. Omit to manage the whole project, including removals.
+            overrides: Replace declared script targets with Typer instances,
+                CommandTrees, or import strings pointing to apps rather than
+                wrappers. Keys must exist in the project's scripts table;
+                overrides outside ``only`` are validated but not loaded.
+            output_dir: Relative paths remain relative to the current working
+                directory, as in the constructor, not to the pyproject file.
 
         Raises:
             AppLoadError: if the file is unreadable, has no ``[project.scripts]``,
-                or ``only`` names a script that is not there.
+                or ``only``/``overrides`` names a script that is not there.
+
+        Targets must already be importable in the current environment. This method
+        does not change cwd/sys.path or call wrapper functions/factories.
         """
-        raise NotImplementedError
+        from .errors import AppLoadError
+        from .introspect import entrypoints
+
+        scripts = entrypoints(pyproject)
+        selected = set(scripts) if only is None else set(only)
+        replacements = dict(overrides or {})
+        unknown = (selected | replacements.keys()) - scripts.keys()
+        if unknown:
+            raise AppLoadError("Unknown console scripts: " + ", ".join(sorted(unknown)))
+        apps: dict[str, typer.Typer | CommandTree | str] = {
+            name: replacements.get(name, scripts[name]) for name in sorted(selected)
+        }
+        result = cls(
+            apps, output_dir=output_dir, shells=shells, options=options, layout=layout
+        )
+        if only is not None:
+            result._only_owners = frozenset(selected)
+        return result
 
     def _trees(self) -> tuple[dict[str, CommandTree], dict[str, str]]:
         from .errors import AppLoadError
@@ -442,7 +473,14 @@ class CompletionSet:
         from ._management import MANIFEST, prepare
 
         outputs, owners, skipped = self._render()
-        plan = prepare(self.output_dir, outputs, owners, skipped, prune=prune)
+        plan = prepare(
+            self.output_dir,
+            outputs,
+            owners,
+            skipped,
+            prune=prune,
+            only_owners=self._only_owners,
+        )
         if plan.conflicts:
             raise ValueError(
                 "Completion ownership conflicts: "
@@ -482,7 +520,14 @@ class CompletionSet:
         from ._management import prepare
 
         outputs, owners, skipped = self._render()
-        plan = prepare(self.output_dir, outputs, owners, skipped, prune=prune)
+        plan = prepare(
+            self.output_dir,
+            outputs,
+            owners,
+            skipped,
+            prune=prune,
+            only_owners=self._only_owners,
+        )
         stale: list[Path] = []
         missing: list[Path] = []
         changes: dict[Path, str] = {}

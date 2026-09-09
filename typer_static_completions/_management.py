@@ -73,12 +73,20 @@ def prepare(
     skipped: dict[str, str],
     *,
     prune: bool,
+    only_owners: frozenset[str] | None = None,
 ) -> Plan:
     manifest = _output_path(root, MANIFEST)
     previous = _read_manifest(root)
     outputs = {
         path: content.encode("utf-8") for path, content in sorted(rendered.items())
     }
+    protected = set(skipped)
+    if only_owners is not None:
+        protected.update(
+            record["owner"]
+            for record in previous.values()
+            if record["owner"] not in only_owners
+        )
     records = dict(previous)
     conflicts: dict[Path, str] = {}
     orphaned: list[Path] = []
@@ -94,14 +102,16 @@ def prepare(
                 raise ValueError(
                     f"Completion layout collides with previous ownership: {path}"
                 )
-            if path == old_path and record["owner"] in skipped:
-                conflicts[path] = "Destination belongs to an app that failed to import"
+            if path == old_path and record["owner"] in protected:
+                conflicts[path] = (
+                    "Destination belongs to an app that failed to import or is outside the selection"
+                )
         if path not in previous and path.exists() and path.read_bytes() != content:
             conflicts[path] = "Unmanaged file has different content"
         records[path] = {"owner": owners[path], "sha256": _digest(content)}
     if prune:
         for path, record in previous.items():
-            if path in outputs or record["owner"] in skipped:
+            if path in outputs or record["owner"] in protected:
                 continue
             if path.exists():
                 if not path.is_file():

@@ -18,7 +18,7 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 readme = "README.md"
-dependencies = ["typer >=0.26,<0.27"]
+dependencies = ["typer >=0.26,<0.27", "tomli >=2,<3; python_version < '3.11'"]
 
 [project.urls]
 repository = "https://github.com/pavelzw/typer-static-completions"
