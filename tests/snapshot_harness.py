@@ -168,7 +168,8 @@ demo() { printf invoked > invoked; }
 python() { printf invoked > invoked; }
 python3() { printf invoked > invoked; }
 PATH=/nonexistent
-printf '\033]777;TSC_READY\007'
+zle-line-init() { printf '\033]777;TSC_READY\007'; zle reset-prompt; }
+zle -N zle-line-init
 """
             )
             args = ["-f", "-i"]

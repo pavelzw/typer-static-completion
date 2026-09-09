@@ -125,3 +125,17 @@ def test_fish_redraw_after_acknowledgement_is_retained(tmp_path):
     )
     shell.chmod(0o755)
     assert capture("", "", shell="fish", executable=str(shell)) == "> redraw▏\n"
+
+
+def test_zsh_waits_for_line_editor_before_sending_keys():
+    from fixtures import fixture
+
+    from typer_static_completions import generate
+
+    # Delay between setup and ZLE activation. A READY emitted by setup allows
+    # the terminal to echo the input while it is still in cooked mode.
+    script = (
+        "precmd() { local start=$SECONDS; while (( SECONDS == start )); do :; done; }\n"
+    )
+    script += generate(fixture(), "demo", "zsh")
+    assert capture(script, "demo dep<TAB>", shell="zsh") == "> demo deploy ▏\n"
