@@ -8,6 +8,7 @@ import pytest
 pytest.importorskip("pexpect")
 pytest.importorskip("pyte")
 
+from coverage_cases import CASES as COVERAGE_CASES
 from fixtures import fixture, parsing_fixture
 from parsing_cases import CASES as PARSING_CASES
 from snapshot_assertions import assert_snapshot
@@ -166,4 +167,96 @@ def test_cli_screen(name, line, completed):
     actual = f"Input: {line}<TAB>\n\n" + "\n---\n\n".join(sections)
     assert_snapshot(
         Path(__file__).with_name("snapshots") / "cli" / f"{name}.snap", actual
+    )
+
+
+@pytest.mark.parametrize("case", COVERAGE_CASES, ids=lambda case: case.name)
+def test_extended_coverage_screen(case, tmp_path):
+    import shutil
+    import subprocess
+
+    from fixtures import coverage_fixture
+
+    sections = []
+    for shell in ("bash", "fish", "zsh"):
+        sentinel = (
+            "function demo; printf invoked > invoked; end\n"
+            if shell == "fish"
+            else "demo() { printf invoked > invoked; }\n"
+        )
+        script = sentinel + generate(
+            coverage_fixture(), "demo", shell, options=case.options
+        )
+        screen = capture(script, case.line + "<TAB>", shell=shell, locale="C.UTF-8")
+        assert screen.startswith("> ") and screen.count("▏") == 1
+        # Parse the completed line in its actual shell. A controlled demo stub
+        # reports substitutions separately; no real application is executed.
+        completed = screen[2:].replace("▏", "").strip()
+        stub = (
+            "function demo; if test (count $argv) -eq 0; printf expansion >&2; end; printf '%s\\0' $argv; end\n"
+            if shell == "fish"
+            else 'demo() { if [ "$#" -eq 0 ]; then printf expansion >&2; fi; printf \'%s\\0\' "$@"; }\n'
+        )
+        executable = shutil.which(shell)
+        assert executable is not None
+        flags = {
+            "bash": ["--noprofile", "--norc"],
+            "fish": ["--no-config"],
+            "zsh": ["-f"],
+        }[shell]
+        result = subprocess.run(
+            [executable, *flags, "-c", stub + completed],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            cwd=tmp_path,
+            env={"PATH": "/nonexistent", "LC_ALL": "C.UTF-8", "HOME": str(tmp_path)},
+        )
+        assert result.returncode == 0 and not result.stderr, (
+            shell,
+            screen,
+            result.stderr,
+        )
+        assert result.stdout.rstrip("\0").split("\0") == list(case.expected[1:]), (
+            shell,
+            screen,
+        )
+        sections.append(f"Shell: {shell}\n\n{screen}")
+    actual = f"Input: {case.line}<TAB>\n\n" + "\n---\n\n".join(sections)
+    assert_snapshot(
+        Path(__file__).with_name("snapshots") / "coverage" / f"{case.name}.snap", actual
+    )
+
+
+@pytest.mark.parametrize(
+    "include_help", [True, False], ids=["descriptions", "no-descriptions"]
+)
+def test_coverage_descriptions(include_help):
+    from fixtures import coverage_fixture
+
+    from typer_static_completions import GenerationOptions
+
+    sections = []
+    for shell in ("bash", "fish", "zsh"):
+        sentinel = (
+            "function demo; printf invoked > invoked; end\n"
+            if shell == "fish"
+            else "demo() { printf invoked > invoked; }\n"
+        )
+        script = sentinel + generate(
+            coverage_fixture(),
+            "demo",
+            shell,
+            options=GenerationOptions(include_help=include_help),
+        )
+        screen = capture(
+            script, "demo show --<TAB><TAB>", shell=shell, locale="C.UTF-8"
+        )
+        if shell in ("fish", "zsh"):
+            assert ('Use [x]: "$HOME", `demo`, and $(demo).' in screen) == include_help
+        sections.append(f"Shell: {shell}\n\n{screen}")
+    actual = "Input: demo show --<TAB><TAB>\n\n" + "\n---\n\n".join(sections)
+    name = "descriptions" if include_help else "no-descriptions"
+    assert_snapshot(
+        Path(__file__).with_name("snapshots") / "coverage" / f"{name}.snap", actual
     )

@@ -1,0 +1,23 @@
+Input: demo show --<TAB><TAB>
+
+Shell: bash
+
+> demo show --
+--assist  --value
+> demo show --▏
+
+---
+
+Shell: fish
+
+> demo show --assist ▏
+--assist  (Show this message and exit.)
+--value   (Use [x]: "$HOME", `demo`, and $(demo).)
+
+---
+
+Shell: zsh
+
+> demo show --▏
+--assist -- Show this message and exit.
+--value -- Use [x]: "$HOME", `demo`, and $(demo).

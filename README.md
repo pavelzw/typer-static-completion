@@ -175,7 +175,17 @@ completion files. Separate tests verify the tricky cases against Typer's parser.
 The CLI itself has four shared interactive cases in `tests/snapshots/cli/` and
 full scripts in `tests/snapshots/generated/cli.{bash,fish,zsh}`.
 
-Current snapshot baselines target the locked Bash 5.x, Fish 4.x, and Zsh 5.9 environment. Unicode,
+The coverage fixture adds 25 shared screens for custom/disabled help flags,
+hidden commands/options, deprecated commands, literal help descriptions, Unicode,
+and escaped values. These cases use `C.UTF-8` and live in `tests/snapshots/coverage/`,
+with full scripts in `tests/snapshots/generated/coverage.{bash,fish,zsh}`.
+Completed lines are parsed by the actual shell using a controlled stub to verify
+argument values and reject executable substitutions before snapshots can update.
+Bash explicitly quotes literal candidates containing expansion syntax because
+Readline's filename quoting alone can leave backticks executable. Custom help
+aliases retain their configured order for deterministic output across processes.
+
+Current snapshot baselines target the locked Bash 5.x, Fish 4.x, and Zsh 5.9 environment. Broader Unicode coverage (including wide and combining characters),
 custom word-break settings, unusual shell parsing modes, and filenames containing
 control characters still need broader coverage.
 

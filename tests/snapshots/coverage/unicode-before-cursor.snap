@@ -1,0 +1,17 @@
+Input: demo show --value café --ass --secret<LEFT:9><TAB>
+
+Shell: bash
+
+> demo show --value café --assist▏ --secret
+
+---
+
+Shell: fish
+
+> demo show --value café --assist ▏--secret
+
+---
+
+Shell: zsh
+
+> demo show --value café --assist ▏ --secret

@@ -19,8 +19,8 @@ interactive screen harness and behavioral tests.
 - [x] Load explicit module/app targets without calling wrappers or factories.
 - [x] Implement CLI `generate` with required shell selection, stdout/file output,
       error handling, and stream/exit-code tests.
-- [x] Record full generated scripts for demo, parsing, and CLI fixtures in all
-      three shells, alongside 54 shared interactive screen cases.
+- [x] Record full generated scripts for demo, parsing, CLI, and coverage fixtures in all
+      three shells, alongside 79 shared interactive screen cases.
 - [x] Test interactive completion for choices, quoted files, nested commands,
       assignments, short clusters, repeated flags, positional values, `--`, parent
       scope, two CLIs loaded together, and repeated sourcing.
@@ -33,10 +33,14 @@ interactive screen harness and behavioral tests.
 
 ## Snapshot coverage (priority)
 
-- [ ] Extend escaping tests to Unicode, colons, brackets, dollars, backticks,
-      backslashes, unusual word-break settings, and control-character filenames.
-      Verify actual insertion and absence of evaluation, not just shell syntax.
-- [ ] Add cases for custom help configuration and hidden/deprecated parameters.
+- [x] Cover accented Unicode, colons, brackets, dollars, backticks, quotes, and
+      backslashes. Verify completed argument values through the actual shell
+      and reject substitution execution, alongside interactive screens.
+- [ ] Extend to wide/combining Unicode, unusual word-break settings, literal
+      metacharacters already present in the typed prefix, and control-character
+      filenames.
+- [x] Add cases for custom/disabled help flags, hidden commands/options,
+      deprecated commands, and literal descriptions with descriptions disabled.
 - [ ] Implement and snapshot tuple values, chain groups, group arguments, and
       case-insensitive choices before claiming support.
 - [ ] Add opt-in dynamic delegation and test it separately from static guarantees.

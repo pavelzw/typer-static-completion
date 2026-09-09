@@ -154,14 +154,20 @@ def from_command(
             choices = tuple(
                 str(getattr(c, "value", c)) for c in getattr(p.type, "choices", ())
             )
+            flags = tuple(p.opts + p.secondary_opts)
+            if p is help_option:
+                # Typer deduplicates help aliases with a set. Restore the user's
+                # configured order so output does not depend on Python's hash seed.
+                configured = [flag for flag in ctx.help_option_names if flag in flags]
+                flags = tuple(
+                    dict.fromkeys(configured + sorted(set(flags) - set(configured)))
+                )
             params.append(
                 Param(
                     kind=kind,
                     name=p.name or "",
                     value_kind=value_kind,
-                    flags=tuple(p.opts + p.secondary_opts)
-                    if kind is ParamKind.OPTION
-                    else (),
+                    flags=flags if kind is ParamKind.OPTION else (),
                     negation_flags=tuple(p.secondary_opts)
                     if kind is ParamKind.OPTION
                     else (),

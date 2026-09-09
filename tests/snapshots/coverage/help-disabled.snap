@@ -1,0 +1,17 @@
+Input: demo bare --h<TAB>
+
+Shell: bash
+
+> demo bare --h▏
+
+---
+
+Shell: fish
+
+> demo bare --h▏
+
+---
+
+Shell: zsh
+
+> demo bare --h▏

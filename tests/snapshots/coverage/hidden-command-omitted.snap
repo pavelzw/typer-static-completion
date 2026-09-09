@@ -1,0 +1,17 @@
+Input: demo internal-s<TAB>
+
+Shell: bash
+
+> demo internal-s▏
+
+---
+
+Shell: fish
+
+> demo internal-s▏
+
+---
+
+Shell: zsh
+
+> demo internal-s▏

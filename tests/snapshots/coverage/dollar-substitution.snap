@@ -1,0 +1,17 @@
+Input: demo show --value doll<TAB>
+
+Shell: bash
+
+> demo show --value dollar\$\(demo\) ▏
+
+---
+
+Shell: fish
+
+> demo show --value dollar\$\(demo\) ▏
+
+---
+
+Shell: zsh
+
+> demo show --value dollar\$\(demo\) ▏

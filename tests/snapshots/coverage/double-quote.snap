@@ -1,0 +1,17 @@
+Input: demo show --value quot<TAB>
+
+Shell: bash
+
+> demo show --value quote\"double ▏
+
+---
+
+Shell: fish
+
+> demo show --value quote\"double ▏
+
+---
+
+Shell: zsh
+
+> demo show --value quote\"double ▏

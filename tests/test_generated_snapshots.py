@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import pytest
-from fixtures import fixture, parsing_fixture
+from fixtures import coverage_fixture, fixture, parsing_fixture
 from snapshot_assertions import assert_snapshot
 
 from typer_static_completions import generate
@@ -14,7 +14,12 @@ from typer_static_completions.verify import check_syntax, is_available
 @pytest.mark.parametrize("shell", ["bash", "fish", "zsh"])
 @pytest.mark.parametrize(
     "name,make_app",
-    [("demo", fixture), ("parsing", parsing_fixture), ("cli", build_cli)],
+    [
+        ("demo", fixture),
+        ("parsing", parsing_fixture),
+        ("cli", build_cli),
+        ("coverage", coverage_fixture),
+    ],
 )
 def test_generated_file(shell, name, make_app):
     program = "typer-static-completions" if name == "cli" else "demo"

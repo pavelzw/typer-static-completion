@@ -95,3 +95,43 @@ def parsing_fixture() -> typer.Typer:
     remote.command()(paint)
     app.add_typer(remote, name="remote")
     return app
+
+
+class Literal(str, Enum):
+    apostrophe = "apos'trophe"
+    unicode = "café"
+    brackets = "bracket[one]:two"
+    dollar = "dollar$(demo)"
+    backtick = "tick`demo`"
+    double_quote = 'quote"double'
+    backslash = "slash\\path"
+
+
+def coverage_fixture() -> typer.Typer:
+    """Help configuration, visibility, and literal values in one shared tree."""
+    app = typer.Typer(
+        add_completion=False, context_settings={"help_option_names": ["-h", "--assist"]}
+    )
+
+    @app.command(context_settings={"help_option_names": ["-h", "--assist"]})
+    def show(
+        value: Literal = typer.Option(
+            Literal.unicode, help='Use [x]: "$HOME", `demo`, and $(demo).'
+        ),
+        secret: bool = typer.Option(False, hidden=True),
+    ):
+        """Show literal values: [x], $HOME, and `demo`."""
+
+    @app.command(name="internal-secret", hidden=True)
+    def hidden():
+        """A hidden command."""
+
+    @app.command(name="legacy-deprecated", deprecated=True)
+    def legacy():
+        """A deprecated command."""
+
+    @app.command(context_settings={"help_option_names": []})
+    def bare():
+        """A command without a help flag."""
+
+    return app

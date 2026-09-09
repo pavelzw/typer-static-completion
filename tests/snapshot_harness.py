@@ -110,6 +110,7 @@ def capture(
     shell: str = "bash",
     executable: str | None = None,
     timeout: float = 10,
+    locale: str = "C",
 ) -> str:
     keys = keystrokes(input)
     if shell not in ("bash", "fish", "zsh"):
@@ -200,7 +201,7 @@ printf '\033]777;TSC_READY\007'
             "XDG_DATA_HOME": str(cwd / "home"),
             "PS1": "TSC_BOOT> ",
             "TERM": "xterm",
-            "LC_ALL": "C",
+            "LC_ALL": locale,
             "INPUTRC": "/dev/null",
             "HISTFILE": "/dev/null",
             "PATH": os.defpath,

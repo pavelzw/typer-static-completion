@@ -1,0 +1,17 @@
+Input: demo show --sec<TAB>
+
+Shell: bash
+
+> demo show --secret ▏
+
+---
+
+Shell: fish
+
+> demo show --secret ▏
+
+---
+
+Shell: zsh
+
+> demo show --secret ▏

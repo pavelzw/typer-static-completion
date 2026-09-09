@@ -1,0 +1,17 @@
+Input: demo show --value café<TAB>
+
+Shell: bash
+
+> demo show --value café ▏
+
+---
+
+Shell: fish
+
+> demo show --value café ▏
+
+---
+
+Shell: zsh
+
+> demo show --value café ▏

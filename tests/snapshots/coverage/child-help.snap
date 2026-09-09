@@ -1,0 +1,17 @@
+Input: demo show --ass<TAB>
+
+Shell: bash
+
+> demo show --assist ▏
+
+---
+
+Shell: fish
+
+> demo show --assist ▏
+
+---
+
+Shell: zsh
+
+> demo show --assist ▏

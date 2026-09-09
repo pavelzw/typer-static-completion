@@ -1,0 +1,17 @@
+Input: demo show --value 'apos<TAB>
+
+Shell: bash
+
+> demo show --value 'apos'\''trophe' ▏
+
+---
+
+Shell: fish
+
+> demo show --value 'apos\'trophe' ▏
+
+---
+
+Shell: zsh
+
+> demo show --value 'apos'\''trophe' ▏

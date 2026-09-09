@@ -1,0 +1,17 @@
+Input: demo legacy-dep<TAB>
+
+Shell: bash
+
+> demo legacy-dep▏
+
+---
+
+Shell: fish
+
+> demo legacy-dep▏
+
+---
+
+Shell: zsh
+
+> demo legacy-dep▏

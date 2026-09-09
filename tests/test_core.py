@@ -251,3 +251,12 @@ def test_invalid_shell_syntax():
         pytest.skip("Bash is not installed")
     with pytest.raises(ScriptSyntaxError):
         check_syntax("broken() {", "bash")
+
+
+def test_help_aliases_preserve_configured_order():
+    from fixtures import coverage_fixture
+
+    tree = from_app(coverage_fixture(), "demo")
+    for command in (tree.root, tree.root.subcommands["show"]):
+        help_option = next(param for param in command.options if param.is_help)
+        assert help_option.flags == ("-h", "--assist")

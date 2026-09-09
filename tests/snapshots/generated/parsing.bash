@@ -287,10 +287,32 @@ _tsc_2a97516c354b6884() {
         char=${full:$k:1}
         if [[ $char != ' ' && $char != "'" && $char != '"' && $char != '\' && $COMP_WORDBREAKS == *"$char"* ]]; then trim=${full:0:k+1}; fi
     done
+    # Readline's filename quoting leaves command substitutions executable.
+    # Quote literal candidates ourselves when they contain expansion syntax.
+    local quote_literals=0
+    for candidate in "${candidates[@]}"; do
+        if [[ $candidate == *'$'* || $candidate == *'`'* ]]; then
+            if compopt -o noquote 2>/dev/null; then quote_literals=1; fi
+            break
+        fi
+    done
     for candidate in "${candidates[@]}"; do
         if [[ $candidate == "$cur"* ]]; then
             candidate=$prefix$candidate
-            COMPREPLY+=("${candidate#"$trim"}")
+            candidate=${candidate#"$trim"}
+            if ((quote_literals)); then
+                if [[ $quote == '"' ]]; then
+                    candidate=${candidate//\\/\\\\}
+                    candidate=${candidate//\"/\\\"}
+                    candidate=${candidate//\$/\\\$}
+                    candidate=${candidate//\`/\\\`}
+                elif [[ $quote == "'" ]]; then
+                    candidate=${candidate//\'/\'\\\'\'}
+                else
+                    printf -v candidate '%q' "$candidate"
+                fi
+            fi
+            COMPREPLY+=("$candidate")
         fi
     done
     return 0
