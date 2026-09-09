@@ -30,7 +30,7 @@ def test_generate_file_and_import_output(tmp_path, capsys, monkeypatch):
         return app
 
     monkeypatch.setattr("typer_static_completions.cli.load_app", noisy)
-    args = ["generate", TARGET, "--prog-name", "tsc"]
+    args = ["generate", TARGET, "--prog-name", "tsc", "--shell", "bash"]
     assert main(args) == 0
     captured = capsys.readouterr()
     assert captured.err == "module diagnostics\n"
@@ -82,7 +82,14 @@ def test_nearest_project_shell_selection_and_relative_output(tmp_path, monkeypat
     [
         ["generate"],
         ["generate", TARGET, "--prog-name", "tsc", "--shell", "powershell"],
-        ["generate", "_missing_cli_module:app", "--prog-name", "tsc"],
+        [
+            "generate",
+            "_missing_cli_module:app",
+            "--prog-name",
+            "tsc",
+            "--shell",
+            "bash",
+        ],
         ["check", "--max-files", "-1"],
         ["unknown-command"],
     ],
@@ -104,3 +111,14 @@ def test_partial_sync_and_invalid_overrides(tmp_path, capsys):
 def test_help(capsys):
     assert main(["--help"]) == 0
     assert "generate" in capsys.readouterr().out
+
+
+def test_generate_requires_shell_before_loading_app(capsys, monkeypatch):
+    def unexpected_load(target):
+        pytest.fail("App must not be loaded without a shell selection")
+
+    monkeypatch.setattr("typer_static_completions.cli.load_app", unexpected_load)
+    assert main(["generate", TARGET, "--prog-name", "tsc"]) == 2
+    captured = capsys.readouterr()
+    assert "--shell" in captured.err
+    assert captured.out == ""

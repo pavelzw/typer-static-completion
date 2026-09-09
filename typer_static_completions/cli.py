@@ -59,9 +59,7 @@ def build_cli() -> typer.Typer:
         prog_name: Annotated[
             str, typer.Option("--prog-name", help="Command name users type.")
         ],
-        shell: Annotated[
-            CompletionShell, typer.Option(help="Target shell.")
-        ] = CompletionShell.bash,
+        shell: Annotated[CompletionShell, typer.Option(help="Target shell.")],
         output: Annotated[
             Path | None,
             typer.Option(

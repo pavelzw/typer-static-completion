@@ -180,6 +180,7 @@ Generate one shell's script from an importable Typer app:
 pixi run typer-static-completions generate myapp.cli:app --prog-name myapp --shell fish -o myapp.fish
 ```
 
+`generate` requires `--shell`; it has no default shell.
 Omit `-o` (or use `-o -`) to emit only the script on stdout. Python import output
 is redirected to stderr so it cannot corrupt the generated script.
 
@@ -193,7 +194,8 @@ pixi run typer-static-completions check --app myapp=myapp.cli:app --no-diff
 `--app NAME=MODULE:APP` overrides a declared wrapper entrypoint. Repeat `--app`,
 `--only NAME`, or `--shell bash --shell fish` to select several apps or shells.
 `--pyproject PATH` selects metadata explicitly; otherwise the nearest pyproject
-is used. The default output is `completions/` beside that file. An explicit
+is used. `sync` and `check` select all three shells unless `--shell` narrows them.
+The default output is `completions/` beside that file. An explicit
 `--output-dir` is relative to cwd. `--no-prune` retains old outputs, and
 `check --max-files 5` bounds diagnostics. Commit the scripts and ownership manifest,
 then run `check` without `sync` in CI.
