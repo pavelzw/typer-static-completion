@@ -17,6 +17,7 @@ uv = "*"
 
 [dependencies]
 typer-static-completions = { path = "." }
+typer = ">=0.26,<0.27"
 
 [feature.test.dependencies]
 pytest = "*"

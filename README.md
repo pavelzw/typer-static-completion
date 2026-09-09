@@ -7,6 +7,10 @@
 
 Generate static shell completions for typer applications
 
+Status: API scaffold only. Generation, introspection, CLI commands, and shell
+verification are not implemented yet. See [TODO.md](TODO.md) for the implementation
+and snapshot-testing plan.
+
 ## Installation
 
 This project is managed by [pixi](https://pixi.sh).
