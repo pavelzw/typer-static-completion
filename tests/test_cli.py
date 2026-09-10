@@ -1,5 +1,7 @@
 """CLI streams, exit statuses, and project workflows."""
 
+import re
+
 import pytest
 
 from typer_static_completion.cli import main
@@ -62,7 +64,9 @@ def test_errors_return_two_without_traceback(args, capsys):
 
 def test_help(capsys):
     assert main(["--help"]) == 0
-    assert "generate" in capsys.readouterr().out
+    output = re.sub(r"\x1b\[[0-9;]*m", "", capsys.readouterr().out)
+    assert "generate" in output
+    assert "--version" in output
 
 
 def test_generate_requires_shell_before_loading_app(capsys, monkeypatch):
@@ -74,3 +78,12 @@ def test_generate_requires_shell_before_loading_app(capsys, monkeypatch):
     captured = capsys.readouterr()
     assert "--shell" in captured.err
     assert captured.out == ""
+
+
+@pytest.mark.parametrize("args", [["--version"], ["--version", "generate"]])
+def test_version(args, capsys, monkeypatch):
+    monkeypatch.setattr("typer_static_completion.cli.__version__", "1.2.3")
+    assert main(args) == 0
+    captured = capsys.readouterr()
+    assert captured.out == "typer-static-completion 1.2.3\n"
+    assert captured.err == ""
