@@ -163,8 +163,6 @@ To generate this CLI's own Fish completion:
 pixi run typer-static-completion generate typer_static_completion.cli:app --prog-name typer-static-completion --shell fish -o typer-static-completion.fish
 ```
 
-Show the installed version with `pixi run typer-static-completion --version`.
-
 The CLI is also available as `pixi run python -m typer_static_completion.cli`.
 
 ## Interactive screen snapshots
