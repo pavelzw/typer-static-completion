@@ -1,5 +1,5 @@
 # Generated - do not edit.
-function __tsc_a0400f50fb4ab9f2_option
+function __tsc_e745c68429bb3a3e_option
 if test "$argv[1]:$argv[2]" = '0:--help'; printf "%s\n" 0 0; return; end
 if test "$argv[1]:$argv[2]" = '1:--prog-name'; printf "%s\n" 2 1; return; end
 if test "$argv[1]:$argv[2]" = '1:--shell'; printf "%s\n" 3 1; return; end
@@ -9,7 +9,7 @@ if test "$argv[1]:$argv[2]" = '1:--help'; printf "%s\n" 5 0; return; end
     printf '%s\n' -1 0
 end
 
-function __tsc_a0400f50fb4ab9f2
+function __tsc_e745c68429bb3a3e
     set -l tokens (commandline -xpc)
     set -l current (commandline -ct)
     set -l unescaped (string unescape -- "$current")
@@ -37,7 +37,7 @@ function __tsc_a0400f50fb4ab9f2
         end
         if string match -qr '^-.+' -- "$word"; and test $ended -eq 0
             set -l flag (string split -m 1 = -- "$word")[1]
-            set -l info (__tsc_a0400f50fb4ab9f2_option $node "$flag")
+            set -l info (__tsc_e745c68429bb3a3e_option $node "$flag")
             if test $info[1] -ge 0
                 set -l consumed 0
                 string match -q '*=*' -- "$word"; and set consumed 1
@@ -52,7 +52,7 @@ function __tsc_a0400f50fb4ab9f2
                 while test -n "$rest"
                     set flag -(string sub -l 1 -- "$rest")
                     set rest (string sub -s 2 -- "$rest")
-                    set info (__tsc_a0400f50fb4ab9f2_option $node "$flag")
+                    set info (__tsc_e745c68429bb3a3e_option $node "$flag")
                     if test $info[1] -lt 0
                         return
                     end
@@ -86,7 +86,7 @@ case 0; return
     if test $target -lt 0; and test $ended -eq 0
         if string match -q -- '--*=*' "$current"
             set -l parts (string split -m 1 = -- "$current")
-            set -l info (__tsc_a0400f50fb4ab9f2_option $node "$parts[1]")
+            set -l info (__tsc_e745c68429bb3a3e_option $node "$parts[1]")
             test $info[2] -gt 0; or return
             set target $info[1]
             set prefix "$parts[1]="
@@ -98,7 +98,7 @@ case 0; return
                 set -l flag -(string sub -l 1 -- "$rest")
                 set attached "$attached"(string sub -l 1 -- "$rest")
                 set rest (string sub -s 2 -- "$rest")
-                set -l info (__tsc_a0400f50fb4ab9f2_option $node "$flag")
+                set -l info (__tsc_e745c68429bb3a3e_option $node "$flag")
                 if test $info[1] -lt 0
                     break
                 end
@@ -170,4 +170,4 @@ case 5; set candidates
         end
     end
 end
-complete -c 'typer-static-completion' -f -a '(__tsc_a0400f50fb4ab9f2)'
+complete -c 'typer-static-completion' -f -a '(__tsc_e745c68429bb3a3e)'

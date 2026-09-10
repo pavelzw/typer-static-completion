@@ -1,6 +1,6 @@
 #compdef typer-static-completion
 # Generated - do not edit.
-_tsc_a0400f50fb4ab9f2() {
+_tsc_e745c68429bb3a3e() {
     setopt localoptions ksharrays
     local COMP_LINE=$BUFFER COMP_POINT=$CURSOR
     local -a COMPREPLY
@@ -164,4 +164,4 @@ _tsc_a0400f50fb4ab9f2() {
         compadd "${suffix_args[@]}" -d descriptions -- "${candidates[@]}"
     fi
 }
-if (( $+compstate )); then _tsc_a0400f50fb4ab9f2 "$@"; elif (( $+functions[compdef] )); then compdef _tsc_a0400f50fb4ab9f2 typer-static-completion; fi
+if (( $+compstate )); then _tsc_e745c68429bb3a3e "$@"; elif (( $+functions[compdef] )); then compdef _tsc_e745c68429bb3a3e typer-static-completion; fi

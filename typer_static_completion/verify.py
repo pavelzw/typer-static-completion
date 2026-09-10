@@ -32,6 +32,7 @@ def check_syntax(script: str, shell: ShellName) -> None:
         [executable, "-n"],
         input=script,
         text=True,
+        encoding="utf-8",
         capture_output=True,
         timeout=10,
     )
