@@ -61,6 +61,10 @@ python_version = '3.11'
 no_implicit_optional = true
 check_untyped_defs = true
 
+[[tool.mypy.overrides]]
+module = ["typer_static_completion", "typer_static_completion.*"]
+disallow_untyped_defs = true
+
 # If you run into `missing library stubs or py.typed marker` errors
 # and no stubs are available for this library, you can add an override
 # to ignore the missing imports.
