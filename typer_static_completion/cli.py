@@ -9,10 +9,17 @@ from typing import Annotated
 
 import typer
 
+from . import __version__
 from .core import _replace_file, generate
 from .errors import StaticCompletionError
 from .introspect import load_app
 from .shells import Shell
+
+
+def _version_callback(value: bool) -> None:
+    if value:
+        typer.echo(f"typer-static-completion {__version__}")
+        raise typer.Exit()
 
 
 def build_cli() -> typer.Typer:
@@ -24,7 +31,17 @@ def build_cli() -> typer.Typer:
     )
 
     @cli.callback()
-    def root() -> None:
+    def root(
+        version: Annotated[
+            bool,
+            typer.Option(
+                "--version",
+                callback=_version_callback,
+                is_eager=True,
+                help="Show the version and exit.",
+            ),
+        ] = False,
+    ) -> None:
         """Generate static shell completions."""
 
     @cli.command("generate")

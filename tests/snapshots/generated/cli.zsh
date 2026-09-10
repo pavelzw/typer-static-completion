@@ -40,12 +40,13 @@ _tsc_e745c68429bb3a3e() {
             [[ $word == *=* ]] && value=1
             target=-1; takes=0
             case "$node:$flag" in
-0:--help) target=0; takes=0 ;;
-1:--prog-name) target=2; takes=1 ;;
-1:--shell) target=3; takes=1 ;;
-1:--output) target=4; takes=1 ;;
-1:-o) target=4; takes=1 ;;
-1:--help) target=5; takes=0 ;;
+0:--version) target=0; takes=0 ;;
+0:--help) target=1; takes=0 ;;
+1:--prog-name) target=3; takes=1 ;;
+1:--shell) target=4; takes=1 ;;
+1:--output) target=5; takes=1 ;;
+1:-o) target=5; takes=1 ;;
+1:--help) target=6; takes=0 ;;
             esac
             if ((target >= 0)); then
                 remaining=$((takes-value))
@@ -57,12 +58,13 @@ _tsc_e745c68429bb3a3e() {
                 for ((j=1; j<${#word}; j++)); do
                     flag=-${word:$j:1}; target=-1; takes=0
                     case "$node:$flag" in
-0:--help) target=0; takes=0 ;;
-1:--prog-name) target=2; takes=1 ;;
-1:--shell) target=3; takes=1 ;;
-1:--output) target=4; takes=1 ;;
-1:-o) target=4; takes=1 ;;
-1:--help) target=5; takes=0 ;;
+0:--version) target=0; takes=0 ;;
+0:--help) target=1; takes=0 ;;
+1:--prog-name) target=3; takes=1 ;;
+1:--shell) target=4; takes=1 ;;
+1:--output) target=5; takes=1 ;;
+1:-o) target=5; takes=1 ;;
+1:--help) target=6; takes=0 ;;
                     esac
                     ((target < 0)) && return 0
                     if ((takes)); then
@@ -94,12 +96,13 @@ _tsc_e745c68429bb3a3e() {
     if ((target < 0 && ended == 0)) && [[ $cur == --*=* ]]; then
         flag=${cur%%=*}; takes=0
         case "$node:$flag" in
-0:--help) target=0; takes=0 ;;
-1:--prog-name) target=2; takes=1 ;;
-1:--shell) target=3; takes=1 ;;
-1:--output) target=4; takes=1 ;;
-1:-o) target=4; takes=1 ;;
-1:--help) target=5; takes=0 ;;
+0:--version) target=0; takes=0 ;;
+0:--help) target=1; takes=0 ;;
+1:--prog-name) target=3; takes=1 ;;
+1:--shell) target=4; takes=1 ;;
+1:--output) target=5; takes=1 ;;
+1:-o) target=5; takes=1 ;;
+1:--help) target=6; takes=0 ;;
         esac
         ((takes)) || return 0
         prefix=$flag=; cur=${cur#*=}
@@ -107,12 +110,13 @@ _tsc_e745c68429bb3a3e() {
         for ((j=1; j<${#cur}; j++)); do
             flag=-${cur:$j:1}; target=-1; takes=0
             case "$node:$flag" in
-0:--help) target=0; takes=0 ;;
-1:--prog-name) target=2; takes=1 ;;
-1:--shell) target=3; takes=1 ;;
-1:--output) target=4; takes=1 ;;
-1:-o) target=4; takes=1 ;;
-1:--help) target=5; takes=0 ;;
+0:--version) target=0; takes=0 ;;
+0:--help) target=1; takes=0 ;;
+1:--prog-name) target=3; takes=1 ;;
+1:--shell) target=4; takes=1 ;;
+1:--output) target=5; takes=1 ;;
+1:-o) target=5; takes=1 ;;
+1:--help) target=6; takes=0 ;;
             esac
             if ((takes)); then prefix=${cur:0:$((j+1))}; cur=${cur:$((j+1))}; break; fi
             target=-1
@@ -120,12 +124,12 @@ _tsc_e745c68429bb3a3e() {
     fi
     if ((target < 0)); then
         case $node in
-0) candidates=(generate); if [[ $cur == -* && $ended == 0 ]]; then candidates=(--help); fi; descriptions=('generate -- Render one app'"'"'s completion script.'); if [[ $cur == -* && $ended == 0 ]]; then descriptions=('--help -- Show this message and exit.'); fi ;;
+0) candidates=(generate); if [[ $cur == -* && $ended == 0 ]]; then candidates=(--version --help); fi; descriptions=('generate -- Render one app'"'"'s completion script.'); if [[ $cur == -* && $ended == 0 ]]; then descriptions=('--version -- Show the version and exit.' '--help -- Show this message and exit.'); fi ;;
 1) candidates=(); if [[ $cur == -* && $ended == 0 ]]; then candidates=(--prog-name --shell --output -o --help); fi; descriptions=(); if [[ $cur == -* && $ended == 0 ]]; then descriptions=('--prog-name -- Command name users type.' '--shell -- Target shell.' '--output -- Output file; omit or use - for stdout.' '-o -- Output file; omit or use - for stdout.' '--help -- Show this message and exit.'); fi ;;
         esac
         if [[ $cur != -* || $ended == 1 ]]; then
             case "$node:$position" in
-1:0) target=1 ;;
+1:0) target=2 ;;
             esac
         fi
     fi
@@ -135,9 +139,10 @@ _tsc_e745c68429bb3a3e() {
 0) candidates=() ;;
 1) candidates=() ;;
 2) candidates=() ;;
-3) candidates=(bash fish zsh); : ;;
-4) file_mode=file ;;
-5) candidates=() ;;
+3) candidates=() ;;
+4) candidates=(bash fish zsh); : ;;
+5) file_mode=file ;;
+6) candidates=() ;;
         esac
     fi
 

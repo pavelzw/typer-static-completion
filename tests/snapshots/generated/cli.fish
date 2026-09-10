@@ -1,11 +1,12 @@
 # Generated - do not edit.
 function __tsc_e745c68429bb3a3e_option
-if test "$argv[1]:$argv[2]" = '0:--help'; printf "%s\n" 0 0; return; end
-if test "$argv[1]:$argv[2]" = '1:--prog-name'; printf "%s\n" 2 1; return; end
-if test "$argv[1]:$argv[2]" = '1:--shell'; printf "%s\n" 3 1; return; end
-if test "$argv[1]:$argv[2]" = '1:--output'; printf "%s\n" 4 1; return; end
-if test "$argv[1]:$argv[2]" = '1:-o'; printf "%s\n" 4 1; return; end
-if test "$argv[1]:$argv[2]" = '1:--help'; printf "%s\n" 5 0; return; end
+if test "$argv[1]:$argv[2]" = '0:--version'; printf "%s\n" 0 0; return; end
+if test "$argv[1]:$argv[2]" = '0:--help'; printf "%s\n" 1 0; return; end
+if test "$argv[1]:$argv[2]" = '1:--prog-name'; printf "%s\n" 3 1; return; end
+if test "$argv[1]:$argv[2]" = '1:--shell'; printf "%s\n" 4 1; return; end
+if test "$argv[1]:$argv[2]" = '1:--output'; printf "%s\n" 5 1; return; end
+if test "$argv[1]:$argv[2]" = '1:-o'; printf "%s\n" 5 1; return; end
+if test "$argv[1]:$argv[2]" = '1:--help'; printf "%s\n" 6 0; return; end
     printf '%s\n' -1 0
 end
 
@@ -117,8 +118,8 @@ case 0
 set candidates 'generate'
 set descriptions 'Render one app\'s completion script.'
 if test $ended -eq 0; and string match -q -- '-*' "$current"
-set candidates '--help'
-set descriptions 'Show this message and exit.'
+set candidates '--version' '--help'
+set descriptions 'Show the version and exit.' 'Show this message and exit.'
 end
 case 1
 set candidates
@@ -129,7 +130,7 @@ set descriptions 'Command name users type.' 'Target shell.' 'Output file; omit o
 end
         end
         if test $ended -eq 1; or not string match -q -- '-*' "$current"
-if test $node -eq 1; and test $position -eq 0; set target 1; end
+if test $node -eq 1; and test $position -eq 0; set target 2; end
         end
     end
     if test $target -ge 0
@@ -139,9 +140,10 @@ if test $node -eq 1; and test $position -eq 0; set target 1; end
 case 0; set candidates
 case 1; set candidates
 case 2; set candidates
-case 3; set candidates 'bash' 'fish' 'zsh'; set choice_mode sensitive; set descriptions 'Target shell.' 'Target shell.' 'Target shell.'
-case 4; set file_mode file
-case 5; set candidates
+case 3; set candidates
+case 4; set candidates 'bash' 'fish' 'zsh'; set choice_mode sensitive; set descriptions 'Target shell.' 'Target shell.' 'Target shell.'
+case 5; set file_mode file
+case 6; set candidates
         end
     end
     set -l index 1
