@@ -1,5 +1,7 @@
 """CLI streams, exit statuses, and project workflows."""
 
+import re
+
 import pytest
 
 from typer_static_completion.cli import main
@@ -62,7 +64,7 @@ def test_errors_return_two_without_traceback(args, capsys):
 
 def test_help(capsys):
     assert main(["--help"]) == 0
-    output = capsys.readouterr().out
+    output = re.sub(r"\x1b\[[0-9;]*m", "", capsys.readouterr().out)
     assert "generate" in output
     assert "--version" in output
 
