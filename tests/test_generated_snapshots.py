@@ -16,9 +16,9 @@ from fixtures import (
 )
 from snapshot_assertions import assert_snapshot
 
-from typer_static_completions import generate
-from typer_static_completions.cli import build_cli
-from typer_static_completions.verify import check_syntax, is_available
+from typer_static_completion import generate
+from typer_static_completion.cli import build_cli
+from typer_static_completion.verify import check_syntax, is_available
 
 
 @pytest.mark.parametrize("shell", ["bash", "fish", "zsh"])
@@ -38,7 +38,7 @@ from typer_static_completions.verify import check_syntax, is_available
     ],
 )
 def test_generated_file(shell, name, make_app):
-    program = "typer-static-completions" if name == "cli" else "demo"
+    program = "typer-static-completion" if name == "cli" else "demo"
     script = generate(make_app(), program, shell)
     assert script == generate(make_app(), program, shell)
     assert script.endswith("\n")

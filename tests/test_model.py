@@ -4,7 +4,7 @@ from dataclasses import replace
 
 import pytest
 
-from typer_static_completions import Command, CommandTree, generate
+from typer_static_completion import Command, CommandTree, generate
 
 
 def test_source_mapping_mutations_do_not_change_generation():

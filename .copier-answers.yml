@@ -13,9 +13,9 @@ _src_path: https://github.com/quantco/copier-template-python-open-source
 add_autobump_workflow: true
 author_email: pavelzw@gmail.com
 author_name: Pavel Zwerschke
-github_url: https://github.com/pavelzw/typer-static-completions
+github_url: https://github.com/pavelzw/typer-static-completion
 github_user: pavelzw
 minimal_python_version: py310
 project_short_description: Generate static shell completions for typer applications
-project_slug: typer-static-completions
+project_slug: typer-static-completion
 use_devcontainer: false

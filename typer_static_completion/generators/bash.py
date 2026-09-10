@@ -140,7 +140,7 @@ class BashGenerator(Generator):
             if self.options.include_version:
                 from importlib.metadata import version
 
-                banner += f"# typer-static-completions {version('typer-static-completions')}; typer {version('typer')}\n"
+                banner += f"# typer-static-completion {version('typer-static-completion')}; typer {version('typer')}\n"
         script = self.runtime().replace("@NAME@", name)
         for marker, cases in (
             ("OPTIONS", option_cases),

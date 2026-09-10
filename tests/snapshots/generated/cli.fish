@@ -170,4 +170,4 @@ case 5; set candidates
         end
     end
 end
-complete -c 'typer-static-completions' -f -a '(__tsc_a0400f50fb4ab9f2)'
+complete -c 'typer-static-completion' -f -a '(__tsc_a0400f50fb4ab9f2)'

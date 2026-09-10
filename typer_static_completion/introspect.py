@@ -1,4 +1,4 @@
-"""Build a :class:`~typer_static_completions.model.CommandTree` from an app.
+"""Build a :class:`~typer_static_completion.model.CommandTree` from an app.
 
 This is the *only* module that touches typer's internals. Since typer 0.26 click
 is vendored under ``typer._click``, so a ``TyperGroup`` is not an

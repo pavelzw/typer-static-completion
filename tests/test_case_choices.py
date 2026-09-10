@@ -2,7 +2,7 @@ import pytest
 from fixtures import case_fixture
 from typer.testing import CliRunner
 
-from typer_static_completions import from_app
+from typer_static_completion import from_app
 
 
 def test_case_metadata():

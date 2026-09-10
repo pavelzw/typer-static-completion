@@ -1,6 +1,6 @@
 """Shell-agnostic description of a CLI.
 
-This is the seam of the library. :mod:`typer_static_completions.introspect`
+This is the seam of the library. :mod:`typer_static_completion.introspect`
 builds these objects out of typer's (private) command classes; generators read
 *only* these objects and never import typer. That keeps every version-fragile
 attribute access in one module, and makes generators testable without

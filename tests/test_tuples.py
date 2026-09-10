@@ -5,7 +5,7 @@ from fixtures import tuple_fixture
 from tuple_cases import CASES
 from typer.testing import CliRunner
 
-from typer_static_completions import (
+from typer_static_completion import (
     Command,
     CommandTree,
     DynamicPolicy,

@@ -18,7 +18,7 @@ from snapshot_harness import capture
 from tuple_argument_cases import CASES as TUPLE_ARGUMENT_CASES
 from tuple_cases import CASES as TUPLE_CASES
 
-from typer_static_completions import (
+from typer_static_completion import (
     Command,
     CommandTree,
     Param,
@@ -131,38 +131,38 @@ def test_multiple_scripts_and_repeated_sourcing(program, line, completed):
     [
         (
             "command",
-            "typer-static-completions gen",
-            "typer-static-completions generate ",
+            "typer-static-completion gen",
+            "typer-static-completion generate ",
         ),
         (
             "shell",
-            "typer-static-completions generate --shell f",
-            "typer-static-completions generate --shell fish ",
+            "typer-static-completion generate --shell f",
+            "typer-static-completion generate --shell fish ",
         ),
         (
             "output-option",
-            "typer-static-completions generate --out",
-            "typer-static-completions generate --output ",
+            "typer-static-completion generate --out",
+            "typer-static-completion generate --output ",
         ),
         (
             "program-name-option",
-            "typer-static-completions generate --prog-n",
-            "typer-static-completions generate --prog-name ",
+            "typer-static-completion generate --prog-n",
+            "typer-static-completion generate --prog-name ",
         ),
     ],
 )
 def test_cli_screen(name, line, completed):
-    from typer_static_completions.cli import build_cli
+    from typer_static_completion.cli import build_cli
 
     sections = []
     for shell in ("bash", "fish", "zsh"):
         sentinel = (
-            "function typer-static-completions; printf invoked > invoked; end\n"
+            "function typer-static-completion; printf invoked > invoked; end\n"
             if shell == "fish"
-            else "typer-static-completions() { printf invoked > invoked; }\n"
+            else "typer-static-completion() { printf invoked > invoked; }\n"
         )
         screen = capture(
-            generate(build_cli(), "typer-static-completions", shell) + sentinel,
+            generate(build_cli(), "typer-static-completion", shell) + sentinel,
             line + "<TAB>",
             shell=shell,
         )
@@ -238,7 +238,7 @@ def test_extended_coverage_screen(case, tmp_path):
 def test_coverage_descriptions(include_help):
     from fixtures import coverage_fixture
 
-    from typer_static_completions import GenerationOptions
+    from typer_static_completion import GenerationOptions
 
     sections = []
     for shell in ("bash", "fish", "zsh"):

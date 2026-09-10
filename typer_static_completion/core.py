@@ -27,12 +27,12 @@ def generate(
 
     Args:
         app: A ``Typer`` app, or an already-introspected
-            :class:`~typer_static_completions.model.CommandTree`.
+            :class:`~typer_static_completion.model.CommandTree`.
         prog_name: The name users type. Required for a ``Typer`` app; ignored
             (and must be ``None``) when a tree is passed, which already has one.
         shell: Target shell.
         options: Content settings. Defaults to
-            :class:`~typer_static_completions.config.GenerationOptions`.
+            :class:`~typer_static_completion.config.GenerationOptions`.
 
     Raises:
         UnsupportedShellError: if no generator is registered for ``shell``.
@@ -84,7 +84,7 @@ def write(
 
     Args:
         output_dir: Root for the written files. Created if absent.
-        shells: Defaults to :data:`~typer_static_completions.shells.DEFAULT_SHELLS`.
+        shells: Defaults to :data:`~typer_static_completion.shells.DEFAULT_SHELLS`.
         layout: Override the per-shell path template, e.g. to write directly into
             a prefix with ``{"bash": "share/bash-completion/completions/{prog}"}``.
             Defaults to each generator's ``filename`` in a per-shell subdirectory.

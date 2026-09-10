@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 
-from typer_static_completions import GenerationOptions
+from typer_static_completion import GenerationOptions
 
 
 @dataclass(frozen=True)

@@ -1,4 +1,4 @@
-#compdef typer-static-completions
+#compdef typer-static-completion
 # Generated - do not edit.
 _tsc_a0400f50fb4ab9f2() {
     setopt localoptions ksharrays
@@ -164,4 +164,4 @@ _tsc_a0400f50fb4ab9f2() {
         compadd "${suffix_args[@]}" -d descriptions -- "${candidates[@]}"
     fi
 }
-if (( $+compstate )); then _tsc_a0400f50fb4ab9f2 "$@"; elif (( $+functions[compdef] )); then compdef _tsc_a0400f50fb4ab9f2 typer-static-completions; fi
+if (( $+compstate )); then _tsc_a0400f50fb4ab9f2 "$@"; elif (( $+functions[compdef] )); then compdef _tsc_a0400f50fb4ab9f2 typer-static-completion; fi

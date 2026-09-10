@@ -1,8 +1,8 @@
 """The generator contract.
 
-A generator turns a :class:`~typer_static_completions.model.CommandTree` into
+A generator turns a :class:`~typer_static_completion.model.CommandTree` into
 one shell's script text. Generators read only the model and
-:class:`~typer_static_completions.config.GenerationOptions` -- never a ``Typer``
+:class:`~typer_static_completion.config.GenerationOptions` -- never a ``Typer``
 app -- so they can be unit-tested against hand-built trees.
 """
 

@@ -1,9 +1,9 @@
-# typer-static-completions
+# typer-static-completion
 
-[![CI](https://img.shields.io/github/actions/workflow/status/pavelzw/typer-static-completions/ci.yml?style=flat-square&branch=main)](https://github.com/pavelzw/typer-static-completions/actions/workflows/ci.yml)
-[![conda-forge](https://img.shields.io/conda/vn/conda-forge/typer-static-completions?logoColor=white&logo=conda-forge&style=flat-square)](https://prefix.dev/channels/conda-forge/packages/typer-static-completions)
-[![pypi-version](https://img.shields.io/pypi/v/typer-static-completions.svg?logo=pypi&logoColor=white&style=flat-square)](https://pypi.org/project/typer-static-completions)
-[![python-version](https://img.shields.io/pypi/pyversions/typer-static-completions?logoColor=white&logo=python&style=flat-square)](https://pypi.org/project/typer-static-completions)
+[![CI](https://img.shields.io/github/actions/workflow/status/pavelzw/typer-static-completion/ci.yml?style=flat-square&branch=main)](https://github.com/pavelzw/typer-static-completion/actions/workflows/ci.yml)
+[![conda-forge](https://img.shields.io/conda/vn/conda-forge/typer-static-completion?logoColor=white&logo=conda-forge&style=flat-square)](https://prefix.dev/channels/conda-forge/packages/typer-static-completion)
+[![pypi-version](https://img.shields.io/pypi/v/typer-static-completion.svg?logo=pypi&logoColor=white&style=flat-square)](https://pypi.org/project/typer-static-completion)
+[![python-version](https://img.shields.io/pypi/pyversions/typer-static-completion?logoColor=white&logo=python&style=flat-square)](https://pypi.org/project/typer-static-completion)
 
 Generate static shell completions for typer applications. Requires Python 3.11 or newer.
 
@@ -14,7 +14,7 @@ PowerShell and dynamic delegation remain unimplemented. See
 [TODO.md](TODO.md) for the remaining work.
 
 ```python
-from typer_static_completions import generate
+from typer_static_completion import generate
 from myapp.cli import app
 
 script = generate(app, "myapp", "bash")
@@ -68,14 +68,14 @@ pixi run example deploy --environment staging
 pixi run example-completions
 ```
 
-The second task calls [`write()`](typer_static_completions/core.py) from
+The second task calls [`write()`](typer_static_completion/core.py) from
 [`examples/completions.py`](examples/completions.py), producing
 `build/completions/bash/shipyard`, `build/completions/zsh/_shipyard`, and
 `build/completions/fish/shipyard.fish`. The example is exercised by the CI test
 suite. In your project, call the same API during your build or release process:
 
 ```python
-from typer_static_completions import GenerationOptions, write
+from typer_static_completion import GenerationOptions, write
 from myapp.cli import app
 
 outputs = write(
@@ -140,7 +140,7 @@ generation command. The banner records the regeneration command for reference.
 Generate one shell's script from an importable Typer app:
 
 ```bash
-pixi run typer-static-completions generate myapp.cli:app --prog-name myapp --shell fish -o myapp.fish
+pixi run typer-static-completion generate myapp.cli:app --prog-name myapp --shell fish -o myapp.fish
 ```
 
 `generate` requires `--shell` and `--prog-name`. Omit `-o` (or use `-o -`) to emit
@@ -160,10 +160,10 @@ and install scripts through your project's build process when its CLI changes.
 To generate this CLI's own Fish completion:
 
 ```bash
-pixi run typer-static-completions generate typer_static_completions.cli:app --prog-name typer-static-completions --shell fish -o typer-static-completions.fish
+pixi run typer-static-completion generate typer_static_completion.cli:app --prog-name typer-static-completion --shell fish -o typer-static-completion.fish
 ```
 
-The CLI is also available as `pixi run python -m typer_static_completions.cli`.
+The CLI is also available as `pixi run python -m typer_static_completion.cli`.
 
 ## Interactive screen snapshots
 
@@ -253,8 +253,8 @@ This project is managed by [pixi](https://pixi.sh).
 You can install the package in development mode using:
 
 ```bash
-git clone https://github.com/pavelzw/typer-static-completions
-cd typer-static-completions
+git clone https://github.com/pavelzw/typer-static-completion
+cd typer-static-completion
 
 pixi run pre-commit-install
 pixi run test

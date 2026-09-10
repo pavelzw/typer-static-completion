@@ -2,9 +2,9 @@
 
 import pytest
 
-from typer_static_completions.cli import main
+from typer_static_completion.cli import main
 
-TARGET = "typer_static_completions.cli:app"
+TARGET = "typer_static_completion.cli:app"
 
 
 @pytest.mark.parametrize("shell", ["bash", "fish", "zsh"])
@@ -17,13 +17,13 @@ def test_generate_stdout(shell, capsys):
 
 
 def test_generate_file_and_import_output(tmp_path, capsys, monkeypatch):
-    from typer_static_completions.cli import app
+    from typer_static_completion.cli import app
 
     def noisy(target):
         print("module diagnostics")
         return app
 
-    monkeypatch.setattr("typer_static_completions.cli.load_app", noisy)
+    monkeypatch.setattr("typer_static_completion.cli.load_app", noisy)
     args = ["generate", TARGET, "--prog-name", "tsc", "--shell", "bash"]
     assert main(args) == 0
     captured = capsys.readouterr()
@@ -69,7 +69,7 @@ def test_generate_requires_shell_before_loading_app(capsys, monkeypatch):
     def unexpected_load(target):
         pytest.fail("App must not be loaded without a shell selection")
 
-    monkeypatch.setattr("typer_static_completions.cli.load_app", unexpected_load)
+    monkeypatch.setattr("typer_static_completion.cli.load_app", unexpected_load)
     assert main(["generate", TARGET, "--prog-name", "tsc"]) == 2
     captured = capsys.readouterr()
     assert "--shell" in captured.err

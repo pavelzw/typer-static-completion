@@ -2,7 +2,7 @@
 
 These assert the *shape* of the API alongside the behavioral tests: that
 the exports exist, that the model is usable without typer, and that the typer
-internals :mod:`typer_static_completions.introspect` relies on are present in the
+internals :mod:`typer_static_completion.introspect` relies on are present in the
 installed typer. That last group is the valuable one -- it is what will fail
 loudly when a typer upgrade moves something, instead of silently generating a
 broken script.
@@ -13,7 +13,7 @@ from dataclasses import FrozenInstanceError
 
 import pytest
 
-import typer_static_completions as tsc
+import typer_static_completion as tsc
 
 
 def test_public_exports_exist():
@@ -80,7 +80,7 @@ def test_dynamic_policy_defaults_to_static():
 )
 def test_generator_filenames(shell, filename):
     """zsh requires the leading underscore; the others must not have one."""
-    from typer_static_completions.generators import bash, fish, zsh
+    from typer_static_completion.generators import bash, fish, zsh
 
     generators = {
         "bash": bash.BashGenerator,

@@ -5,7 +5,7 @@ import typer
 from fixtures import group_argument_fixture
 from typer.testing import CliRunner
 
-from typer_static_completions import IntrospectionError, from_app
+from typer_static_completion import IntrospectionError, from_app
 
 
 @pytest.mark.parametrize(

@@ -14,7 +14,7 @@ from snapshot_assertions import assert_snapshot
 from snapshot_harness import capture_state
 from typer.testing import CliRunner
 
-from typer_static_completions import generate
+from typer_static_completion import generate
 
 SETTINGS = [
     ("default", None),

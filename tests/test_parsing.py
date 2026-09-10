@@ -4,7 +4,7 @@ import pytest
 from fixtures import parsing_fixture
 from typer.testing import CliRunner
 
-from typer_static_completions import ValueKind, from_app
+from typer_static_completion import ValueKind, from_app
 
 
 def test_parsing_metadata():

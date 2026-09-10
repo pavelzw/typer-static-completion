@@ -3,7 +3,7 @@
 import subprocess
 import sys
 
-from typer_static_completions.verify import check_syntax, is_available
+from typer_static_completion.verify import check_syntax, is_available
 
 
 def test_example_workflow(tmp_path, monkeypatch):

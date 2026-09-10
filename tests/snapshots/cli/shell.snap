@@ -1,17 +1,17 @@
-Input: typer-static-completions generate --shell f<TAB>
+Input: typer-static-completion generate --shell f<TAB>
 
 Shell: bash
 
-> typer-static-completions generate --shell fish ▏
+> typer-static-completion generate --shell fish ▏
 
 ---
 
 Shell: fish
 
-> typer-static-completions generate --shell fish ▏
+> typer-static-completion generate --shell fish ▏
 
 ---
 
 Shell: zsh
 
-> typer-static-completions generate --shell fish ▏
+> typer-static-completion generate --shell fish ▏

@@ -4,8 +4,8 @@ import pytest
 import typer
 from typer.testing import CliRunner
 
-from typer_static_completions import IntrospectionError, from_app, generate, write
-from typer_static_completions.cli import main
+from typer_static_completion import IntrospectionError, from_app, generate, write
+from typer_static_completion.cli import main
 
 
 def chain_app(**settings):
@@ -85,7 +85,7 @@ def test_chain_failure_preserves_existing_output(tmp_path, monkeypatch, capsys):
     app = chain_app(chain=True)
     destination = tmp_path / "completion"
     destination.write_text("existing")
-    monkeypatch.setattr("typer_static_completions.cli.load_app", lambda target: app)
+    monkeypatch.setattr("typer_static_completion.cli.load_app", lambda target: app)
     assert (
         main(
             [

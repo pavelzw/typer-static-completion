@@ -1,4 +1,4 @@
-"""Exception hierarchy for typer-static-completions."""
+"""Exception hierarchy for typer-static-completion."""
 
 from __future__ import annotations
 

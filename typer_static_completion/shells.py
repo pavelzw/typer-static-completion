@@ -2,7 +2,7 @@
 
 :class:`Shell` is a ``str`` enum, so the members interoperate with plain strings
 everywhere a shell is accepted. Third-party generators may register shells that
-are not members here (see :mod:`typer_static_completions.generators`), which is
+are not members here (see :mod:`typer_static_completion.generators`), which is
 why the public API is typed as ``str | Shell`` rather than ``Shell``.
 """
 

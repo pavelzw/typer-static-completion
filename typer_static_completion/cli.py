@@ -62,7 +62,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         result = get_command(app).main(
-            args=argv, prog_name="typer-static-completions", standalone_mode=False
+            args=argv, prog_name="typer-static-completion", standalone_mode=False
         )
         return int(result or 0)
     except ClickException as exc:

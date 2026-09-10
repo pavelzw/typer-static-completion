@@ -6,7 +6,7 @@ import subprocess
 import pytest
 from fixtures import fixture
 
-from typer_static_completions import (
+from typer_static_completion import (
     Command,
     CommandTree,
     GenerationOptions,
@@ -15,7 +15,7 @@ from typer_static_completions import (
     ValueKind,
     generate,
 )
-from typer_static_completions.generators.fish import FishGenerator
+from typer_static_completion.generators.fish import FishGenerator
 
 
 def complete(script, line, *, descriptions=False):

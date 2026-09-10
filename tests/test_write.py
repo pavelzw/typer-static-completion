@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from fixtures import fixture
 
-from typer_static_completions import (
+from typer_static_completion import (
     GenerationOptions,
     UnsupportedShellError,
     from_app,

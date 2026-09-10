@@ -140,7 +140,7 @@ class FishGenerator(Generator):
             if self.options.include_version:
                 from importlib.metadata import version
 
-                banner += f"# typer-static-completions {version('typer-static-completions')}; typer {version('typer')}\n"
+                banner += f"# typer-static-completion {version('typer-static-completion')}; typer {version('typer')}\n"
         return banner + runtime + f"complete -c {prog} -f -a '({name})'\n"
 
 

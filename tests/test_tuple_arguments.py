@@ -2,7 +2,7 @@ import pytest
 from fixtures import tuple_argument_fixture
 from typer.testing import CliRunner
 
-from typer_static_completions import ValueKind, from_app
+from typer_static_completion import ValueKind, from_app
 
 
 def test_tuple_argument_metadata():

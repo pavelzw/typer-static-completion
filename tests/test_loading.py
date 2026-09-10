@@ -6,8 +6,8 @@ from types import ModuleType, SimpleNamespace
 import pytest
 from fixtures import fixture
 
-from typer_static_completions import AppLoadError
-from typer_static_completions.introspect import load_app
+from typer_static_completion import AppLoadError
+from typer_static_completion.introspect import load_app
 
 
 def test_load_explicit_nested_and_bare_targets(monkeypatch):

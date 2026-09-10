@@ -9,7 +9,7 @@ import pytest
 import typer
 from fixtures import fixture
 
-from typer_static_completions import (
+from typer_static_completion import (
     Command,
     CommandTree,
     DynamicPolicy,
@@ -22,7 +22,7 @@ from typer_static_completions import (
     from_app,
     generate,
 )
-from typer_static_completions.verify import check_syntax
+from typer_static_completion.verify import check_syntax
 
 
 def candidates(script: str, line: str) -> list[str]:
@@ -210,8 +210,8 @@ def test_control_characters_rejected():
 
 
 def test_custom_generator_registration(monkeypatch):
-    import typer_static_completions.generators as registry
-    from typer_static_completions.generators.bash import BashGenerator
+    import typer_static_completion.generators as registry
+    from typer_static_completion.generators.bash import BashGenerator
 
     monkeypatch.setattr(registry, "_REGISTRY", dict(registry._REGISTRY))
 
@@ -245,7 +245,7 @@ def test_dynamic_omit_does_not_enable_file_fallback():
 
 
 def test_invalid_shell_syntax():
-    from typer_static_completions import ScriptSyntaxError
+    from typer_static_completion import ScriptSyntaxError
 
     if not shutil.which("bash"):
         pytest.skip("Bash is not installed")

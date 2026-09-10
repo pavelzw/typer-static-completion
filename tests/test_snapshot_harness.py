@@ -107,7 +107,7 @@ def test_live_terminal_negotiation(tmp_path):
 def test_zsh_autoload_matches_sourced_script(tmp_path):
     from fixtures import fixture
 
-    from typer_static_completions import generate
+    from typer_static_completion import generate
 
     script = generate(fixture(), "demo", "zsh")
     (tmp_path / "_demo").write_text(script)
@@ -130,7 +130,7 @@ def test_fish_redraw_after_acknowledgement_is_retained(tmp_path):
 def test_zsh_waits_for_line_editor_before_sending_keys():
     from fixtures import fixture
 
-    from typer_static_completions import generate
+    from typer_static_completion import generate
 
     # Delay between setup and ZLE activation. A READY emitted by setup allows
     # the terminal to echo the input while it is still in cooked mode.

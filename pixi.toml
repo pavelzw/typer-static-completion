@@ -1,12 +1,12 @@
 [workspace]
-name = "typer-static-completions"
+name = "typer-static-completion"
 channels = ["conda-forge"]
 exclude-newer = "7d"
 platforms = ["osx-arm64", "osx-64", "linux-64", "win-64"]
 preview = ["pixi-build"]
 
 [package]
-name = "typer-static-completions"
+name = "typer-static-completion"
 [package.build.backend]
 name = "pixi-build-python"
 version = "*"
@@ -20,7 +20,7 @@ python = ">=3.11"
 typer = ">=0.26,<0.27"
 
 [dependencies]
-typer-static-completions = { path = "." }
+typer-static-completion = { path = "." }
 typer = ">=0.26,<0.27"
 
 [tasks]
@@ -33,7 +33,7 @@ pytest-cov = "*"
 mypy = "*"
 [feature.test.tasks]
 test = "pytest"
-test-coverage = "pytest --cov=typer_static_completions --cov-report=xml --cov-report=term-missing"
+test-coverage = "pytest --cov=typer_static_completion --cov-report=xml --cov-report=term-missing"
 
 [feature.build.dependencies]
 python = "*"

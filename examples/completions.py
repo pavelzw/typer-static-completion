@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from typer_static_completions import GenerationOptions, write
+from typer_static_completion import GenerationOptions, write
 
 from .cli import app
 

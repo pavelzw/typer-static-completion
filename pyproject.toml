@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "typer-static-completions"
+name = "typer-static-completion"
 description = "Generate static shell completions for typer applications"
 authors = [{ name = "Pavel Zwerschke", email = "pavelzw@gmail.com" }]
 # replaced in CI
@@ -20,13 +20,13 @@ readme = "README.md"
 dependencies = ["typer >=0.26,<0.27"]
 
 [project.urls]
-repository = "https://github.com/pavelzw/typer-static-completions"
+repository = "https://github.com/pavelzw/typer-static-completion"
 
 [tool.setuptools.packages.find]
-include = ["typer_static_completions"]
+include = ["typer_static_completion"]
 
 [project.scripts]
-typer-static-completions = "typer_static_completions.cli:main"
+typer-static-completion = "typer_static_completion.cli:main"
 
 [tool.ruff]
 line-length = 88
