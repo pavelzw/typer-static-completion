@@ -19,8 +19,9 @@ interactive screen harness and behavioral tests.
 - [x] Load explicit module/app targets without calling wrappers or factories.
 - [x] Implement CLI `generate` with required shell selection, stdout/file output,
       error handling, and stream/exit-code tests.
-- [x] Record full generated scripts for demo, parsing, CLI, coverage, tuple, tuple-argument, group-argument, case-matching, and Unicode fixtures in all
-      three shells, alongside 204 shared interactive screen cases.
+- [x] Record full generated scripts for demo, parsing, CLI, coverage, tuple, tuple-argument, group-argument, case-matching, Unicode, and word-break fixtures in all
+      three shells, alongside 204 shared interactive screen cases and 12 Bash-only
+      cases covering 72 word-break scenarios.
 - [x] Test interactive completion for choices, quoted files, nested commands,
       assignments, short clusters, repeated flags, positional values, `--`, parent
       scope, two CLIs loaded together, and repeated sourcing.
@@ -42,8 +43,10 @@ interactive screen harness and behavioral tests.
 - [x] Cover CJK, single-code-point emoji, and decomposed/stacked accents at the
       end and middle of the line. Record exact editor state independently of
       display normalization, and place cursor markers by terminal cell.
-- [ ] Extend to multi-code-point emoji sequences, line wrapping, unusual
-      word-break settings, and control-character filenames.
+- [x] Test custom Bash word-break settings for `:`, `=`, and `@`, including
+      quoted/escaped prefixes and assignments; preserve Readline's special `@` prefix.
+- [ ] Extend to multi-code-point emoji sequences, line wrapping, and
+      control-character filenames.
 - [x] Add cases for custom/disabled help flags, hidden commands/options,
       deprecated commands, and literal descriptions with descriptions disabled.
 - [x] Support tuple options with per-position types, repeated occurrences, assigned

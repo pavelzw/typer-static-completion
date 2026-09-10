@@ -1,0 +1,60 @@
+Input: demo --value user@ex<TAB>
+Shell: bash
+
+Setting: default
+COMP_WORDBREAKS: null
+
+> demo --value user\@example.org ▏
+
+Buffer: "demo --value user\\@example.org "
+Cursor: 31
+
+---
+
+Setting: no-delimiters
+COMP_WORDBREAKS: " \t\n"
+
+> demo --value user\@example.org ▏
+
+Buffer: "demo --value user\\@example.org "
+Cursor: 31
+
+---
+
+Setting: colon
+COMP_WORDBREAKS: " \t\n:"
+
+> demo --value user\@example.org ▏
+
+Buffer: "demo --value user\\@example.org "
+Cursor: 31
+
+---
+
+Setting: equals
+COMP_WORDBREAKS: " \t\n="
+
+> demo --value user\@example.org ▏
+
+Buffer: "demo --value user\\@example.org "
+Cursor: 31
+
+---
+
+Setting: at
+COMP_WORDBREAKS: " \t\n@"
+
+> demo --value user\@example.org ▏
+
+Buffer: "demo --value user\\@example.org "
+Cursor: 31
+
+---
+
+Setting: all
+COMP_WORDBREAKS: " \t\n:=@"
+
+> demo --value user\@example.org ▏
+
+Buffer: "demo --value user\\@example.org "
+Cursor: 31

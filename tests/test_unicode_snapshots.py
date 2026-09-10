@@ -21,7 +21,7 @@ CASES = [
     ("cjk-insert", "demo --value 東<TAB>", "demo --value 東京 ▏"),
     ("cjk-complete", "demo --value 東京<TAB>", "demo --value 東京 ▏"),
     ("emoji-insert", "demo --value 🚀l<TAB>", "demo --value 🚀launch ▏"),
-    ("combining-insert", "demo --value caf<TAB>", "demo --value cafe\u0301 ▏"),
+    ("combining-insert", "demo --value cafe<TAB>", "demo --value cafe\u0301 ▏"),
     ("combining-prefix", "demo --value cafe\u0301<TAB>", "demo --value cafe\u0301 ▏"),
     (
         "multiple-combining",

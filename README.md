@@ -235,9 +235,16 @@ to decomposed values. Zsh's default display shows combining marks as codes;
 the original code points remain in its edit buffer. Full scripts live in
 `tests/snapshots/generated/unicode.{bash,fish,zsh}`.
 
+The word-break fixture adds 12 Bash-specific snapshot cases, each checked with
+six `COMP_WORDBREAKS` settings (72 scenarios). They cover `:`, `=`, and `@`,
+quoted/escaped prefixes, assignments, and attached short options, with exact
+editor-state checks. Bash preserves `@` when Readline includes it in the word
+being replaced. Full scripts live in
+`tests/snapshots/generated/word-breaks.{bash,fish,zsh}`.
+
 Current snapshot baselines target the locked Bash 5.x, Fish 4.x, and Zsh 5.9
-environment. Multi-code-point emoji sequences, line wrapping, custom word-break
-settings, unusual shell parsing modes, and filenames containing control
+environment. Multi-code-point emoji sequences, line wrapping, unusual shell
+parsing modes, and filenames containing control
 characters still need broader coverage.
 
 ## Installation

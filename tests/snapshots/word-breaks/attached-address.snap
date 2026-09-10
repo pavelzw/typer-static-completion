@@ -1,0 +1,60 @@
+Input: demo -vuser@ex<TAB>
+Shell: bash
+
+Setting: default
+COMP_WORDBREAKS: null
+
+> demo -vuser\@example.org ▏
+
+Buffer: "demo -vuser\\@example.org "
+Cursor: 25
+
+---
+
+Setting: no-delimiters
+COMP_WORDBREAKS: " \t\n"
+
+> demo -vuser\@example.org ▏
+
+Buffer: "demo -vuser\\@example.org "
+Cursor: 25
+
+---
+
+Setting: colon
+COMP_WORDBREAKS: " \t\n:"
+
+> demo -vuser\@example.org ▏
+
+Buffer: "demo -vuser\\@example.org "
+Cursor: 25
+
+---
+
+Setting: equals
+COMP_WORDBREAKS: " \t\n="
+
+> demo -vuser\@example.org ▏
+
+Buffer: "demo -vuser\\@example.org "
+Cursor: 25
+
+---
+
+Setting: at
+COMP_WORDBREAKS: " \t\n@"
+
+> demo -vuser\@example.org ▏
+
+Buffer: "demo -vuser\\@example.org "
+Cursor: 25
+
+---
+
+Setting: all
+COMP_WORDBREAKS: " \t\n:=@"
+
+> demo -vuser\@example.org ▏
+
+Buffer: "demo -vuser\\@example.org "
+Cursor: 25

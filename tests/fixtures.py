@@ -299,3 +299,22 @@ def unicode_fixture() -> typer.Typer:
         typer.echo(value.value)
 
     return app
+
+
+class WordBreakValue(str, Enum):
+    colon = "svc:prod"
+    address = "user@example.org"
+    assignment = "key=value"
+
+
+def word_break_fixture() -> typer.Typer:
+    app = typer.Typer(add_completion=False)
+
+    @app.command()
+    def show(
+        value: WordBreakValue = typer.Option(WordBreakValue.colon, "--value", "-v"),
+        quiet: bool = False,
+    ):
+        typer.echo(value.value)
+
+    return app

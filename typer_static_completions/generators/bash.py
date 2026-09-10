@@ -274,6 +274,9 @@ _OUTPUT = r"""    if [[ -n $file_mode ]]; then
     fi
     # An open quote makes Readline replace only the portion inside it.
     if [[ -n $quote ]]; then trim=$quote_prefix; fi
+    # Readline retains @ at the start of its replacement word (the second
+    # completion argument), unlike ordinary word-break delimiters such as :.
+    if [[ ${2-} == @* && $trim == *@ ]]; then trim=${trim%@}; fi
     # Otherwise the scanner records unquoted, unescaped Readline word breaks.
     # Readline's filename quoting leaves command substitutions executable.
     # Quote literal candidates ourselves when they contain expansion syntax.

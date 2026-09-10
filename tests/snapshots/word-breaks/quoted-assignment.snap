@@ -1,0 +1,60 @@
+Input: demo --value="key=va<TAB>
+Shell: bash
+
+Setting: default
+COMP_WORDBREAKS: null
+
+> demo --value="key=value" ▏
+
+Buffer: "demo --value=\"key=value\" "
+Cursor: 25
+
+---
+
+Setting: no-delimiters
+COMP_WORDBREAKS: " \t\n"
+
+> demo --value="key=value" ▏
+
+Buffer: "demo --value=\"key=value\" "
+Cursor: 25
+
+---
+
+Setting: colon
+COMP_WORDBREAKS: " \t\n:"
+
+> demo --value="key=value" ▏
+
+Buffer: "demo --value=\"key=value\" "
+Cursor: 25
+
+---
+
+Setting: equals
+COMP_WORDBREAKS: " \t\n="
+
+> demo --value="key=value" ▏
+
+Buffer: "demo --value=\"key=value\" "
+Cursor: 25
+
+---
+
+Setting: at
+COMP_WORDBREAKS: " \t\n@"
+
+> demo --value="key=value" ▏
+
+Buffer: "demo --value=\"key=value\" "
+Cursor: 25
+
+---
+
+Setting: all
+COMP_WORDBREAKS: " \t\n:=@"
+
+> demo --value="key=value" ▏
+
+Buffer: "demo --value=\"key=value\" "
+Cursor: 25

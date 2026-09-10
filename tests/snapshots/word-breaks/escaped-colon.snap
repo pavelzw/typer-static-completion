@@ -1,0 +1,60 @@
+Input: demo --value svc\:p<TAB>
+Shell: bash
+
+Setting: default
+COMP_WORDBREAKS: null
+
+> demo --value svc\:prod ▏
+
+Buffer: "demo --value svc\\:prod "
+Cursor: 23
+
+---
+
+Setting: no-delimiters
+COMP_WORDBREAKS: " \t\n"
+
+> demo --value svc:prod ▏
+
+Buffer: "demo --value svc:prod "
+Cursor: 22
+
+---
+
+Setting: colon
+COMP_WORDBREAKS: " \t\n:"
+
+> demo --value svc\:prod ▏
+
+Buffer: "demo --value svc\\:prod "
+Cursor: 23
+
+---
+
+Setting: equals
+COMP_WORDBREAKS: " \t\n="
+
+> demo --value svc:prod ▏
+
+Buffer: "demo --value svc:prod "
+Cursor: 22
+
+---
+
+Setting: at
+COMP_WORDBREAKS: " \t\n@"
+
+> demo --value svc:prod ▏
+
+Buffer: "demo --value svc:prod "
+Cursor: 22
+
+---
+
+Setting: all
+COMP_WORDBREAKS: " \t\n:=@"
+
+> demo --value svc\:prod ▏
+
+Buffer: "demo --value svc\\:prod "
+Cursor: 23
